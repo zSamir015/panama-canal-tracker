@@ -12,5 +12,7 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 - `pyproject.toml` con ruff, pytest y mypy; lockfiles con hashes verificados.
 - Baseline de seguridad: `SECURITY.md`, `.dockerignore`, pre-commit con gitleaks, Dependabot.
 - `app/core/config.py`: configuración con pydantic-settings; en producción la app no arranca con
-  `JWT_SECRET_KEY` débil o ausente, `CORS_ORIGINS` sin definir o `LOG_LEVEL=DEBUG`. `*` en
-  `CORS_ORIGINS` se rechaza en cualquier entorno. Los errores de validación no muestran secretos.
+  `JWT_SECRET_KEY` débil o ausente, `CORS_ORIGINS` sin definir o `LOG_LEVEL=DEBUG`. `CORS_ORIGINS`
+  vacía o con `*` se rechaza en cualquier entorno. Los errores de validación no muestran secretos.
+- `app/core/logging.py`: logs JSON de una línea con structlog, también para `logging` y uvicorn
+  (incluida su CLI). Campos sensibles redactados y tracebacks sin variables locales.
