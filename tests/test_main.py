@@ -1,15 +1,11 @@
-from collections.abc import Iterator
-
 import httpx
 import pytest
 from fastapi import FastAPI
 
-from app.main import create_app
-
 
 @pytest.fixture
-def application() -> Iterator[FastAPI]:
-    yield create_app()
+def application(app: FastAPI) -> FastAPI:
+    return app
 
 
 @pytest.mark.asyncio
