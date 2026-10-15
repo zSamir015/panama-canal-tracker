@@ -2,12 +2,17 @@
 
 import uvicorn
 from fastapi import APIRouter, FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import Settings, get_settings
 from app.core.errors import register_exception_handlers
+from app.core.headers import REQUEST_ID_HEADER
 from app.core.logging import configure_logging
-from app.core.middleware import BodySizeLimitMiddleware, RequestIdMiddleware
+from app.core.middleware import (
+    BodySizeLimitMiddleware,
+    HardenedCORSMiddleware,
+    RequestIdMiddleware,
+    SecurityHeadersMiddleware,
+)
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -18,15 +23,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(title="Panama Canal Tracker")
     register_exception_handlers(app)
 
-    # El último middleware añadido es el más externo: RequestId → CORS → límite de body.
+    # El último middleware añadido es el más externo:
+    # RequestId → cabeceras de seguridad → CORS → límite de body.
     app.add_middleware(BodySizeLimitMiddleware)
     app.add_middleware(
-        CORSMiddleware,
+        HardenedCORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=True,
         allow_methods=["GET", "POST", "DELETE"],
         allow_headers=["Authorization", "Content-Type"],
+        # Para que el frontend pueda leer el id y mostrarlo en un error.
+        expose_headers=[REQUEST_ID_HEADER],
+        max_age=600,
     )
+    app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(RequestIdMiddleware)
 
     api_router = APIRouter(prefix="/api/v1")

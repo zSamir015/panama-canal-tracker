@@ -25,3 +25,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   (también en los access logs de uvicorn). Un id enviado por el cliente se ignora.
 - Límite de 64 KB en el body: 413 por `Content-Length` antes de leer y también contando bytes
   en peticiones chunked; `Content-Length` no numérico devuelve 400.
+- Cabeceras de seguridad en todas las respuestas, incluidos los errores 500:
+  `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY` y
+  `Cross-Origin-Resource-Policy: same-site`; `Cache-Control: no-store` bajo `/api/v1/auth/`.
+- CORS endurecido: un preflight rechazado responde `problem+json` sin anunciar métodos, cabeceras
+  ni credenciales; `X-Request-ID` expuesto al frontend; `max_age` de 600 s explícito.
+- `CORS_ORIGINS` valida cada origen (`esquema://host[:puerto]`, sin ruta, barra final, usuario ni
+  `null`) y en producción solo admite `https`.

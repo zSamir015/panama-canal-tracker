@@ -70,6 +70,35 @@ def test_rejects_empty_cors_origins() -> None:
         make_settings(cors_origins=" , ")
 
 
+@pytest.mark.parametrize(
+    "origin",
+    [
+        "https://tracker.example.com/",  # el navegador envía el origen sin barra final
+        "https://tracker.example.com/app",
+        "https://tracker.example.com?x=1",
+        "https://user@tracker.example.com",
+        "null",  # lo envían iframes con sandbox y archivos locales
+        "tracker.example.com",
+        "ftp://tracker.example.com",
+        "https://",
+    ],
+)
+def test_rejects_malformed_cors_origin(origin: str) -> None:
+    with pytest.raises(ValidationError, match="CORS_ORIGINS"):
+        make_settings(cors_origins=origin)
+
+
+def test_accepts_cors_origin_with_port() -> None:
+    settings = make_settings(cors_origins="http://localhost:5173,https://tracker.example.com:8443")
+
+    assert settings.cors_origins == ["http://localhost:5173", "https://tracker.example.com:8443"]
+
+
+def test_production_requires_https_cors_origins() -> None:
+    with pytest.raises(ValidationError, match="https"):
+        make_settings(**production_env(cors_origins="http://tracker.example.com"))
+
+
 def test_jwt_secret_is_masked_in_repr() -> None:
     settings = make_settings(jwt_secret_key=STRONG_SECRET)
 
