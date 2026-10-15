@@ -18,7 +18,7 @@ def app_settings() -> Settings:
     return Settings(
         _env_file=None,
         app_env="test",
-        cors_origins="http://localhost:5173",
+        cors_origins=["https://tracker.example.com"],
     )
 
 

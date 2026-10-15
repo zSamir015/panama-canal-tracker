@@ -10,7 +10,7 @@ from app.core.logging import configure_logging
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     """Crea y configura la aplicación HTTP."""
-    settings = settings or get_settings()
+    settings = get_settings() if settings is None else settings
     configure_logging(settings.log_level)
 
     app = FastAPI(title="Panama Canal Tracker")

@@ -1,16 +1,9 @@
 import httpx
-import pytest
 from fastapi import FastAPI
 
 
-@pytest.fixture
-def application(app: FastAPI) -> FastAPI:
-    return app
-
-
-@pytest.mark.asyncio
-async def test_health_is_public(application: FastAPI) -> None:
-    transport = httpx.ASGITransport(app=application)
+async def test_health_is_public(app: FastAPI) -> None:
+    transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/health")
 
@@ -18,32 +11,37 @@ async def test_health_is_public(application: FastAPI) -> None:
     assert response.json() == {"status": "ok"}
 
 
-@pytest.mark.asyncio
-async def test_health_is_outside_api_prefix(application: FastAPI) -> None:
-    transport = httpx.ASGITransport(app=application)
+async def test_health_is_outside_api_prefix(app: FastAPI) -> None:
+    transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/api/v1/health")
 
     assert response.status_code == 404
 
 
-@pytest.mark.asyncio
-async def test_cors_allows_configured_origin(application: FastAPI) -> None:
-    transport = httpx.ASGITransport(app=application)
+async def test_cors_uses_injected_settings_instead_of_environment(app: FastAPI) -> None:
+    transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get(
+        injected_origin_response = await client.get(
+            "/health",
+            headers={"Origin": "https://tracker.example.com"},
+        )
+        environment_origin_response = await client.get(
             "/health",
             headers={"Origin": "http://localhost:5173"},
         )
 
-    assert response.status_code == 200
-    assert response.headers["access-control-allow-origin"] == "http://localhost:5173"
-    assert response.headers["access-control-allow-credentials"] == "true"
+    assert injected_origin_response.status_code == 200
+    assert (
+        injected_origin_response.headers["access-control-allow-origin"]
+        == "https://tracker.example.com"
+    )
+    assert injected_origin_response.headers["access-control-allow-credentials"] == "true"
+    assert "access-control-allow-origin" not in environment_origin_response.headers
 
 
-@pytest.mark.asyncio
-async def test_cors_rejects_unlisted_origin(application: FastAPI) -> None:
-    transport = httpx.ASGITransport(app=application)
+async def test_cors_rejects_unlisted_origin(app: FastAPI) -> None:
+    transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get(
             "/health",
