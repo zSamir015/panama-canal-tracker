@@ -26,23 +26,23 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` terminada
 
 ---
 
-## Fase 1 — Esqueleto FastAPI, CI y seguridad del repo `[ ]`
+## Fase 1 — Esqueleto FastAPI, CI y seguridad del repo `[x]`
 **Objetivo**: API mínima que arranca, con configuración por entorno y un CI exigente desde el día 1.
 
-- [ ] 1.1 `app/core/config.py` con pydantic-settings: `SecretStr`, validación fail-fast en
+- [x] 1.1 `app/core/config.py` con pydantic-settings: `SecretStr`, validación fail-fast en
       producción (secreto JWT, CORS sin `*`, variables obligatorias)
-- [ ] 1.2 `app/core/logging.py`: logs JSON con structlog
-- [ ] 1.3 `app/main.py`: app FastAPI, CORS desde config, router `/api/v1`, `GET /health`
-- [ ] 1.4 Handler global de errores `application/problem+json` (RFC 9457), sin detalles internos
+- [x] 1.2 `app/core/logging.py`: logs JSON con structlog
+- [x] 1.3 `app/main.py`: app FastAPI, CORS desde config, router `/api/v1`, `GET /health`
+- [x] 1.4 Handler global de errores `application/problem+json` (RFC 9457), sin detalles internos
       en producción; límite de tamaño de body
-- [ ] 1.5 Middleware de cabeceras de seguridad y CORS endurecido
-- [ ] 1.6 Tests: `/health`, 404 problem+json, cabeceras, CORS rechaza origen no listado,
+- [x] 1.5 Middleware de cabeceras de seguridad y CORS endurecido
+- [x] 1.6 Tests: `/health`, 404 problem+json, cabeceras, CORS rechaza origen no listado,
       500 sin stack trace en producción, config rechaza secreto débil en producción
-- [ ] 1.7 GitHub Actions: ruff, mypy, pytest + cobertura, `pip-audit` sobre los lockfiles,
+- [x] 1.7 GitHub Actions: ruff, mypy, pytest + cobertura, `pip-audit` sobre los lockfiles,
       `gitleaks` con historial completo; permisos mínimos del `GITHUB_TOKEN`
-- [ ] 1.8 Branch protection en `main` con CI obligatorio; secret scanning + push protection y
+- [x] 1.8 Branch protection en `main` con CI obligatorio; secret scanning + push protection y
       private vulnerability reporting activados
-- [ ] 1.9 Badges de CI en `README.md` y `README.es.md`
+- [x] 1.9 Badges de CI en `README.md` y `README.es.md`
 
 **Aceptación**: `uvicorn app.main:app` levanta; `GET /health` → 200; CI verde con todos los jobs.
 **Release**: `v0.1.0`.
