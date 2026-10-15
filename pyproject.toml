@@ -49,7 +49,7 @@ extend-exclude = ["web"]
 select = ["E", "W", "F", "I", "B", "UP", "N", "ASYNC", "S", "RUF"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101"]  # assert permitido en tests
+"tests/**" = ["S101", "S105", "S106"]  # assert y secretos falsos permitidos en tests
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
