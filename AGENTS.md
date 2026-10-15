@@ -323,7 +323,8 @@ pre-commit install               # hooks: gitleaks, detect-private-key, ruff
 pytest                           # tests (configurados en pyproject.toml)
 ruff check . && ruff format .    # lint + formato
 mypy app                         # tipos
-docker compose up -d             # db + redis (desde Fase 2/3)
+docker compose up -d --wait      # db + redis (desde Fase 2); contraseñas en .env
+scripts/check_dev_services.sh    # verifica roles de la DB y contraseña de Redis
 uvicorn app.main:app --reload    # API
 python -m app.workers.ais_consumer  # worker AIS (desde Fase 3)
 ```

@@ -5,7 +5,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
-Los cambios futuros se documentarán aquí antes de la siguiente release.
+### Added
+- `docker-compose.yml` de desarrollo: PostgreSQL 16 + TimescaleDB 2.30 + PostGIS y Redis 8 con
+  contraseña, imágenes fijadas por digest, healthchecks, volúmenes y puertos solo en `127.0.0.1`.
+- Roles de la base (`docker/db/initdb/100_canal_roles.sh`): `canal_owner` es dueño de la base y
+  ejecuta migraciones; `canal_app` solo lee y escribe datos, sin DDL. Contraseña `scram-sha-256`
+  obligatoria también dentro del contenedor.
+- `scripts/check_dev_services.sh`: comprueba roles, permisos, extensiones y autenticación.
 
 ## [0.1.0] - 2026-10-15
 
