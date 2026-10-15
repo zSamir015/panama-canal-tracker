@@ -15,6 +15,9 @@ from structlog.typing import EventDict, Processor, WrappedLogger
 
 REDACTED = "[REDACTED]"
 
+# uvicorn configura estos loggers con sus propios handlers de texto y `propagate=False`.
+UVICORN_LOGGERS = ("uvicorn", "uvicorn.error", "uvicorn.access")
+
 # Se comparan en minúsculas y por substring: "refresh_token", "AISSTREAM_API_KEY", etc.
 SENSITIVE_KEY_PARTS = (
     "password",
@@ -99,3 +102,10 @@ def configure_logging(level: str, *, stream: TextIO | None = None) -> None:
     root = logging.getLogger()
     root.handlers[:] = [handler]
     root.setLevel(numeric_level)
+
+    # Con `uvicorn app.main:app` la CLI ya configuró sus loggers al importar la app: se les
+    # quitan los handlers para que sus mensajes suban al root y salgan en JSON.
+    for name in UVICORN_LOGGERS:
+        uvicorn_logger = logging.getLogger(name)
+        uvicorn_logger.handlers.clear()
+        uvicorn_logger.propagate = True
