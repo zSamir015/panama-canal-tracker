@@ -32,3 +32,6 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   ni credenciales; `X-Request-ID` expuesto al frontend; `max_age` de 600 s explícito.
 - `CORS_ORIGINS` valida cada origen (`esquema://host[:puerto]`, sin ruta, barra final, usuario ni
   `null`) y en producción solo admite `https`.
+- CI en GitHub Actions con cinco jobs: ruff, mypy, pytest con cobertura, `pip-audit` sobre los
+  lockfiles y gitleaks sobre todo el historial. `GITHUB_TOKEN` sin permisos por defecto (solo
+  `contents: read` por job), actions fijadas por SHA y binario de gitleaks verificado por SHA-256.
