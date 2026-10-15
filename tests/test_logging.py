@@ -76,8 +76,8 @@ def test_redacts_sensitive_fields_at_any_depth() -> None:
     structlog.get_logger().info(
         "login_attempt",
         email="demo@example.com",
-        password="hunter2-hunter2",  # noqa: S106 (valor falso de prueba)
-        refresh_token="tok-123",  # noqa: S106 (valor falso de prueba)
+        password="hunter2-hunter2",
+        refresh_token="tok-123",
         headers={"Authorization": "Bearer abc", "Accept": "application/json"},
         AISSTREAM_API_KEY="key-456",
     )
