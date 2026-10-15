@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# SO
+.DS_Store
+Thumbs.db
+
+# Datos locales
+*.sqlite3
+data/
+
+# Frontend
+node_modules/
+web/dist/
+*.local
+
+# Secretos y credenciales (nunca al repo)
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+secrets/
+credentials*.json
+service-account*.json
+
+# Volcados de base de datos
+*.dump
+*.sql.gz
+backups/
+
+# Instrucciones personales de Claude Code y notas de aprendizaje (privadas)
+CLAUDE.local.md
+*Aprendizaje*.md
