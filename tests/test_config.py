@@ -65,6 +65,11 @@ def test_rejects_wildcard_cors_origin_in_any_environment() -> None:
         make_settings(cors_origins="http://localhost:5173,*")
 
 
+def test_rejects_empty_cors_origins() -> None:
+    with pytest.raises(ValidationError, match="CORS_ORIGINS"):
+        make_settings(cors_origins=" , ")
+
+
 def test_jwt_secret_is_masked_in_repr() -> None:
     settings = make_settings(jwt_secret_key=STRONG_SECRET)
 

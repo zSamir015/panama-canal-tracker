@@ -45,7 +45,9 @@ class Settings(BaseSettings):
 
     @field_validator("cors_origins")
     @classmethod
-    def reject_wildcard_origin(cls, value: list[str]) -> list[str]:
+    def require_explicit_origins(cls, value: list[str]) -> list[str]:
+        if not value:
+            raise ValueError("CORS_ORIGINS debe contener al menos un origen explícito")
         if "*" in value:
             raise ValueError("CORS_ORIGINS no puede contener '*'; lista los orígenes explícitos")
         return value
