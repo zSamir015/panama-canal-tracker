@@ -2,7 +2,6 @@ import io
 import json
 import logging
 import logging.config
-from collections.abc import Iterator
 from datetime import datetime
 from typing import Any
 
@@ -11,20 +10,6 @@ import structlog
 from uvicorn.config import LOGGING_CONFIG
 
 from app.core.logging import REDACTED, UVICORN_LOGGERS, configure_logging
-
-
-@pytest.fixture(autouse=True)
-def reset_logging() -> Iterator[None]:
-    """Cada test configura los logs desde cero y deja el estado global como estaba."""
-    loggers = [logging.getLogger(name) for name in ("", *UVICORN_LOGGERS)]
-    saved = [(lg, lg.handlers[:], lg.level, lg.propagate) for lg in loggers]
-    yield
-    structlog.reset_defaults()
-    structlog.contextvars.clear_contextvars()
-    for lg, handlers, level, propagate in saved:
-        lg.handlers[:] = handlers
-        lg.setLevel(level)
-        lg.propagate = propagate
 
 
 def lines(stream: io.StringIO) -> list[dict[str, Any]]:
