@@ -18,3 +18,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   (incluida su CLI). Campos sensibles redactados y tracebacks sin variables locales.
 - `app/main.py`: fábrica `create_app(settings)` con logging, CORS explícito, router `/api/v1` y
   `GET /health` en la raíz. `uvicorn app.main:app` arranca y responde 200.
+- Errores `application/problem+json` (RFC 9457) con `detail` en español e `instance`, para rutas
+  inexistentes, métodos no permitidos, validación (422, sin devolver el valor recibido) y errores
+  no controlados (500, sin mensaje ni traza: los detalles van al log).
+- `X-Request-ID` único por petición, en la cabecera, en el cuerpo de los errores y en cada log
+  (también en los access logs de uvicorn). Un id enviado por el cliente se ignora.
+- Límite de 64 KB en el body: 413 por `Content-Length` antes de leer y también contando bytes
+  en peticiones chunked; `Content-Length` no numérico devuelve 400.
