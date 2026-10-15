@@ -11,3 +11,6 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 - `AGENTS.md` como guía única de convenciones, con reglas de seguridad obligatorias (§8).
 - `pyproject.toml` con ruff, pytest y mypy; lockfiles con hashes verificados.
 - Baseline de seguridad: `SECURITY.md`, `.dockerignore`, pre-commit con gitleaks, Dependabot.
+- `app/core/config.py`: configuración con pydantic-settings; en producción la app no arranca con
+  `JWT_SECRET_KEY` débil o ausente, `CORS_ORIGINS` sin definir o `LOG_LEVEL=DEBUG`. `*` en
+  `CORS_ORIGINS` se rechaza en cualquier entorno. Los errores de validación no muestran secretos.
