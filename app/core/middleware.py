@@ -11,9 +11,11 @@ from http import HTTPStatus
 import structlog
 from starlette.datastructures import Headers, MutableHeaders
 from starlette.exceptions import HTTPException
+from starlette.middleware.cors import CORSMiddleware
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
-from app.core.errors import REQUEST_ID_HEADER, problem_response
+from app.core.errors import problem_response
+from app.core.headers import REQUEST_ID_HEADER, security_headers
 
 MAX_BODY_BYTES = 64 * 1024  # AGENTS.md §8.6
 
@@ -45,6 +47,55 @@ class RequestIdMiddleware:
             await send(message)
 
         await self.app(scope, receive, send_with_request_id)
+
+
+class SecurityHeadersMiddleware:
+    """Añade las cabeceras de seguridad de AGENTS.md §8.11 a todas las respuestas."""
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        headers_to_add = security_headers(scope["path"])
+
+        async def send_with_headers(message: Message) -> None:
+            if message["type"] == "http.response.start":
+                headers = MutableHeaders(scope=message)
+                for name, value in headers_to_add.items():
+                    headers[name] = value
+            await send(message)
+
+        await self.app(scope, receive, send_with_headers)
+
+
+class HardenedCORSMiddleware(CORSMiddleware):
+    """CORS de Starlette, pero un preflight rechazado responde `problem+json` sin la política.
+
+    Starlette responde texto plano e incluye igualmente `Access-Control-Allow-Methods`,
+    `-Headers` y `-Credentials`: no hace falta anunciar la política a un origen no autorizado.
+    """
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] == "http" and scope["method"] == "OPTIONS":
+            request_headers = Headers(scope=scope)
+            # Misma condición que usa Starlette para reconocer un preflight.
+            if "origin" in request_headers and "access-control-request-method" in request_headers:
+                response = self.preflight_response(request_headers=request_headers)
+                if response.status_code != HTTPStatus.OK:
+                    response = problem_response(
+                        HTTPStatus.BAD_REQUEST,
+                        scope=scope,
+                        detail="Petición CORS no permitida",
+                        headers={"Vary": response.headers["vary"]},
+                    )
+                await response(scope, receive, send)
+                return
+
+        await super().__call__(scope, receive, send)
 
 
 class BodySizeLimitMiddleware:

@@ -20,8 +20,9 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import Scope
 
+from app.core.headers import REQUEST_ID_HEADER, security_headers
+
 PROBLEM_JSON = "application/problem+json"
-REQUEST_ID_HEADER = "X-Request-ID"
 
 # Mensajes `detail` en español para los errores que genera el framework (rutas, métodos...).
 DEFAULT_DETAILS = {
@@ -61,11 +62,15 @@ def problem_response(
         "request_id": request_id,
         **extensions,
     }
-    # El 500 lo envía Starlette por fuera de los middlewares: la cabecera se pone aquí también.
+    # El 500 lo envía Starlette por fuera de los middlewares: estas cabeceras se ponen aquí también.
     return ProblemResponse(
         content,
         status_code=status.value,
-        headers={**(headers or {}), REQUEST_ID_HEADER: request_id},
+        headers={
+            **(headers or {}),
+            **security_headers(scope["path"]),
+            REQUEST_ID_HEADER: request_id,
+        },
     )
 
 
