@@ -16,3 +16,5 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   vacía o con `*` se rechaza en cualquier entorno. Los errores de validación no muestran secretos.
 - `app/core/logging.py`: logs JSON de una línea con structlog, también para `logging` y uvicorn
   (incluida su CLI). Campos sensibles redactados y tracebacks sin variables locales.
+- `app/main.py`: fábrica `create_app(settings)` con logging, CORS explícito, router `/api/v1` y
+  `GET /health` en la raíz. `uvicorn app.main:app` arranca y responde 200.
