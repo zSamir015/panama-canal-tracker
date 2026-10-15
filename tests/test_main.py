@@ -1,5 +1,13 @@
+from collections.abc import Iterator
+
 import httpx
+import pytest
 from fastapi import FastAPI
+from pydantic import ValidationError
+from starlette.routing import Route
+
+from app.core.config import Settings, get_settings
+from app.main import create_app
 
 
 async def test_health_is_public(app: FastAPI) -> None:
@@ -50,3 +58,48 @@ async def test_cors_rejects_unlisted_origin(app: FastAPI) -> None:
 
     assert response.status_code == 200
     assert "access-control-allow-origin" not in response.headers
+
+
+# Rutas que responden sin autenticación (AGENTS.md §8.9). Cualquier ruta nueva hace fallar este
+# test hasta que se decida: o se añade aquí justificándolo, o queda protegida. En la Fase 2 se
+# completa con la comprobación de que el resto de rutas responde 401 sin token.
+PUBLIC_PATHS = {"/health", "/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}
+
+
+def test_only_whitelisted_routes_are_exposed(app: FastAPI) -> None:
+    paths = {route.path for route in app.routes if isinstance(route, Route)}
+
+    assert paths == PUBLIC_PATHS
+
+
+@pytest.mark.parametrize("app_env", ["development", "test", "production"])
+def test_app_never_runs_in_debug_mode(app_env: str) -> None:
+    # Con debug=True Starlette responde los 500 con la traza completa en HTML (AGENTS.md §8.12).
+    settings = Settings(
+        _env_file=None,
+        app_env=app_env,  # type: ignore[arg-type]
+        cors_origins=["https://tracker.example.com"],
+        jwt_secret_key="x" * 32,
+    )
+
+    assert create_app(settings).debug is False
+
+
+@pytest.fixture
+def fresh_settings_cache() -> Iterator[None]:
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
+
+
+@pytest.mark.usefixtures("fresh_settings_cache")
+def test_app_refuses_to_start_with_insecure_production_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Sin settings inyectadas, create_app() lee el entorno: así arranca `uvicorn app.main:app`.
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv("CORS_ORIGINS", "https://tracker.example.com")
+    monkeypatch.setenv("JWT_SECRET_KEY", "corto")
+
+    with pytest.raises(ValidationError, match="JWT_SECRET_KEY"):
+        create_app()
