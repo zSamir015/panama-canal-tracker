@@ -5,6 +5,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+Los cambios futuros se documentarán aquí antes de la siguiente release.
+
+## [0.1.0] - 2026-10-15
+
 ### Added
 - Scaffold del proyecto: estructura de `app/`, `web/`, `tests/`, `scripts/`, `docs/`.
 - Documentación: arquitectura, roadmap por fases, diseño de API, fuentes de datos y ADRs 0001–0006.

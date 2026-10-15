@@ -5,7 +5,10 @@
 
 [Español](README.es.md)
 
-<!-- Badges (Phase 1): CI · coverage · license -->
+[![CI](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-96%25-brightgreen)](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 <!-- Demo GIF (Phase 4): docs/media/live-map.gif -->
 
 ## What it does
@@ -53,7 +56,7 @@ keeping a single upstream AIS connection. Details in [docs/ARCHITECTURE.md](docs
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Scaffold and documentation | ✅ |
-| 1 | FastAPI skeleton, CI, repo security | 🚧 next |
+| 1 | FastAPI skeleton, CI, repo security | ✅ |
 | 2 | Database and authentication | ⏳ |
 | 3 | AIS ingestion worker | ⏳ |
 | 4 | Real-time map and live demo | ⏳ |

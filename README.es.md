@@ -5,7 +5,10 @@
 
 [English](README.md)
 
-<!-- Badges (Fase 1): CI · cobertura · licencia -->
+[![CI](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml)
+[![Cobertura](https://img.shields.io/badge/cobertura-96%25-brightgreen)](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml)
+[![Licencia: MIT](https://img.shields.io/badge/Licencia-MIT-yellow.svg)](LICENSE)
+
 <!-- GIF de la demo (Fase 4): docs/media/live-map.gif -->
 
 ## Qué hace
@@ -53,7 +56,7 @@ conexión a AISStream. Detalle en [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 | Fase | Alcance | Estado |
 |---|---|---|
 | 0 | Scaffold y documentación | ✅ |
-| 1 | Esqueleto FastAPI, CI, seguridad del repo | 🚧 siguiente |
+| 1 | Esqueleto FastAPI, CI, seguridad del repo | ✅ |
 | 2 | Base de datos y autenticación | ⏳ |
 | 3 | Worker de ingesta AIS | ⏳ |
 | 4 | Mapa en tiempo real y demo | ⏳ |
