@@ -1,0 +1,59 @@
+# Servicios de desarrollo local (Fase 2): la API corre en el host con `uvicorn` y se conecta aquí.
+# Los puertos solo escuchan en 127.0.0.1. Producción tendrá su propio compose, sin puertos
+# publicados (AGENTS.md §8.16, docs/ARCHITECTURE.md).
+#
+# Las contraseñas salen de `.env` (ver `.env.example`); sin ellas `docker compose` no arranca.
+# Imágenes fijadas por versión y digest (índice multi-arquitectura: amd64 y arm64).
+name: panama-canal-tracker
+
+services:
+  db:
+    # PostgreSQL 16 + TimescaleDB 2.30 + PostGIS (ADR-0001, ADR-0005).
+    image: timescale/timescaledb-ha:pg16.15-ts2.30.2@sha256:9c6c86701e9b9ea0d7af055338443cd66741528406fa383e5de5171d2a7a366b
+    environment:
+      POSTGRES_DB: canal_tracker
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en .env}
+      # Los lee docker/db/initdb/100_canal_roles.sh al crear la base por primera vez.
+      CANAL_OWNER_PASSWORD: ${CANAL_OWNER_PASSWORD:?Define CANAL_OWNER_PASSWORD en .env}
+      CANAL_APP_PASSWORD: ${CANAL_APP_PASSWORD:?Define CANAL_APP_PASSWORD en .env}
+      TIMESCALEDB_TELEMETRY: "off"
+      # Contraseña obligatoria también dentro del contenedor (por defecto la imagen confía en
+      # cualquier conexión local o por 127.0.0.1 sin pedirla).
+      POSTGRES_INITDB_ARGS: "--auth-local=scram-sha-256 --auth-host=scram-sha-256"
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - db-data:/home/postgres/pgdata
+      # Solo este archivo: la imagen trae sus propios scripts de inicio en esa carpeta.
+      - ./docker/db/initdb/100_canal_roles.sh:/docker-entrypoint-initdb.d/100_canal_roles.sh:ro
+    healthcheck:
+      # Por TCP: durante la inicialización el servidor temporal solo escucha en el socket local,
+      # así que el servicio no aparece "healthy" hasta que los roles están creados.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d canal_tracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+  redis:
+    image: redis:8.10.2-alpine@sha256:3811787313eba226a2ef38658c6ccb91cd5e110edc89c37767de373120a0e5a0
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?Define REDIS_PASSWORD en .env}"]
+    environment:
+      # redis-cli lo usa para autenticarse sin poner la contraseña en la línea de comandos.
+      REDISCLI_AUTH: ${REDIS_PASSWORD:?Define REDIS_PASSWORD en .env}
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+volumes:
+  db-data:
+  redis-data:
