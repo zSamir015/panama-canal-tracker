@@ -6,6 +6,7 @@ Este es el único módulo que lee el entorno. El resto del código pide la confi
 
 from functools import lru_cache
 from typing import Annotated, Literal, Self
+from urllib.parse import urlsplit
 
 from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -15,6 +16,17 @@ LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
 JWT_SECRET_PLACEHOLDER = "changeme"  # noqa: S105 (placeholder de .env.example, no es un secreto)
 JWT_SECRET_MIN_BYTES = 32
+
+
+def _is_origin(value: str) -> bool:
+    """`esquema://host[:puerto]` exacto, como lo envía el navegador en la cabecera `Origin`."""
+    parts = urlsplit(value)
+    return (
+        parts.scheme in ("http", "https")
+        and bool(parts.hostname)
+        and "@" not in parts.netloc
+        and value == f"{parts.scheme}://{parts.netloc}"
+    )
 
 
 class Settings(BaseSettings):
@@ -50,6 +62,12 @@ class Settings(BaseSettings):
             raise ValueError("CORS_ORIGINS debe contener al menos un origen explícito")
         if "*" in value:
             raise ValueError("CORS_ORIGINS no puede contener '*'; lista los orígenes explícitos")
+        for origin in value:
+            if not _is_origin(origin):
+                # El navegador compara el origen exacto: "https://x.com/" no coincidiría nunca.
+                raise ValueError(
+                    f"CORS_ORIGINS: {origin!r} no es un origen válido (esquema://host[:puerto])"
+                )
         return value
 
     @model_validator(mode="after")
@@ -72,6 +90,8 @@ class Settings(BaseSettings):
 
         if "cors_origins" not in self.model_fields_set:
             errors.append("CORS_ORIGINS es obligatoria en producción")
+        elif any(not origin.startswith("https://") for origin in self.cors_origins):
+            errors.append("CORS_ORIGINS solo admite orígenes https en producción")
 
         if self.log_level == "DEBUG":
             errors.append("LOG_LEVEL no puede ser DEBUG en producción")
