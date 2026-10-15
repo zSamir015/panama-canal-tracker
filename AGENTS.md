@@ -312,7 +312,8 @@ Principio general: **denegar por defecto** — todo cerrado salvo lo que se abre
 
 ## 9. Estado actual
 
-> **Fase actual: 1 — Esqueleto FastAPI.** La Fase 0 (scaffold y documentación) está cerrada.
+> **Fase actual: 2 — Base de datos y autenticación.** La Fase 1 (esqueleto FastAPI, CI y
+> seguridad del repositorio) está cerrada.
 
 ## 10. Comandos útiles
 

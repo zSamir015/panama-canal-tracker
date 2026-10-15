@@ -6,7 +6,6 @@
 [English](README.md)
 
 [![CI](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml)
-[![Cobertura](https://img.shields.io/badge/cobertura-96%25-brightgreen)](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml)
 [![Licencia: MIT](https://img.shields.io/badge/Licencia-MIT-yellow.svg)](LICENSE)
 
 <!-- GIF de la demo (Fase 4): docs/media/live-map.gif -->
