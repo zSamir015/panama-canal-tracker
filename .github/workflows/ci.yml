@@ -83,8 +83,9 @@ jobs:
           pip install --require-hashes -r requirements-dev.lock
           pip install --no-deps -e .
       # El mínimo de cobertura (80 %) se exige desde la Fase 2 (AGENTS.md §5); de momento se informa.
+      # Los tests `integration` necesitan PostgreSQL; el service container llega en la 2.8 (#26).
       - name: pytest con cobertura
-        run: pytest --cov=app --cov-report=term-missing
+        run: pytest -m "not integration" --cov=app --cov-report=term-missing
 
   audit:
     name: Dependencias (pip-audit)

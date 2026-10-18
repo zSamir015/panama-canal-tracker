@@ -6,12 +6,14 @@ from pydantic import ValidationError
 from app.core.config import Settings, get_settings
 
 STRONG_SECRET = "s3cr3t-de-prueba-con-mas-de-32-bytes-de-largo"
+DB_PASSWORD = "pw-db-falsa-de-prueba"
+DB_URL = f"postgresql+asyncpg://canal_app:{DB_PASSWORD}@db:5432/canal_tracker"
 
 
 @pytest.fixture(autouse=True)
 def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """Aísla los tests de las variables del entorno de quien los ejecuta."""
-    for name in ("APP_ENV", "LOG_LEVEL", "CORS_ORIGINS", "JWT_SECRET_KEY"):
+    for name in ("APP_ENV", "LOG_LEVEL", "CORS_ORIGINS", "JWT_SECRET_KEY", "DATABASE_URL"):
         monkeypatch.delenv(name, raising=False)
 
 
@@ -24,6 +26,7 @@ def production_env(**overrides: str) -> dict[str, str]:
         "app_env": "production",
         "cors_origins": "https://tracker.example.com",
         "jwt_secret_key": STRONG_SECRET,
+        "database_url": DB_URL,
     }
     env.update(overrides)
     return env
@@ -164,6 +167,7 @@ def test_production_values_from_environment_count_as_explicit(
     monkeypatch.setenv("APP_ENV", "production")
     monkeypatch.setenv("CORS_ORIGINS", "https://tracker.example.com")
     monkeypatch.setenv("JWT_SECRET_KEY", STRONG_SECRET)
+    monkeypatch.setenv("DATABASE_URL", DB_URL)
 
     settings = make_settings()
 
@@ -179,3 +183,68 @@ def test_get_settings_reads_once_per_process(
         assert get_settings() is get_settings()
     finally:
         get_settings.cache_clear()
+
+
+def test_database_url_has_a_development_default() -> None:
+    settings = make_settings()
+
+    assert settings.database_url.get_secret_value().startswith("postgresql+asyncpg://")
+
+
+def test_database_url_never_appears_in_repr_or_str() -> None:
+    settings = make_settings(database_url=DB_URL)
+
+    assert DB_PASSWORD not in repr(settings)
+    assert DB_PASSWORD not in str(settings)
+    assert DB_PASSWORD not in settings.model_dump_json()
+    assert settings.database_url.get_secret_value() == DB_URL
+
+
+def test_database_url_rejects_other_drivers_without_leaking_the_value() -> None:
+    url = f"postgresql://canal_app:{DB_PASSWORD}@db:5432/canal_tracker"
+
+    with pytest.raises(ValidationError) as error:
+        make_settings(database_url=url)
+
+    assert "postgresql+asyncpg://" in str(error.value)
+    assert DB_PASSWORD not in str(error.value)
+    assert DB_PASSWORD not in repr(error.value.errors(include_input=False))
+
+
+def test_production_requires_database_url() -> None:
+    env = production_env()
+    del env["database_url"]
+
+    with pytest.raises(ValidationError, match="DATABASE_URL es obligatoria"):
+        make_settings(**env)
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "postgresql+asyncpg://canal_app:changeme@db:5432/canal_tracker",
+        "postgresql+asyncpg://canal_app@db:5432/canal_tracker",
+        "postgresql+asyncpg://canal_app:@db:5432/canal_tracker",
+    ],
+)
+def test_production_rejects_a_database_url_without_a_real_password(url: str) -> None:
+    with pytest.raises(ValidationError, match="contraseña real"):
+        make_settings(**production_env(database_url=url))
+
+
+def test_production_accepts_a_database_url_with_a_password() -> None:
+    settings = make_settings(**production_env(database_url=DB_URL))
+
+    assert settings.database_url.get_secret_value() == DB_URL
+
+
+def test_production_errors_never_include_the_database_url() -> None:
+    with pytest.raises(ValidationError) as error:
+        make_settings(
+            **production_env(
+                database_url=f"postgresql+asyncpg://canal_app:changeme@db:5432/x?{DB_PASSWORD}",
+                log_level="DEBUG",
+            )
+        )
+
+    assert DB_PASSWORD not in str(error.value)

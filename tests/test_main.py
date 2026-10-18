@@ -80,6 +80,7 @@ def test_app_never_runs_in_debug_mode(app_env: str) -> None:
         app_env=app_env,  # type: ignore[arg-type]
         cors_origins=["https://tracker.example.com"],
         jwt_secret_key="x" * 32,
+        database_url="postgresql+asyncpg://canal_app:pw-falsa-de-prueba@db:5432/canal_tracker",
     )
 
     assert create_app(settings).debug is False

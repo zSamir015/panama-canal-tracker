@@ -107,6 +107,7 @@ def production_settings() -> Settings:
         app_env="production",
         cors_origins=["https://tracker.example.com"],
         jwt_secret_key="x" * 32,
+        database_url="postgresql+asyncpg://canal_app:pw-falsa-de-prueba@db:5432/canal_tracker",
     )
 
 
