@@ -15,6 +15,7 @@ AppEnv = Literal["development", "test", "production"]
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
 JWT_SECRET_PLACEHOLDER = "changeme"  # noqa: S105 (placeholder de .env.example, no es un secreto)
+MIGRATIONS_DATABASE_URL_PLACEHOLDER = "postgresql+asyncpg://localhost:5432/canal_tracker"
 JWT_SECRET_MIN_BYTES = 32
 DATABASE_URL_PLACEHOLDER = "postgresql+asyncpg://canal_app:changeme@localhost:5432/canal_tracker"
 DATABASE_DRIVER_SCHEME = "postgresql+asyncpg"
@@ -52,13 +53,16 @@ class Settings(BaseSettings):
     jwt_secret_key: SecretStr = SecretStr(JWT_SECRET_PLACEHOLDER)
     # Lleva la contraseña del rol `canal_app` (sin DDL), así que es un secreto (AGENTS.md §8.16).
     database_url: SecretStr = SecretStr(DATABASE_URL_PLACEHOLDER)
+    migrations_database_url: SecretStr = SecretStr(MIGRATIONS_DATABASE_URL_PLACEHOLDER)
 
-    @field_validator("database_url")
+    @field_validator("database_url", "migrations_database_url")
     @classmethod
     def require_asyncpg_url(cls, value: SecretStr) -> SecretStr:
         # El mensaje no incluye el valor: la URL lleva la contraseña.
         if urlsplit(value.get_secret_value()).scheme != DATABASE_DRIVER_SCHEME:
-            raise ValueError(f"DATABASE_URL debe usar el esquema {DATABASE_DRIVER_SCHEME}://")
+            raise ValueError(
+                f"La URL de PostgreSQL debe usar el esquema {DATABASE_DRIVER_SCHEME}://"
+            )
         return value
 
     @field_validator("cors_origins", mode="before")
