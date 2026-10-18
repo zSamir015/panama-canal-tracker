@@ -1,8 +1,13 @@
 from pathlib import Path
 
+import pytest
+from alembic import command
 from alembic.config import Config
 
+import app.core.config
+from app.core.config import Settings
 from app.models import Base
+from app.models.base import include_object
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -14,7 +19,7 @@ def test_alembic_points_to_the_versioned_migration_directory() -> None:
     assert (ROOT / "alembic" / "versions" / "20261018_0001_users_refresh_tokens.py").is_file()
 
 
-def test_models_match_the_initial_schema() -> None:
+def test_models_declare_the_initial_tables() -> None:
     assert set(Base.metadata.tables) == {"users", "refresh_tokens"}
 
     users = Base.metadata.tables["users"]
@@ -31,8 +36,44 @@ def test_models_match_the_initial_schema() -> None:
     assert refresh_tokens.c.replaced_by_jti.nullable is True
 
 
-def test_migration_uses_owner_url_not_application_url() -> None:
-    env_source = (ROOT / "alembic" / "env.py").read_text()
+def alembic_config() -> Config:
+    config = Config(str(ROOT / "alembic.ini"))
+    config.attributes["configure_logger"] = False
+    return config
 
-    assert "migrations_database_url" in env_source
-    assert ".database_url" not in env_source
+
+def test_extension_tables_are_ignored_but_ours_are_not() -> None:
+    users = Base.metadata.tables["users"]
+
+    assert include_object(users, "spatial_ref_sys", "table", True, None) is False
+    assert include_object(users, "users", "table", True, None) is True
+    assert include_object(users, "spatial_ref_sys", "table", False, users) is True
+
+
+def test_alembic_refuses_to_run_without_the_migrations_url(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Sin MIGRATIONS_DATABASE_URL, Alembic no debe caer en otra URL (ni en la de canal_app).
+    monkeypatch.setattr(app.core.config, "get_settings", lambda: Settings(_env_file=None))
+
+    with pytest.raises(RuntimeError, match="MIGRATIONS_DATABASE_URL no está definida"):
+        command.upgrade(alembic_config(), "head")
+
+
+def test_alembic_refuses_offline_mode() -> None:
+    with pytest.raises(RuntimeError, match="offline"):
+        command.upgrade(alembic_config(), "head", sql=True)
+
+
+def test_server_defaults_are_sql_expressions_not_string_literals() -> None:
+    # `server_default="now()"` se compila como DEFAULT 'now()': un texto que PostgreSQL convierte
+    # en una fecha fija al crear la tabla. Hay que usar `func.now()` o `text(...)`.
+    literals = [
+        f"{table.name}.{column.name}"
+        for table in Base.metadata.tables.values()
+        for column in table.columns
+        if column.server_default is not None
+        and isinstance(getattr(column.server_default, "arg", None), str)
+    ]
+
+    assert literals == []

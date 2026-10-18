@@ -7,9 +7,8 @@ Revises:
 from collections.abc import Sequence
 
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
-
 from alembic import op
+from sqlalchemy.dialects import postgresql
 
 revision: str = "20261018_0001"
 down_revision: str | None = None
@@ -18,7 +17,6 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    op.execute("CREATE EXTENSION IF NOT EXISTS pgcrypto")
     postgresql.ENUM("user", "admin", name="user_role").create(op.get_bind(), checkfirst=True)
     user_role = postgresql.ENUM("user", "admin", name="user_role", create_type=False)
 
@@ -41,6 +39,9 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("email"),
+        # La unicidad debe ignorar mayúsculas: el servicio guarda el email ya normalizado y la
+        # base rechaza cualquier otro, así `Ana@x.com` y `ana@x.com` nunca son dos cuentas.
+        sa.CheckConstraint("email = lower(email)", name="ck_users_email_lowercase"),
     )
     op.create_table(
         "refresh_tokens",

@@ -13,7 +13,14 @@ DB_URL = f"postgresql+asyncpg://canal_app:{DB_PASSWORD}@db:5432/canal_tracker"
 @pytest.fixture(autouse=True)
 def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """Aísla los tests de las variables del entorno de quien los ejecuta."""
-    for name in ("APP_ENV", "LOG_LEVEL", "CORS_ORIGINS", "JWT_SECRET_KEY", "DATABASE_URL"):
+    for name in (
+        "APP_ENV",
+        "LOG_LEVEL",
+        "CORS_ORIGINS",
+        "JWT_SECRET_KEY",
+        "DATABASE_URL",
+        "MIGRATIONS_DATABASE_URL",
+    ):
         monkeypatch.delenv(name, raising=False)
 
 
@@ -247,4 +254,34 @@ def test_production_errors_never_include_the_database_url() -> None:
             )
         )
 
+    assert DB_PASSWORD not in str(error.value)
+
+
+OWNER_URL = f"postgresql+asyncpg://canal_owner:{DB_PASSWORD}@db:5432/canal_tracker"
+
+
+def test_migrations_database_url_is_optional_for_the_api() -> None:
+    # La API nunca necesita la URL del rol con DDL, ni siquiera en producción.
+    assert make_settings().migrations_database_url is None
+    assert make_settings(**production_env()).migrations_database_url is None
+
+
+def test_migrations_database_url_never_appears_in_repr_or_str() -> None:
+    settings = make_settings(migrations_database_url=OWNER_URL)
+
+    assert DB_PASSWORD not in repr(settings)
+    assert DB_PASSWORD not in str(settings)
+    assert DB_PASSWORD not in settings.model_dump_json()
+    assert settings.migrations_database_url is not None
+    assert settings.migrations_database_url.get_secret_value() == OWNER_URL
+
+
+@pytest.mark.parametrize("field", ["database_url", "migrations_database_url"])
+def test_url_scheme_error_names_the_variable_without_leaking_it(field: str) -> None:
+    url = f"postgresql://canal_owner:{DB_PASSWORD}@db:5432/canal_tracker"
+
+    with pytest.raises(ValidationError) as error:
+        make_settings(**{field: url})
+
+    assert f"{field.upper()} debe usar el esquema postgresql+asyncpg://" in str(error.value)
     assert DB_PASSWORD not in str(error.value)
