@@ -12,6 +12,17 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   ejecuta migraciones; `canal_app` solo lee y escribe datos, sin DDL. Contraseña `scram-sha-256`
   obligatoria también dentro del contenedor.
 - `scripts/check_dev_services.sh`: comprueba roles, permisos, extensiones y autenticación.
+- Acceso a la base con SQLAlchemy 2.1 async + asyncpg (`app/core/db.py`): `create_app()` crea el
+  engine y la fábrica de sesiones, y el `lifespan` cierra las conexiones al apagar. `get_db` abre
+  una sesión por request, hace rollback si algo falla y la cierra siempre. El engine no registra
+  SQL ni incluye los parámetros de las consultas en los errores.
+- `DATABASE_URL` como secreto (`SecretStr`) con esquema `postgresql+asyncpg` obligatorio; en
+  producción debe definirse y llevar una contraseña distinta del placeholder.
+- Patrón repository (`app/repositories/base.py`) y tests de arquitectura: los routers no importan
+  el ORM y ninguna consulta se construye con f-strings, `%`, `+` ni `.format()`.
+- Tests de integración (marcador `integration`) contra PostgreSQL real con el rol `canal_app`:
+  conexión, rol sin DDL, rollback, devolución de conexiones al pool y parámetros enlazados. Si la
+  base no está levantada fallan con instrucciones; el CI los excluye hasta la 2.8.
 
 ## [0.1.0] - 2026-10-15
 

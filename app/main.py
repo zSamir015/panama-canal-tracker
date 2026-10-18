@@ -1,9 +1,13 @@
 """Punto de entrada de la API FastAPI."""
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import APIRouter, FastAPI
 
 from app.core.config import Settings, get_settings
+from app.core.db import create_engine, create_session_factory
 from app.core.errors import register_exception_handlers
 from app.core.headers import REQUEST_ID_HEADER
 from app.core.logging import configure_logging
@@ -20,7 +24,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings = get_settings() if settings is None else settings
     configure_logging(settings.log_level)
 
-    app = FastAPI(title="Panama Canal Tracker")
+    engine = create_engine(settings)
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+        try:
+            yield
+        finally:
+            # Devuelve las conexiones abiertas a PostgreSQL antes de que el proceso termine.
+            await engine.dispose()
+
+    app = FastAPI(title="Panama Canal Tracker", lifespan=lifespan)
+    app.state.engine = engine
+    app.state.session_factory = create_session_factory(engine)
     register_exception_handlers(app)
 
     # El último middleware añadido es el más externo:
