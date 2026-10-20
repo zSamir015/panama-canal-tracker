@@ -4,6 +4,7 @@ from collections.abc import Iterator
 import pytest
 import structlog
 from fastapi import FastAPI
+from limits.aio.storage import MemoryStorage
 
 from app.core.config import Settings
 from app.core.logging import UVICORN_LOGGERS
@@ -17,6 +18,16 @@ def isolate_settings_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("APP_ENV", "test")
     monkeypatch.setenv("LOG_LEVEL", "INFO")
     monkeypatch.setenv("CORS_ORIGINS", "http://localhost:5173")
+
+
+@pytest.fixture(autouse=True)
+def in_memory_rate_limits(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Cada app de los tests cuenta las peticiones en memoria, con contadores propios.
+
+    Los tests que necesitan el Redis real (tests/integration/test_rate_limit_redis.py) crean su
+    almacenamiento explícitamente.
+    """
+    monkeypatch.setattr("app.main.create_storage", lambda _settings: MemoryStorage())
 
 
 @pytest.fixture(autouse=True)

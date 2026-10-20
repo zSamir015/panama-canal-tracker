@@ -213,7 +213,8 @@ Principio general: **denegar por defecto** — todo cerrado salvo lo que se abre
   Redis, compartido entre réplicas).
 - Límites iniciales: login 5/min por IP y por email; register 3/min por IP; refresh 10/min;
   API general 120/min por usuario; conexiones WebSocket 5 simultáneas por usuario.
-- Respuesta 429 con `Retry-After`. La librería concreta se decide en un ADR en la Fase 2.
+- Respuesta 429 con `Retry-After`. Librería `limits` con Redis (ADR-0007). Si Redis no responde,
+  auth falla cerrado (503) y la API general falla abierto.
 
 ### 8.9 Endpoints de la API
 - **Denegar por defecto**: todo endpoint requiere autenticación salvo una lista blanca explícita

@@ -62,6 +62,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   ni al revés.
 - Excepciones de dominio (`app/services/exceptions.py`) traducidas a `problem+json` por un
   handler global.
+- Rate limiting con `limits` y contador en Redis compartido entre réplicas (ADR-0007,
+  `app/core/rate_limit.py`): login 5/min por IP y por email, register 3/min por IP, refresh
+  10/min por IP y 120/min por usuario en el resto de `/api/v1`. Exceso → 429 con `Retry-After`.
+  Si Redis no responde, auth falla cerrado (503) y la API general falla abierto (log
+  `rate_limit_unavailable`). Las claves llevan el email como SHA-256, nunca en claro.
+- `REDIS_URL` como `SecretStr`, con esquema `redis`/`rediss` y obligatoria en producción con
+  contraseña real.
 
 ### Security
 - `certifi` 2026.10.19 en `requirements-dev.lock` (GHSA-6q48-6c7w-9gw2 en 2026.7.22).

@@ -47,7 +47,9 @@
   mayúsculas) responde 409.
 - **Login**: credenciales incorrectas → 401 con el mismo mensaje y tiempo similar exista o no el
   email.
-- **Rate limiting**: login 5/min por IP y por email, register 3/min por IP, refresh 10/min.
+- **Rate limiting** (ADR-0007): login 5/min por IP y por email, register 3/min por IP, refresh
+  10/min por IP; el resto de `/api/v1`, 120/min por usuario. Exceso → 429 con `Retry-After`. Si el
+  contador (Redis) no responde, los endpoints de auth responden 503 y el resto sigue sin límite.
 
 ## Vessels
 

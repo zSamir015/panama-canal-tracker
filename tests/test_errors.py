@@ -108,6 +108,7 @@ def production_settings() -> Settings:
         cors_origins=["https://tracker.example.com"],
         jwt_secret_key="x" * 32,
         database_url="postgresql+asyncpg://canal_app:pw-falsa-de-prueba@db:5432/canal_tracker",
+        redis_url="redis://:pw-redis-falsa-de-prueba@redis:6379/0",
     )
 
 
