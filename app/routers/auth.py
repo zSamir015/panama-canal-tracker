@@ -18,6 +18,7 @@ from fastapi import APIRouter, Cookie, Depends, Response
 from app.core.auth import CurrentUser, get_app_settings
 from app.core.config import Settings
 from app.core.db import DbSession
+from app.core.rate_limit import enforce_login, enforce_refresh, enforce_register
 from app.schemas.auth import LoginRequest, TokenResponse, UserCreate, UserResponse
 from app.services.auth import AuthService, IssuedTokens
 
@@ -70,6 +71,7 @@ def _token_response(response: Response, tokens: IssuedTokens) -> TokenResponse:
 
 @public_router.post(
     "/register",
+    dependencies=[Depends(enforce_register)],
     status_code=HTTPStatus.CREATED,
     summary="Crear una cuenta",
     description=(
@@ -88,6 +90,7 @@ async def register(body: UserCreate, service: Service) -> UserResponse:
 
 @public_router.post(
     "/login",
+    dependencies=[Depends(enforce_login)],
     summary="Iniciar sesión",
     description=(
         "Devuelve un access token y deja el refresh token en la cookie `refresh_token`. "
@@ -101,6 +104,7 @@ async def login(body: LoginRequest, response: Response, service: Service) -> Tok
 
 @public_router.post(
     "/refresh",
+    dependencies=[Depends(enforce_refresh)],
     summary="Renovar el access token",
     description=(
         "Usa la cookie `refresh_token`, la rota (la anterior deja de valer) y devuelve un access "

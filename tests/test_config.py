@@ -8,6 +8,7 @@ from app.core.config import Settings, get_settings
 STRONG_SECRET = "s3cr3t-de-prueba-con-mas-de-32-bytes-de-largo"
 DB_PASSWORD = "pw-db-falsa-de-prueba"
 DB_URL = f"postgresql+asyncpg://canal_app:{DB_PASSWORD}@db:5432/canal_tracker"
+REDIS_URL = "redis://:pw-redis-falsa-de-prueba@redis:6379/0"
 
 
 @pytest.fixture(autouse=True)
@@ -20,6 +21,7 @@ def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
         "JWT_SECRET_KEY",
         "DATABASE_URL",
         "MIGRATIONS_DATABASE_URL",
+        "REDIS_URL",
     ):
         monkeypatch.delenv(name, raising=False)
 
@@ -34,6 +36,7 @@ def production_env(**overrides: str) -> dict[str, str]:
         "cors_origins": "https://tracker.example.com",
         "jwt_secret_key": STRONG_SECRET,
         "database_url": DB_URL,
+        "redis_url": REDIS_URL,
     }
     env.update(overrides)
     return env
@@ -175,6 +178,7 @@ def test_production_values_from_environment_count_as_explicit(
     monkeypatch.setenv("CORS_ORIGINS", "https://tracker.example.com")
     monkeypatch.setenv("JWT_SECRET_KEY", STRONG_SECRET)
     monkeypatch.setenv("DATABASE_URL", DB_URL)
+    monkeypatch.setenv("REDIS_URL", REDIS_URL)
 
     settings = make_settings()
 

@@ -4,12 +4,18 @@ from collections.abc import Iterator
 import pytest
 import structlog
 from fastapi import FastAPI
+from limits import RateLimitItem
 
 from app.core.config import Settings
 from app.core.logging import UVICORN_LOGGERS
 
 # Clave de firma de los tests: pública a propósito y con los 32 bytes que exige HS256.
 TEST_JWT_KEY = "clave-de-firma-solo-para-los-tests-0123456789"
+
+
+class AllowAllRateLimiter:
+    async def hit(self, item: RateLimitItem, scope: str, *identifiers: str) -> object:
+        return type("Result", (), {"allowed": True, "retry_after": 0})()
 
 
 @pytest.fixture(autouse=True)
@@ -50,4 +56,6 @@ def app_settings() -> Settings:
 def app(app_settings: Settings) -> Iterator[FastAPI]:
     from app.main import create_app
 
-    yield create_app(app_settings)
+    application = create_app(app_settings)
+    application.state.rate_limiter = AllowAllRateLimiter()
+    yield application

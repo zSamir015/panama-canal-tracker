@@ -19,6 +19,7 @@ JWT_SECRET_MIN_BYTES = 32
 DATABASE_URL_PLACEHOLDER = "postgresql+asyncpg://canal_app:changeme@localhost:5432/canal_tracker"
 DATABASE_DRIVER_SCHEME = "postgresql+asyncpg"
 DATABASE_PASSWORD_PLACEHOLDER = "changeme"  # noqa: S105 (placeholder de .env.example)
+REDIS_URL_PLACEHOLDER = "redis://:changeme@localhost:6379/0"
 
 
 def _is_origin(value: str) -> bool:
@@ -61,6 +62,7 @@ class Settings(BaseSettings):
     # Rol `canal_owner` (DDL). Solo la usa Alembic: el proceso de la API no necesita tenerla, así
     # que no tiene valor por defecto y `alembic/env.py` falla si no está definida.
     migrations_database_url: SecretStr | None = None
+    redis_url: SecretStr = SecretStr(REDIS_URL_PLACEHOLDER)
 
     @field_validator("database_url", "migrations_database_url")
     @classmethod
@@ -72,6 +74,13 @@ class Settings(BaseSettings):
         ):
             name = (info.field_name or "").upper()
             raise ValueError(f"{name} debe usar el esquema {DATABASE_DRIVER_SCHEME}://")
+        return value
+
+    @field_validator("redis_url")
+    @classmethod
+    def require_redis_url(cls, value: SecretStr) -> SecretStr:
+        if urlsplit(value.get_secret_value()).scheme not in {"redis", "rediss"}:
+            raise ValueError("REDIS_URL debe usar el esquema redis:// o rediss://")
         return value
 
     @field_validator("cors_origins", mode="before")
@@ -122,6 +131,12 @@ class Settings(BaseSettings):
             DATABASE_PASSWORD_PLACEHOLDER,
         ):
             errors.append("DATABASE_URL debe llevar una contraseña real en producción")
+
+        redis_parts = urlsplit(self.redis_url.get_secret_value())
+        if "redis_url" not in self.model_fields_set:
+            errors.append("REDIS_URL es obligatoria en producción")
+        elif redis_parts.password in (None, "", DATABASE_PASSWORD_PLACEHOLDER):
+            errors.append("REDIS_URL debe llevar una contraseña real en producción")
 
         if "cors_origins" not in self.model_fields_set:
             errors.append("CORS_ORIGINS es obligatoria en producción")

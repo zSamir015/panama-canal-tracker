@@ -22,6 +22,7 @@ from app.core.logging import configure_logging
 from app.core.security import create_access_token
 from app.main import create_app
 from app.routers import admin
+from tests.conftest import AllowAllRateLimiter
 
 ADMIN_PATH = "/api/v1/admin/_test"
 
@@ -43,7 +44,9 @@ def admin_test_route(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
 
 @pytest.fixture
 def auth_app(app_settings: Settings, admin_test_route: None) -> FastAPI:
-    return create_app(app_settings)
+    application = create_app(app_settings)
+    application.state.rate_limiter = AllowAllRateLimiter()
+    return application
 
 
 @pytest.fixture

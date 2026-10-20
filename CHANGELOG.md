@@ -6,6 +6,7 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Changed
+- Las rutas protegidas aplican un límite compartido de 120 peticiones por minuto por usuario.
 - Los access tokens llevan el claim obligatorio `token_type: access`.
 - El test de rutas públicas lee las rutas del esquema OpenAPI: desde FastAPI 0.143 `app.routes`
   guarda cada router incluido como un solo objeto.
@@ -13,6 +14,9 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   consultas en greenlets y sin esto las líneas tras un `await` a la base salían sin cubrir.
 
 ### Added
+- Rate limiting asíncrono con Redis (`app/core/rate_limit.py`): límites por IP y email para
+  autenticación, ventanas atómicas con Lua, respuestas 429 con `Retry-After` y fallo cerrado
+  con 503 si Redis no está disponible. La decisión está documentada en ADR-0007.
 - `docker-compose.yml` de desarrollo: PostgreSQL 16 + TimescaleDB 2.30 + PostGIS y Redis 8 con
   contraseña, imágenes fijadas por digest, healthchecks, volúmenes y puertos solo en `127.0.0.1`.
 - Roles de la base (`docker/db/initdb/100_canal_roles.sh`): `canal_owner` es dueño de la base y

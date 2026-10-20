@@ -2,11 +2,13 @@
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from typing import Annotated
 
 import uvicorn
-from fastapi import APIRouter, Depends, FastAPI
+from fastapi import APIRouter, Depends, FastAPI, Request
+from redis.asyncio import Redis
 
-from app.core.auth import get_current_user
+from app.core.auth import CurrentUser, get_current_user
 from app.core.config import Settings, get_settings
 from app.core.db import create_engine, create_session_factory
 from app.core.errors import register_exception_handlers
@@ -18,6 +20,11 @@ from app.core.middleware import (
     RequestIdMiddleware,
     SecurityHeadersMiddleware,
 )
+from app.core.rate_limit import (
+    RedisRateLimiter,
+    enforce_api_limit,
+    get_rate_limiter,
+)
 from app.routers import admin, auth
 
 
@@ -27,6 +34,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     configure_logging(settings.log_level)
 
     engine = create_engine(settings)
+    redis_client = Redis.from_url(settings.redis_url.get_secret_value(), decode_responses=False)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
@@ -35,11 +43,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         finally:
             # Devuelve las conexiones abiertas a PostgreSQL antes de que el proceso termine.
             await engine.dispose()
+            await redis_client.aclose()
 
     app = FastAPI(title="Panama Canal Tracker", lifespan=lifespan)
     app.state.settings = settings
     app.state.engine = engine
     app.state.session_factory = create_session_factory(engine)
+    app.state.rate_limiter = RedisRateLimiter(redis_client)
     register_exception_handlers(app)
 
     # El último middleware añadido es el más externo:
@@ -61,7 +71,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Denegar por defecto (AGENTS.md §8.9): todo lo que cuelga de este router exige un access token
     # válido. Las rutas públicas de la lista blanca van en `public_api_router`, para que abrir
     # una ruta sea siempre una decisión explícita.
-    api_router = APIRouter(prefix="/api/v1", dependencies=[Depends(get_current_user)])
+    async def enforce_authenticated_limit(
+        request: Request,
+        user: CurrentUser,
+        limiter: Annotated[RedisRateLimiter, Depends(get_rate_limiter)],
+    ) -> None:
+        await enforce_api_limit(request, str(user.id), limiter)
+
+    api_router = APIRouter(
+        prefix="/api/v1",
+        dependencies=[Depends(get_current_user), Depends(enforce_authenticated_limit)],
+    )
     api_router.include_router(auth.router)
     api_router.include_router(admin.router)
     app.include_router(api_router)

@@ -26,9 +26,11 @@ dependencies = [
     "alembic>=1.20.0,<2.0",
     "pwdlib[argon2]>=0.3.1,<1.0",
     "pyjwt>=2.15.1,<3.0",
+    "redis>=6.4.0,<7.0",
+    "limits>=5.8.0,<6.0",
 ]
 # Se añadirán en su fase (no instalar antes):
-#   Fase 2: geoalchemy2, redis (rate limiting), librería de rate limiting (ADR-0007)
+#   Fase 2: geoalchemy2
 #   Fase 3: websockets
 
 [project.optional-dependencies]
