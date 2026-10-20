@@ -16,7 +16,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.core.config import Settings
 from app.core.db import DbSession
-from app.core.security import InvalidAccessTokenError, decode_access_token
+from app.core.security import InvalidTokenError, decode_access_token
 from app.models.user import User, UserRole
 from app.repositories.user import UserRepository
 
@@ -53,7 +53,7 @@ async def get_current_user(
         raise _unauthorized()
     try:
         claims = decode_access_token(credentials.credentials, settings)
-    except InvalidAccessTokenError as error:
+    except InvalidTokenError as error:
         # Solo el tipo de error, nunca el token.
         logger.info("access_token_rejected", reason=str(error))
         raise _unauthorized() from None

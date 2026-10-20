@@ -18,7 +18,7 @@ from app.core.middleware import (
     RequestIdMiddleware,
     SecurityHeadersMiddleware,
 )
-from app.routers import admin
+from app.routers import admin, auth
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -59,11 +59,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(RequestIdMiddleware)
 
     # Denegar por defecto (AGENTS.md §8.9): todo lo que cuelga de este router exige un access token
-    # válido. Los endpoints públicos de la lista blanca (register, login, refresh) irán en un
-    # router aparte, para que abrir una ruta sea siempre una decisión explícita.
+    # válido. Las rutas públicas de la lista blanca van en `public_api_router`, para que abrir
+    # una ruta sea siempre una decisión explícita.
     api_router = APIRouter(prefix="/api/v1", dependencies=[Depends(get_current_user)])
+    api_router.include_router(auth.router)
     api_router.include_router(admin.router)
     app.include_router(api_router)
+
+    public_api_router = APIRouter(prefix="/api/v1")
+    public_api_router.include_router(auth.public_router)
+    app.include_router(public_api_router)
 
     @app.get("/health", tags=["infrastructure"])
     async def health() -> dict[str, str]:

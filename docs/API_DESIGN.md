@@ -36,10 +36,15 @@
 | GET | `/auth/me` | ✅ | Perfil del usuario actual |
 
 - **Refresh token**: cookie `refresh_token`, `HttpOnly; Secure; SameSite=Strict;
-  Path=/api/v1/auth`. Nunca en el body ni en `localStorage`. Reutilizar un refresh ya rotado
-  revoca todas las sesiones de ese usuario.
+  Path=/api/v1/auth`. Nunca en el body ni en `localStorage`. Es un JWT firmado
+  (`token_type: refresh`) cuyo `jti` se guarda en `refresh_tokens`; un access token no sirve como
+  refresh ni al revés. Cada login abre una sesión (familia); reutilizar un refresh ya rotado
+  revoca esa sesión completa (AGENTS.md §8.4), no las demás sesiones del usuario.
+- **Logout**: `204`, revoca la sesión del refresh de la cookie (solo si es del usuario del access
+  token) y borra la cookie.
 - **Register**: body `{email, password}` con `extra="forbid"`; contraseña de 12 a 128 caracteres.
-  Si el email ya existe responde 409.
+  Responde `201` con `{id, email, role, created_at}`. Si el email ya existe (sin distinguir
+  mayúsculas) responde 409.
 - **Login**: credenciales incorrectas → 401 con el mismo mensaje y tiempo similar exista o no el
   email.
 - **Rate limiting**: login 5/min por IP y por email, register 3/min por IP, refresh 10/min.
