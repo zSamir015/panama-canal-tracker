@@ -81,7 +81,8 @@ Documentos de referencia (leer según la tarea):
 
 - `pytest` + `pytest-asyncio` (modo auto) + `httpx.AsyncClient`. Fixtures en `tests/conftest.py`.
 - Cubrir caso feliz y errores (401, 403, 404, 422) en cada endpoint.
-- Tests de integración contra PostgreSQL/PostGIS real (service container en CI), no SQLite.
+- Tests de integración contra PostgreSQL/PostGIS y Redis reales, no SQLite. En el CI, el job de
+  tests levanta el mismo `docker-compose.yml` con credenciales aleatorias de cada ejecución.
 - Mensajes AIS de ejemplo en `tests/fixtures/ais_messages/`. Ningún test depende de AISStream real.
 - Cobertura mínima: 80 % en `app/` (lo exige el CI desde Fase 2).
 

@@ -1,4 +1,5 @@
-# CI de la Fase 1 (AGENTS.md §5 y §8). Cada job es un check independiente para branch protection.
+# CI (AGENTS.md §5 y §8). Cada job es un check independiente para branch protection: si se
+# renombra un job, hay que actualizar la protección de `main` en el mismo momento.
 name: CI
 
 on:
@@ -66,7 +67,7 @@ jobs:
   test:
     name: Tests (pytest)
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     permissions:
       contents: read
     steps:
@@ -82,10 +83,45 @@ jobs:
         run: |
           pip install --require-hashes -r requirements-dev.lock
           pip install --no-deps -e .
-      # El mínimo de cobertura (80 %) se exige desde la Fase 2 (AGENTS.md §5); de momento se informa.
-      # Los tests `integration` necesitan PostgreSQL; el service container llega en la 2.8 (#26).
+      # Credenciales efímeras: aleatorias en cada ejecución, enmascaradas en los logs y fuera del
+      # repositorio. Nunca secretos del repo (issue #26). `.env` está en .gitignore.
+      - name: Generar credenciales efímeras (.env)
+        run: |
+          # El `::add-mask::` tiene que salir por la salida del paso, no dentro de un `$(...)`.
+          for name in postgres owner app redis jwt; do
+            value=$(openssl rand -hex 32)
+            echo "::add-mask::${value}"
+            printf -v "$name" '%s' "$value"
+          done
+          {
+            echo "POSTGRES_PASSWORD=${postgres}"
+            echo "CANAL_OWNER_PASSWORD=${owner}"
+            echo "CANAL_APP_PASSWORD=${app}"
+            echo "REDIS_PASSWORD=${redis}"
+            echo "JWT_SECRET_KEY=${jwt}"
+            echo "DATABASE_URL=postgresql+asyncpg://canal_app:${app}@localhost:5432/canal_tracker"
+            echo "MIGRATIONS_DATABASE_URL=postgresql+asyncpg://canal_owner:${owner}@localhost:5432/canal_tracker"
+            echo "REDIS_URL=redis://:${redis}@localhost:6379/0"
+          } > .env
+      # El mismo docker-compose.yml que en desarrollo: misma imagen (digest), roles, permisos,
+      # scram-sha-256, base `canal_tracker_test` y Redis con contraseña. Los service containers de
+      # Actions no pueden montar los scripts de docker/db/initdb/ ni pasar `--requirepass`.
+      - name: Levantar PostgreSQL y Redis
+        run: docker compose up -d --wait --wait-timeout 300
+      - name: Comprobar roles, permisos y contraseñas
+        run: scripts/check_dev_services.sh
+      # Base vacía → migraciones; `alembic check` falla si los modelos y la migración no coinciden.
+      - name: Migraciones (alembic upgrade head + check)
+        run: |
+          alembic upgrade head
+          alembic check
+      # Unitarios + integración contra PostgreSQL y Redis reales. Mínimo de cobertura: 80 %
+      # (AGENTS.md §5, `fail_under` en pyproject.toml).
       - name: pytest con cobertura
-        run: pytest -m "not integration" --cov=app --cov-report=term-missing
+        run: pytest --cov=app --cov-report=term-missing
+      - name: Logs de los servicios (si algo falló)
+        if: failure()
+        run: docker compose logs --no-color --tail 200
 
   audit:
     name: Dependencias (pip-audit)
