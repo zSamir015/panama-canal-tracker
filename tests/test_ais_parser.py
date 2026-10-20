@@ -261,6 +261,13 @@ def test_name_is_preserved() -> None:
     assert malicious.name == "<img src=x onerror=alert(1)>"
 
 
+def test_name_maximum_valid_length_is_accepted() -> None:
+    max_name = "A" * 128
+    result = parse_message(message_with_static(Name=max_name), received_at=RECEIVED_AT)
+    assert isinstance(result, VesselStatic)
+    assert result.name == max_name
+
+
 @pytest.mark.parametrize(
     ("bad_name", "reason"),
     [
