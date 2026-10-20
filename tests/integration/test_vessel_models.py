@@ -89,28 +89,63 @@ async def test_app_role_can_write_valid_vessel_and_position(
 
 
 @pytest.mark.parametrize(
-    ("table", "column", "value"),
+    ("statement", "value"),
     [
-        ("vessels", "mmsi", 123),
-        ("positions", "vessel_mmsi", 123),
+        ("INSERT INTO vessels (mmsi, name) VALUES (:value, 'BAD')", 123),
+        ("INSERT INTO vessels (mmsi, imo) VALUES (352001234, :value)", 10000000),
+        ("INSERT INTO vessels (mmsi, ship_type) VALUES (352001234, :value)", 100),
+        ("INSERT INTO vessels (mmsi, length_m) VALUES (352001234, :value)", 0),
+        ("INSERT INTO vessels (mmsi, beam_m) VALUES (352001234, :value)", -1),
     ],
 )
-async def test_mmsi_constraints_reject_invalid_values(
-    migrated: AsyncEngine,
-    table: str,
-    column: str,
-    value: int,
+async def test_vessel_constraints_reject_invalid_values(
+    migrated: AsyncEngine, statement: str, value: int
 ) -> None:
-    statement = (
-        text("INSERT INTO vessels (mmsi, name) VALUES (:value, 'BAD')")
-        if table == "vessels"
-        else text(
-            "INSERT INTO positions (received_at, vessel_mmsi, geom) "
-            "VALUES (:received_at, :value, ST_GeogFromText('SRID=4326;POINT(-79.9 9.3)'))"
-        )
-    )
-    parameters = {"value": value, "received_at": datetime.now(UTC)}
-
     async with migrated.connect() as connection:
         with pytest.raises(IntegrityError):
+            await connection.execute(text(statement), {"value": value})
+
+
+@pytest.mark.parametrize(
+    ("column", "value"),
+    [("vessel_mmsi", 123), ("sog", 102.3), ("cog", 360), ("heading", 511)],
+)
+async def test_position_constraints_reject_unavailable_values(
+    migrated: AsyncEngine, column: str, value: float
+) -> None:
+    statement = text(
+        "INSERT INTO positions "
+        "(received_at, vessel_mmsi, geom, sog, cog, heading) "
+        "VALUES (:received_at, :vessel_mmsi, "
+        "ST_GeogFromText('SRID=4326;POINT(-79.9 9.3)'), "
+        ":sog, :cog, :heading)"
+    )
+    parameters = {
+        "received_at": datetime.now(UTC),
+        "vessel_mmsi": value if column == "vessel_mmsi" else 352001234,
+        "sog": value if column == "sog" else 7.5,
+        "cog": value if column == "cog" else 180,
+        "heading": value if column == "heading" else 180,
+    }
+
+    async with migrated.connect() as connection:
+        await connection.execute(
+            text("INSERT INTO vessels (mmsi, name) VALUES (352001234, 'VALID')")
+        )
+        await connection.commit()
+        with pytest.raises(IntegrityError):
             await connection.execute(statement, parameters)
+
+
+async def test_position_requires_an_existing_vessel(migrated: AsyncEngine) -> None:
+    async with migrated.connect() as connection:
+        with pytest.raises(IntegrityError):
+            await connection.execute(
+                text(
+                    "INSERT INTO positions "
+                    "(received_at, vessel_mmsi, geom) "
+                    "VALUES (:received_at, 352001234, "
+                    "ST_GeogFromText('SRID=4326;POINT(-79.9 9.3)'))"
+                ),
+                {"received_at": datetime.now(UTC)},
+            )

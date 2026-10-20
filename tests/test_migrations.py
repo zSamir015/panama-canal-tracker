@@ -1,4 +1,3 @@
-import sys
 from pathlib import Path
 
 import pytest
@@ -67,17 +66,11 @@ def test_alembic_refuses_to_run_without_the_migrations_url(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     # Sin MIGRATIONS_DATABASE_URL, Alembic no debe caer en otra URL (ni en la de canal_app).
-    def settings_without_migrations() -> Settings:
-        return Settings(_env_file=None)
-
     monkeypatch.delenv("MIGRATIONS_DATABASE_URL", raising=False)
-    monkeypatch.setattr(app.core.config, "get_settings", settings_without_migrations)
-    alembic_module = sys.modules.get("alembic.env")
-    if alembic_module is not None:
-        monkeypatch.setattr(alembic_module, "get_settings", settings_without_migrations)
+    monkeypatch.setattr(app.core.config, "get_settings", lambda: Settings(_env_file=None))
 
     with pytest.raises(RuntimeError, match="MIGRATIONS_DATABASE_URL no está definida"):
-        command.downgrade(alembic_config(), "base")
+        command.upgrade(alembic_config(), "head")
 
 
 def test_alembic_refuses_offline_mode() -> None:
