@@ -21,6 +21,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import Scope
 
 from app.core.headers import REQUEST_ID_HEADER, security_headers
+from app.services.exceptions import DomainError
 
 PROBLEM_JSON = "application/problem+json"
 
@@ -94,6 +95,14 @@ async def validation_exception_handler(request: Request, exc: Exception) -> Prob
     return problem_response(HTTPStatus.UNPROCESSABLE_ENTITY, scope=request.scope, errors=errors)
 
 
+async def domain_exception_handler(request: Request, exc: Exception) -> ProblemResponse:
+    # Errores esperados de los servicios (409, 401...): su `detail` está pensado para el cliente.
+    exc = cast(DomainError, exc)
+    return problem_response(
+        exc.status_code, scope=request.scope, detail=exc.detail, headers=exc.headers
+    )
+
+
 async def unhandled_exception_handler(request: Request, exc: Exception) -> ProblemResponse:
     # `request_id` llega al log por contextvars (lo enlaza RequestIdMiddleware).
     structlog.get_logger(__name__).error("unhandled_error", exc_info=exc)
@@ -103,5 +112,6 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> Probl
 def register_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
+    app.add_exception_handler(DomainError, domain_exception_handler)
     # Con `Exception`, Starlette lo usa en ServerErrorMiddleware para cualquier error no controlado.
     app.add_exception_handler(Exception, unhandled_exception_handler)

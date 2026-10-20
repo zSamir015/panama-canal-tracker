@@ -6,6 +6,9 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Changed
+- Los access tokens llevan el claim obligatorio `token_type: access`.
+- El test de rutas públicas lee las rutas del esquema OpenAPI: desde FastAPI 0.143 `app.routes`
+  guarda cada router incluido como un solo objeto.
 - Coverage mide con `concurrency = ["greenlet", "thread"]`: SQLAlchemy async ejecuta las
   consultas en greenlets y sin esto las líneas tras un `await` a la base salían sin cubrir.
 
@@ -50,6 +53,18 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 - `UserRepository`, que guarda y busca el email en minúsculas.
 - `scripts/create_admin.py`: crea administradores desde la terminal (la API nunca lo hace). Pide
   la contraseña sin mostrarla y deja en el log solo el id del usuario creado.
+- Endpoints de auth (`app/routers/auth.py`, `app/services/auth.py`): `register` (siempre rol
+  `user`; `role` u otro campo desconocido → 422; duplicado → 409), `login` (mismo 401 exista o no
+  el email; rehash si cambiaron los parámetros de Argon2), `refresh`, `logout` y `me`.
+- Refresh tokens JWT firmados con `jti` persistido, en cookie `HttpOnly; Secure; SameSite=Strict;
+  Path=/api/v1/auth`. Rotación en cada uso y detección de reutilización: un refresh ya rotado
+  revoca toda su sesión (familia). Claim `token_type` para que un access no sirva como refresh
+  ni al revés.
+- Excepciones de dominio (`app/services/exceptions.py`) traducidas a `problem+json` por un
+  handler global.
+
+### Security
+- `certifi` 2026.10.19 en `requirements-dev.lock` (GHSA-6q48-6c7w-9gw2 en 2026.7.22).
 
 ## [0.1.0] - 2026-10-15
 

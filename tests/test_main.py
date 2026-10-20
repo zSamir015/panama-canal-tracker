@@ -61,15 +61,32 @@ async def test_cors_rejects_unlisted_origin(app: FastAPI) -> None:
 
 
 # Rutas que responden sin autenticación (AGENTS.md §8.9). Cualquier ruta nueva hace fallar este
-# test hasta que se decida: o se añade aquí justificándolo, o queda protegida. En la Fase 2 se
-# completa con la comprobación de que el resto de rutas responde 401 sin token.
-PUBLIC_PATHS = {"/health", "/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}
+# test hasta que se decida: o se añade aquí justificándolo, o a la lista de protegidas. La 2.7
+# completa esto comprobando que las protegidas responden 401 sin token.
+PUBLIC_PATHS = {
+    "/health",
+    "/openapi.json",
+    "/docs",
+    "/docs/oauth2-redirect",
+    "/redoc",
+    "/api/v1/auth/register",
+    "/api/v1/auth/login",
+    "/api/v1/auth/refresh",
+}
+PROTECTED_PATHS = {"/api/v1/auth/logout", "/api/v1/auth/me"}
+
+
+def exposed_paths(app: FastAPI) -> set[str]:
+    # Desde FastAPI 0.143 `app.routes` guarda cada router incluido como un solo objeto (sin
+    # `path`); sus rutas se ven en el esquema OpenAPI. Las de nivel superior, en `app.routes`.
+    top_level = {route.path for route in app.routes if isinstance(route, Route)}
+    return top_level | set(app.openapi()["paths"])
 
 
 def test_only_whitelisted_routes_are_exposed(app: FastAPI) -> None:
-    paths = {route.path for route in app.routes if isinstance(route, Route)}
+    paths = exposed_paths(app)
 
-    assert paths == PUBLIC_PATHS
+    assert paths == PUBLIC_PATHS | PROTECTED_PATHS
 
 
 @pytest.mark.parametrize("app_env", ["development", "test", "production"])

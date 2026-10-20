@@ -14,10 +14,12 @@ from app.core.security import (
     PASSWORD_MAX_LENGTH,
     PASSWORD_MIN_LENGTH,
     REQUIRED_CLAIMS,
-    InvalidAccessTokenError,
+    InvalidTokenError,
     PasswordPolicyError,
     create_access_token,
+    create_refresh_token,
     decode_access_token,
+    decode_refresh_token,
     hash_password,
     verify_password,
 )
@@ -39,6 +41,7 @@ def claims(settings: Settings, **overrides: Any) -> dict[str, Any]:
         "iss": settings.jwt_issuer,
         "aud": settings.jwt_audience,
         "jti": uuid4().hex,
+        "token_type": "access",
     }
     payload.update(overrides)
     return {key: value for key, value in payload.items() if value is not None}
@@ -192,14 +195,14 @@ def test_expired_token_is_rejected(settings: Settings) -> None:
     past = datetime.now(UTC) - timedelta(minutes=settings.access_token_expire_minutes + 1)
     token, _ = create_access_token(uuid4(), settings, now=past)
 
-    with pytest.raises(InvalidAccessTokenError, match="ExpiredSignatureError"):
+    with pytest.raises(InvalidTokenError, match="ExpiredSignatureError"):
         decode_access_token(token, settings)
 
 
 def test_token_signed_with_another_key_is_rejected(settings: Settings) -> None:
     forged = jwt.encode(claims(settings), "otra-clave-de-32-bytes-como-minimo!!", algorithm="HS256")
 
-    with pytest.raises(InvalidAccessTokenError, match="InvalidSignatureError"):
+    with pytest.raises(InvalidTokenError, match="InvalidSignatureError"):
         decode_access_token(forged, settings)
 
 
@@ -208,14 +211,14 @@ def test_tampered_payload_is_rejected(settings: Settings) -> None:
     header, _, signature = token.split(".")
     other_payload = sign(claims(settings), settings, algorithm="HS256").split(".")[1]
 
-    with pytest.raises(InvalidAccessTokenError):
+    with pytest.raises(InvalidTokenError):
         decode_access_token(f"{header}.{other_payload}.{signature}", settings)
 
 
 def test_alg_none_is_rejected(settings: Settings) -> None:
     unsigned = jwt.encode(claims(settings), key=None, algorithm="none")
 
-    with pytest.raises(InvalidAccessTokenError, match="InvalidAlgorithmError"):
+    with pytest.raises(InvalidTokenError, match="InvalidAlgorithmError"):
         decode_access_token(unsigned, settings)
 
     # HS512 no está en la lista aceptada. Clave de 64 bytes: el mínimo que PyJWT pide para HS512.
@@ -225,7 +228,7 @@ def test_other_hmac_algorithm_is_rejected(settings: Settings) -> None:
     # Firmado con la misma clave, pero HS512 no está en la lista; clave de 64 bytes para HS512.
     token = jwt.encode(claims(settings), "k" * 64, algorithm="HS512")
 
-    with pytest.raises(InvalidAccessTokenError, match="InvalidAlgorithmError"):
+    with pytest.raises(InvalidTokenError, match="InvalidAlgorithmError"):
         decode_access_token(token, settings)
 
 
@@ -242,7 +245,7 @@ def test_other_hmac_algorithm_is_rejected(settings: Settings) -> None:
 def test_wrong_claim_is_rejected(settings: Settings, claim: str, value: object, error: str) -> None:
     token = sign(claims(settings, **{claim: value}), settings, algorithm="HS256")
 
-    with pytest.raises(InvalidAccessTokenError, match=error):
+    with pytest.raises(InvalidTokenError, match=error):
         decode_access_token(token, settings)
 
 
@@ -252,20 +255,20 @@ def test_token_missing_a_required_claim_is_rejected(settings: Settings, claim: s
     del payload[claim]
     token = sign(payload, settings, algorithm="HS256")
 
-    with pytest.raises(InvalidAccessTokenError):
+    with pytest.raises(InvalidTokenError):
         decode_access_token(token, settings)
 
 
 @pytest.mark.parametrize("garbage", ["", "abc", "a.b.c", "Bearer x"])
 def test_malformed_token_is_rejected(settings: Settings, garbage: str) -> None:
-    with pytest.raises(InvalidAccessTokenError, match="DecodeError"):
+    with pytest.raises(InvalidTokenError, match="DecodeError"):
         decode_access_token(garbage, settings)
 
 
 def test_error_message_never_contains_the_token(settings: Settings) -> None:
     token = sign(claims(settings, aud="otra-api"), settings, algorithm="HS256")
 
-    with pytest.raises(InvalidAccessTokenError) as caught:
+    with pytest.raises(InvalidTokenError) as caught:
         decode_access_token(token, settings)
 
     assert token not in str(caught.value)
@@ -282,3 +285,57 @@ def test_settings_bound_the_access_token_lifetime() -> None:
         Settings(_env_file=None, access_token_expire_minutes=0)
     with pytest.raises(ValueError, match="access_token_expire_minutes"):
         Settings(_env_file=None, access_token_expire_minutes=24 * 60)
+
+
+# --- Refresh tokens ------------------------------------------------------------------------
+
+
+def test_refresh_token_roundtrip_keeps_user_family_and_jti(settings: Settings) -> None:
+    user_id, family_id = uuid4(), uuid4()
+    now = datetime.now(UTC).replace(microsecond=0)
+
+    token, issued = create_refresh_token(user_id, family_id, settings, now=now)
+    decoded = decode_refresh_token(token, settings)
+
+    assert decoded == issued
+    assert decoded.family_id == family_id
+    assert decoded.expires_at == now + timedelta(days=settings.refresh_token_expire_days)
+
+
+def test_each_refresh_token_gets_a_unique_jti(settings: Settings) -> None:
+    family_id = uuid4()
+
+    _, first = create_refresh_token(uuid4(), family_id, settings)
+    _, second = create_refresh_token(uuid4(), family_id, settings)
+
+    assert first.jti != second.jti
+
+
+def test_refresh_token_is_not_an_access_token(settings: Settings) -> None:
+    token, _ = create_refresh_token(uuid4(), uuid4(), settings)
+
+    with pytest.raises(InvalidTokenError, match="WrongTokenType"):
+        decode_access_token(token, settings)
+
+
+def test_access_token_is_not_a_refresh_token(settings: Settings) -> None:
+    token, _ = create_access_token(uuid4(), settings)
+
+    with pytest.raises(InvalidTokenError, match="WrongTokenType"):
+        decode_refresh_token(token, settings)
+
+
+@pytest.mark.parametrize("fam", [None, "no-es-un-uuid"], ids=["sin_fam", "fam_invalida"])
+def test_refresh_token_needs_a_valid_family(settings: Settings, fam: str | None) -> None:
+    payload = claims(settings, token_type="refresh", jti=str(uuid4()), fam=fam)
+
+    with pytest.raises(InvalidTokenError):
+        decode_refresh_token(sign(payload, settings, algorithm="HS256"), settings)
+
+
+def test_expired_refresh_token_is_rejected(settings: Settings) -> None:
+    past = datetime.now(UTC) - timedelta(days=settings.refresh_token_expire_days, seconds=1)
+    token, _ = create_refresh_token(uuid4(), uuid4(), settings, now=past)
+
+    with pytest.raises(InvalidTokenError, match="ExpiredSignatureError"):
+        decode_refresh_token(token, settings)

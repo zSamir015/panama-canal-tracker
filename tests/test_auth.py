@@ -65,6 +65,7 @@ def payload(settings: Settings, **overrides: object) -> dict[str, object]:
         "iss": settings.jwt_issuer,
         "aud": settings.jwt_audience,
         "jti": uuid4().hex,
+        "token_type": "access",
     }
     return claims | overrides
 
@@ -141,3 +142,44 @@ async def test_rejected_token_never_reaches_the_logs(
     events = [json.loads(line) for line in output.splitlines()]
     rejected = [e for e in events if e["event"] == "access_token_rejected"]
     assert {e["reason"] for e in rejected} >= {"ExpiredSignatureError", "InvalidAlgorithmError"}
+
+
+# --- Endpoints de auth: casos que se rechazan antes de llegar a la base --------------------
+
+
+async def test_register_rejects_a_role_in_the_body(client: AsyncClient) -> None:
+    response = await client.post(
+        "/api/v1/auth/register",
+        json={"email": "ana@example.com", "password": "una frase larga", "role": "admin"},
+    )
+
+    assert response.status_code == 422
+    assert response.json()["errors"][0]["loc"] == ["body", "role"]
+
+
+@pytest.mark.parametrize("path", ["/api/v1/auth/register", "/api/v1/auth/login"])
+async def test_auth_bodies_never_echo_the_password(client: AsyncClient, path: str) -> None:
+    response = await client.post(path, json={"email": "ana@example.com", "password": 12345})
+
+    assert response.status_code == 422
+    assert "12345" not in response.text
+
+
+async def test_refresh_without_cookie_is_401(client: AsyncClient) -> None:
+    response = await client.post("/api/v1/auth/refresh")
+
+    assert response.status_code == 401
+    assert response.headers["content-type"] == "application/problem+json"
+    assert response.headers["cache-control"] == "no-store"
+
+
+@pytest.mark.parametrize(
+    ("method", "path"), [("POST", "/api/v1/auth/logout"), ("GET", "/api/v1/auth/me")]
+)
+async def test_protected_auth_routes_need_a_token(
+    client: AsyncClient, method: str, path: str
+) -> None:
+    response = await client.request(method, path)
+
+    assert response.status_code == 401
+    assert response.json()["detail"] == UNAUTHORIZED_DETAIL
