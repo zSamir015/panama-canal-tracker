@@ -67,7 +67,7 @@ asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 addopts = "-ra --strict-markers"
 markers = [
-    "integration: necesita la base real (docker compose up -d --wait); el CI las ejecuta desde la 2.8",
+    "integration: necesita PostgreSQL y Redis reales (docker compose up -d --wait); el CI las ejecuta",
 ]
 
 [tool.coverage.run]
@@ -76,6 +76,10 @@ branch = true
 # SQLAlchemy async ejecuta las consultas en greenlets: sin esto, coverage pierde las líneas que
 # siguen a un `await` sobre la base y las marca como no ejecutadas.
 concurrency = ["greenlet", "thread"]
+
+[tool.coverage.report]
+# AGENTS.md §5: mínimo en `app/` desde la Fase 2. El CI falla por debajo.
+fail_under = 80
 
 [tool.mypy]
 python_version = "3.12"

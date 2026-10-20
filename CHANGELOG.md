@@ -6,6 +6,11 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Changed
+- El job `Tests (pytest)` del CI ejecuta también los tests de integración: levanta el mismo
+  `docker-compose.yml` de desarrollo con credenciales aleatorias de cada ejecución (enmascaradas,
+  nunca secretos del repositorio), comprueba roles y permisos con `scripts/check_dev_services.sh`,
+  aplica las migraciones a una base vacía con `alembic check`, y exige un 80 % de cobertura
+  (`fail_under`).
 - Los access tokens llevan el claim obligatorio `token_type: access`.
 - El test de rutas públicas lee las rutas del esquema OpenAPI: desde FastAPI 0.143 `app.routes`
   guarda cada router incluido como un solo objeto.
