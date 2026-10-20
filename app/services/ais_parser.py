@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import unicodedata
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Literal
@@ -10,17 +11,40 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, FiniteFloat, StrictBool, StrictInt, StrictStr
 
 MAX_MESSAGE_BYTES = 8 * 1024
+MAX_NAME_LENGTH = 128
 _POSITION_REPORT = "PositionReport"
 _STATIC_REPORT = "ShipStaticData"
 _INTERESTING_MESSAGE_TYPES = {_POSITION_REPORT, _STATIC_REPORT}
 FiniteIntOrNone = StrictInt | None
 
+AisRejectionReason = Literal[
+    "message_too_large",
+    "invalid_json",
+    "invalid_schema",
+    "missing_position_report",
+    "missing_static_data",
+    "invalid_mmsi",
+    "mmsi_mismatch",
+    "invalid_message",
+    "invalid_position",
+    "no_position",
+    "invalid_sog",
+    "invalid_cog",
+    "invalid_heading",
+    "invalid_nav_status",
+    "invalid_imo",
+    "invalid_ship_type",
+    "invalid_name",
+    "name_too_long",
+    "invalid_dimension",
+]
+
 
 class AisMessageRejected(ValueError):  # noqa: N818
     """Indica que un mensaje AIS no cumple el contrato esperado."""
 
-    def __init__(self, reason: str) -> None:
-        self.reason = reason
+    def __init__(self, reason: AisRejectionReason) -> None:
+        self.reason: AisRejectionReason = reason
         super().__init__(reason)
 
 
@@ -120,19 +144,19 @@ def parse_message(
 
     try:
         decoded: Any = json.loads(raw_bytes)
-    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise AisMessageRejected("invalid_json") from exc
+    except (UnicodeDecodeError, ValueError):
+        raise AisMessageRejected("invalid_json") from None
     if not isinstance(decoded, dict):
         raise AisMessageRejected("invalid_schema")
 
     message_type = decoded.get("MessageType")
-    if message_type not in _INTERESTING_MESSAGE_TYPES:
+    if not isinstance(message_type, str) or message_type not in _INTERESTING_MESSAGE_TYPES:
         return None
 
     try:
         envelope = _Envelope.model_validate(decoded)
-    except ValueError as exc:
-        raise AisMessageRejected("invalid_schema") from exc
+    except ValueError:
+        raise AisMessageRejected("invalid_schema") from None
 
     if envelope.message_type == _POSITION_REPORT:
         report = envelope.message.position_report
@@ -241,8 +265,10 @@ def _normalize_ship_type(value: int | None) -> int | None:
 def _normalize_name(value: str | None) -> str | None:
     if value is None:
         return None
-    if any(ord(character) < 32 for character in value):
+    if any(unicodedata.category(character).startswith("C") for character in value):
         raise AisMessageRejected("invalid_name")
+    if len(value) > MAX_NAME_LENGTH:
+        raise AisMessageRejected("name_too_long")
     normalized = value.rstrip("@ ")
     return normalized or None
 
