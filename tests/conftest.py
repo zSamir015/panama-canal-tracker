@@ -8,6 +8,9 @@ from fastapi import FastAPI
 from app.core.config import Settings
 from app.core.logging import UVICORN_LOGGERS
 
+# Clave de firma de los tests: pública a propósito y con los 32 bytes que exige HS256.
+TEST_JWT_KEY = "clave-de-firma-solo-para-los-tests-0123456789"
+
 
 @pytest.fixture(autouse=True)
 def isolate_settings_environment(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -39,6 +42,7 @@ def app_settings() -> Settings:
         _env_file=None,
         app_env="test",
         cors_origins=["https://tracker.example.com"],
+        jwt_secret_key=TEST_JWT_KEY,  # type: ignore[arg-type]
     )
 
 

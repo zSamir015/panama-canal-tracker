@@ -11,6 +11,7 @@ Si la base no está levantada fallan con un mensaje claro; nunca se saltan en si
 from collections.abc import AsyncIterator
 
 import pytest
+from alembic import command
 from fastapi import FastAPI
 from pydantic import SecretStr
 from sqlalchemy import text
@@ -19,6 +20,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from app.core.config import Settings
 from app.main import create_app
+from tests.conftest import TEST_JWT_KEY
+from tests.integration.alembic_helpers import alembic
 
 TEST_DATABASE_SUFFIX = "_test"
 
@@ -69,6 +72,8 @@ def db_settings() -> Settings:
         update={
             "database_url": to_test_database(settings.database_url),
             "migrations_database_url": to_test_database(settings.migrations_database_url),
+            # La clave de `.env` puede ser el placeholder; los tests firman con la suya.
+            "jwt_secret_key": SecretStr(TEST_JWT_KEY),
         }
     )
 
@@ -92,3 +97,17 @@ async def owner_engine(db_settings: Settings) -> AsyncIterator[AsyncEngine]:
     await require_connection(engine, "canal_owner")
     yield engine
     await engine.dispose()
+
+
+@pytest.fixture
+async def migrated(owner_engine: AsyncEngine) -> AsyncIterator[AsyncEngine]:
+    """Esquema migrado a `head` en la base de test; al terminar vuelve a `base`.
+
+    Empieza bajando a `base` por si una ejecución anterior se cortó a la mitad.
+    """
+    async with owner_engine.begin() as connection:
+        await connection.run_sync(alembic(command.downgrade, "base"))
+        await connection.run_sync(alembic(command.upgrade, "head"))
+    yield owner_engine
+    async with owner_engine.begin() as connection:
+        await connection.run_sync(alembic(command.downgrade, "base"))

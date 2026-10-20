@@ -1,6 +1,7 @@
 """Modelo ORM de usuarios."""
 
 from datetime import datetime
+from enum import StrEnum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
@@ -12,6 +13,13 @@ from app.models.base import Base
 
 if TYPE_CHECKING:
     from app.models.refresh_token import RefreshToken
+
+
+class UserRole(StrEnum):
+    """Valores del enum `user_role` de la base (migración 20261018_0001)."""
+
+    USER = "user"
+    ADMIN = "admin"
 
 
 class User(Base):
