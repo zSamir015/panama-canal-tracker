@@ -4,8 +4,9 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, Depends, FastAPI
 
+from app.core.auth import get_current_user
 from app.core.config import Settings, get_settings
 from app.core.db import create_engine, create_session_factory
 from app.core.errors import register_exception_handlers
@@ -17,6 +18,7 @@ from app.core.middleware import (
     RequestIdMiddleware,
     SecurityHeadersMiddleware,
 )
+from app.routers import admin
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -35,6 +37,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             await engine.dispose()
 
     app = FastAPI(title="Panama Canal Tracker", lifespan=lifespan)
+    app.state.settings = settings
     app.state.engine = engine
     app.state.session_factory = create_session_factory(engine)
     register_exception_handlers(app)
@@ -55,7 +58,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(RequestIdMiddleware)
 
-    api_router = APIRouter(prefix="/api/v1")
+    # Denegar por defecto (AGENTS.md §8.9): todo lo que cuelga de este router exige un access token
+    # válido. Los endpoints públicos de la lista blanca (register, login, refresh) irán en un
+    # router aparte, para que abrir una ruta sea siempre una decisión explícita.
+    api_router = APIRouter(prefix="/api/v1", dependencies=[Depends(get_current_user)])
+    api_router.include_router(admin.router)
     app.include_router(api_router)
 
     @app.get("/health", tags=["infrastructure"])

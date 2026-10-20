@@ -1,11 +1,8 @@
-from collections.abc import AsyncIterator, Callable
-from pathlib import Path
 from typing import Any
 
 import pytest
 from alembic import command
 from alembic.autogenerate import compare_metadata
-from alembic.config import Config
 from alembic.migration import MigrationContext
 from fastapi import FastAPI
 from sqlalchemy import inspect, text
@@ -15,39 +12,15 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from app.models import Base
 from app.models.base import include_object
+from tests.integration.alembic_helpers import alembic
 
-ROOT = Path(__file__).resolve().parent.parent.parent
 INSUFFICIENT_PRIVILEGE = "42501"
 CHECK_VIOLATION = "23514"
 UNIQUE_VIOLATION = "23505"
 
 
-def alembic(action: Callable[[Config, str], None], revision: str) -> Callable[[Connection], None]:
-    def run(connection: Connection) -> None:
-        config = Config(str(ROOT / "alembic.ini"))
-        config.attributes["connection"] = connection
-        config.attributes["configure_logger"] = False
-        action(config, revision)
-
-    return run
-
-
 def sqlstate(error: Exception) -> str | None:
     return getattr(getattr(error, "orig", None), "sqlstate", None)
-
-
-@pytest.fixture
-async def migrated(owner_engine: AsyncEngine) -> AsyncIterator[AsyncEngine]:
-    """Esquema migrado a `head` en la base de test; al terminar vuelve a `base`.
-
-    Empieza bajando a `base` por si una ejecución anterior se cortó a la mitad.
-    """
-    async with owner_engine.begin() as connection:
-        await connection.run_sync(alembic(command.downgrade, "base"))
-        await connection.run_sync(alembic(command.upgrade, "head"))
-    yield owner_engine
-    async with owner_engine.begin() as connection:
-        await connection.run_sync(alembic(command.downgrade, "base"))
 
 
 async def test_tests_never_touch_the_development_database(owner_engine: AsyncEngine) -> None:

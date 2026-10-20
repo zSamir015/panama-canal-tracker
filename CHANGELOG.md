@@ -5,6 +5,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Changed
+- Coverage mide con `concurrency = ["greenlet", "thread"]`: SQLAlchemy async ejecuta las
+  consultas en greenlets y sin esto las líneas tras un `await` a la base salían sin cubrir.
+
 ### Added
 - `docker-compose.yml` de desarrollo: PostgreSQL 16 + TimescaleDB 2.30 + PostGIS y Redis 8 con
   contraseña, imágenes fijadas por digest, healthchecks, volúmenes y puertos solo en `127.0.0.1`.
@@ -33,6 +37,19 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   (`docker/db/initdb/110_canal_test_database.sh`; en un volumen existente,
   `scripts/create_test_database.sh`). Los tests de migraciones comprueban upgrade y downgrade,
   que los modelos coinciden con la base migrada y los permisos reales de `canal_app`.
+- Hash de contraseñas con Argon2id (`pwdlib`, `app/core/security.py`): política de 12 a 128
+  caracteres sin reglas de composición, rehash cuando cambian los parámetros y un hash ficticio
+  para verificar en el mismo tiempo exista o no el email.
+- Access tokens JWT con PyJWT: `sub`, `iat`, `exp`, `iss`, `aud` y `jti` obligatorios y solo
+  `HS256` (`JWT_ALGORITHM` no admite otro valor). Configuración nueva: `JWT_ISSUER`,
+  `JWT_AUDIENCE`, `ACCESS_TOKEN_EXPIRE_MINUTES` (1–60) y `REFRESH_TOKEN_EXPIRE_DAYS` (1–30).
+- Dependencias `get_current_user` y `require_admin` (`app/core/auth.py`). Todo fallo de
+  autenticación responde el mismo 401 con `WWW-Authenticate: Bearer`; el rol se lee de la base en
+  cada petición, no del token. `/api/v1` exige token por defecto y el router `/api/v1/admin`
+  aplica `require_admin` a nivel de router.
+- `UserRepository`, que guarda y busca el email en minúsculas.
+- `scripts/create_admin.py`: crea administradores desde la terminal (la API nunca lo hace). Pide
+  la contraseña sin mostrarla y deja en el log solo el id del usuario creado.
 
 ## [0.1.0] - 2026-10-15
 

@@ -50,6 +50,12 @@ class Settings(BaseSettings):
         default_factory=lambda: ["http://localhost:5173"]
     )
     jwt_secret_key: SecretStr = SecretStr(JWT_SECRET_PLACEHOLDER)
+    # Un solo valor posible: nadie puede configurar `none` ni mezclar HS256 con claves públicas.
+    jwt_algorithm: Literal["HS256"] = "HS256"
+    jwt_issuer: str = Field(default="panama-canal-tracker", min_length=1)
+    jwt_audience: str = Field(default="panama-canal-tracker-api", min_length=1)
+    access_token_expire_minutes: int = Field(default=15, ge=1, le=60)
+    refresh_token_expire_days: int = Field(default=7, ge=1, le=30)
     # Lleva la contraseña del rol `canal_app` (sin DDL), así que es un secreto (AGENTS.md §8.16).
     database_url: SecretStr = SecretStr(DATABASE_URL_PLACEHOLDER)
     # Rol `canal_owner` (DDL). Solo la usa Alembic: el proceso de la API no necesita tenerla, así
