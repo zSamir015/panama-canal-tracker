@@ -9,16 +9,19 @@ Si la base no está levantada fallan con un mensaje claro; nunca se saltan en si
 """
 
 from collections.abc import AsyncIterator
+from urllib.parse import urlsplit, urlunsplit
 
 import pytest
 from alembic import command
 from fastapi import FastAPI
+from limits.aio.storage import RedisStorage
 from pydantic import SecretStr
 from sqlalchemy import text
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from app.core.config import Settings
+from app.core.rate_limit import create_storage
 from app.main import create_app
 from tests.conftest import TEST_JWT_KEY
 from tests.integration.alembic_helpers import alembic
@@ -111,3 +114,32 @@ async def migrated(owner_engine: AsyncEngine) -> AsyncIterator[AsyncEngine]:
     yield owner_engine
     async with owner_engine.begin() as connection:
         await connection.run_sync(alembic(command.downgrade, "base"))
+
+
+# Redis real: la base 15, nunca la 0 de desarrollo. Se vacía antes y después de cada test.
+TEST_REDIS_DB = 15
+NO_REDIS_HELP = (
+    "No se pudo conectar a Redis con REDIS_URL. Levántalo con: docker compose up -d --wait. "
+    "Para ejecutar solo los tests unitarios: pytest -m 'not integration'"
+)
+
+
+def with_test_db(url: SecretStr) -> SecretStr:
+    parts = urlsplit(url.get_secret_value())
+    return SecretStr(urlunsplit(parts._replace(path=f"/{TEST_REDIS_DB}")))
+
+
+@pytest.fixture
+def redis_url() -> SecretStr:
+    return with_test_db(Settings(app_env="test").redis_url)
+
+
+@pytest.fixture
+async def redis_storage(redis_url: SecretStr) -> AsyncIterator[RedisStorage]:
+    settings = Settings(app_env="test", redis_url=redis_url)
+    redis = create_storage(settings)
+    if not await redis.check():
+        pytest.fail(NO_REDIS_HELP, pytrace=False)
+    await redis.reset()
+    yield redis
+    await redis.reset()

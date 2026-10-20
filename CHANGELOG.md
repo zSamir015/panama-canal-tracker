@@ -5,6 +5,11 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-20
+
+Fase 2: base de datos y autenticación. Flujo register → login → endpoint protegido → refresh →
+logout probado de extremo a extremo contra PostgreSQL y Redis reales (en local y en el CI).
+
 ### Changed
 - El job `Tests (pytest)` del CI ejecuta también los tests de integración: levanta el mismo
   `docker-compose.yml` de desarrollo con credenciales aleatorias de cada ejecución (enmascaradas,
@@ -79,6 +84,9 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   test. Una ruta-sonda sin autenticación propia en el router protegido comprueba que la protección
   viene del router. `include_in_schema=False` prohibido en `app/` para que ninguna ruta escape al
   recorrido.
+- Tests de aceptación de la fase (`tests/integration/test_phase2_acceptance.py`): el flujo
+  completo como un navegador, y la fuerza bruta contra el login frenada con 429 por el contador
+  en Redis.
 
 ### Security
 - `certifi` 2026.10.19 en `requirements-dev.lock` (GHSA-6q48-6c7w-9gw2 en 2026.7.22).

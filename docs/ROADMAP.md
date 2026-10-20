@@ -49,21 +49,23 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` terminada
 
 ---
 
-## Fase 2 — Base de datos y autenticación `[ ]`
+## Fase 2 — Base de datos y autenticación `[x]`
 **Objetivo**: PostgreSQL/PostGIS/TimescaleDB local, usuarios con registro, login y refresh seguro.
 
-- [ ] 2.1 `docker-compose.yml`: `db` (TimescaleDB + PostGIS) y `redis` con contraseña; roles
+- [x] 2.1 `docker-compose.yml`: `db` (TimescaleDB + PostGIS) y `redis` con contraseña; roles
       `canal_owner` (migraciones) y `canal_app` (sin DDL)
-- [ ] 2.2 SQLAlchemy 2.0 async, `get_db`, patrón repository
-- [ ] 2.3 Alembic; migraciones de `users` y `refresh_tokens`
-- [ ] 2.4 `POST /auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`, `GET /auth/me`;
+- [x] 2.2 SQLAlchemy 2.0 async, `get_db`, patrón repository
+- [x] 2.3 Alembic; migraciones de `users` y `refresh_tokens`
+- [x] 2.4 `POST /auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`, `GET /auth/me`;
       refresh en cookie HttpOnly con rotación y detección de reutilización
-- [ ] 2.5 Argon2id (pwdlib), PyJWT con `iss`/`aud`; `get_current_user`, `require_admin` a nivel
+- [x] 2.5 Argon2id (pwdlib), PyJWT con `iss`/`aud`; `get_current_user`, `require_admin` a nivel
       de router; login resistente a enumeración; `scripts/create_admin.py`
-- [ ] 2.6 Rate limiting con contador en Redis (ADR-0007 elige la librería)
-- [ ] 2.7 Test "denegar por defecto" que recorre `app.routes`
-- [ ] 2.8 CI con service container de la DB; tests de integración reales
-- [ ] 2.9 Tests: registro, duplicado (409), campo `role` en el body rechazado, login, token
+- [x] 2.6 Rate limiting con contador en Redis (ADR-0007 elige la librería)
+- [x] 2.7 Test "denegar por defecto" que recorre todas las rutas (esquema OpenAPI: desde
+      FastAPI 0.143 `app.routes` no lista las de los routers incluidos)
+- [x] 2.8 CI con PostgreSQL y Redis reales (el mismo `docker-compose.yml`, credenciales
+      efímeras); tests de integración y cobertura mínima del 80 %
+- [x] 2.9 Tests: registro, duplicado (409), campo `role` en el body rechazado, login, token
       inválido / expirado / `alg: none` / audiencia incorrecta (401), refresh rotado, refresh
       reutilizado revoca la familia, rol admin (403), rate limit (429). Cobertura ≥ 80 %
 
