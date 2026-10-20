@@ -56,7 +56,7 @@ keeping a single upstream AIS connection. Details in [docs/ARCHITECTURE.md](docs
 |---|---|---|
 | 0 | Scaffold and documentation | ✅ |
 | 1 | FastAPI skeleton, CI, repo security | ✅ |
-| 2 | Database and authentication | ⏳ |
+| 2 | Database and authentication | ✅ |
 | 3 | AIS ingestion worker | ⏳ |
 | 4 | Real-time map and live demo | ⏳ |
 | 5 | Transit detection and validation | ⏳ |

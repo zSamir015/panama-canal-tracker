@@ -29,8 +29,7 @@ dependencies = [
     "limits[redis]>=5.8.0,<6.0",
 ]
 # Se añadirán en su fase (no instalar antes):
-#   Fase 2: geoalchemy2
-#   Fase 3: websockets
+#   Fase 3: geoalchemy2 (tabla `positions`), websockets
 
 [project.optional-dependencies]
 dev = [

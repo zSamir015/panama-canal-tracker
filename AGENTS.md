@@ -316,8 +316,9 @@ Principio general: **denegar por defecto** — todo cerrado salvo lo que se abre
 
 ## 9. Estado actual
 
-> **Fase actual: 2 — Base de datos y autenticación.** La Fase 1 (esqueleto FastAPI, CI y
-> seguridad del repositorio) está cerrada.
+> **Fase actual: 3 — Ingesta AIS (worker) y tiempo real interno.** Las Fases 1 (esqueleto,
+> CI y seguridad del repositorio, `v0.1.0`) y 2 (base de datos y autenticación, `v0.2.0`) están
+> cerradas.
 
 ## 10. Comandos útiles
 
