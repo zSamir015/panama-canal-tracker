@@ -27,9 +27,10 @@ dependencies = [
     "pwdlib[argon2]>=0.3.1,<1.0",
     "pyjwt>=2.15.1,<3.0",
     "limits[redis]>=5.8.0,<6.0",
+    "geoalchemy2>=0.20.0,<1.0",
 ]
 # Se añadirán en su fase (no instalar antes):
-#   Fase 3: geoalchemy2 (tabla `positions`), websockets
+#   Fase 3: websockets
 
 [project.optional-dependencies]
 dev = [

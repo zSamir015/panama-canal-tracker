@@ -5,6 +5,11 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Added
+- Modelos y migración de `vessels` y `positions`: la tabla de posiciones usa una hypertable de
+  TimescaleDB, `GEOGRAPHY(Point,4326)`, índices GIST y por buque/tiempo, clave foránea al buque
+  y constraints para MMSI y valores AIS básicos.
+
 ## [0.2.0] - 2026-10-20
 
 Fase 2: base de datos y autenticación. Flujo register → login → endpoint protegido → refresh →

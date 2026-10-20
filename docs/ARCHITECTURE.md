@@ -96,8 +96,8 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
 | sog / cog / heading | REAL | velocidad, rumbo, proa |
 | nav_status | SMALLINT | estado de navegación AIS (fondeado, en ruta...) |
 
-- Sin FK hacia `vessels` (las hypertables con alto volumen de escritura evitan FKs; la integridad
-  la garantiza el worker con upsert previo del buque).
+- FK hacia `vessels.mmsi`; el writer hace upsert del buque antes de insertar posiciones, en la
+  misma transacción, para evitar posiciones huérfanas.
 - **Compresión** de chunks > 7 días; **política de downsampling** para datos > 90 días
   (agregado continuo con una posición cada 5 min). El histórico no se borra, se compacta.
 
