@@ -60,7 +60,7 @@ def upgrade() -> None:
         sa.CheckConstraint("sog IS NULL OR sog >= 0 AND sog < 102.3", name="ck_positions_sog"),
         sa.CheckConstraint("cog IS NULL OR cog >= 0 AND cog < 360", name="ck_positions_cog"),
         sa.CheckConstraint(
-            "heading IS NULL OR heading >= 0 AND heading < 511", name="ck_positions_heading"
+            "heading IS NULL OR heading >= 0 AND heading < 360", name="ck_positions_heading"
         ),
         sa.CheckConstraint(
             "nav_status IS NULL OR nav_status BETWEEN 0 AND 15",

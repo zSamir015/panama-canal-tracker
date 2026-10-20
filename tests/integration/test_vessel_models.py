@@ -108,7 +108,13 @@ async def test_vessel_constraints_reject_invalid_values(
 
 @pytest.mark.parametrize(
     ("column", "value"),
-    [("vessel_mmsi", 123), ("sog", 102.3), ("cog", 360), ("heading", 511)],
+    [
+        ("vessel_mmsi", 123),
+        ("sog", 102.3),
+        ("cog", 360),
+        ("heading", 360),
+        ("heading", 511),
+    ],
 )
 async def test_position_constraints_reject_unavailable_values(
     migrated: AsyncEngine, column: str, value: float
@@ -135,6 +141,24 @@ async def test_position_constraints_reject_unavailable_values(
         await connection.commit()
         with pytest.raises(IntegrityError):
             await connection.execute(statement, parameters)
+
+
+async def test_position_constraints_accept_valid_boundary_values(migrated: AsyncEngine) -> None:
+    async with migrated.connect() as connection:
+        await connection.execute(
+            text("INSERT INTO vessels (mmsi, name) VALUES (352001234, 'VALID')")
+        )
+        await connection.execute(
+            text(
+                "INSERT INTO positions "
+                "(received_at, vessel_mmsi, geom, sog, cog, heading) "
+                "VALUES (:received_at, 352001234, "
+                "ST_GeogFromText('SRID=4326;POINT(-79.9 9.3)'), "
+                "102.2, 359.9, 359)"
+            ),
+            {"received_at": datetime.now(UTC)},
+        )
+        await connection.commit()
 
 
 async def test_position_requires_an_existing_vessel(migrated: AsyncEngine) -> None:

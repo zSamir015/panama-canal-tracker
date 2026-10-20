@@ -26,13 +26,15 @@ class Position(Base):
         CheckConstraint("sog IS NULL OR sog >= 0 AND sog < 102.3", name="ck_positions_sog"),
         CheckConstraint("cog IS NULL OR cog >= 0 AND cog < 360", name="ck_positions_cog"),
         CheckConstraint(
-            "heading IS NULL OR heading >= 0 AND heading < 511", name="ck_positions_heading"
+            "heading IS NULL OR heading >= 0 AND heading < 360", name="ck_positions_heading"
         ),
         CheckConstraint(
             "nav_status IS NULL OR nav_status BETWEEN 0 AND 15",
             name="ck_positions_nav_status",
         ),
         ForeignKeyConstraint(["vessel_mmsi"], ["vessels.mmsi"], name="fk_positions_vessel_mmsi"),
+        # Timescale crea este índice al convertir la tabla en hypertable; se declara para que
+        # Alembic no intente eliminarlo durante una comprobación de deriva del esquema.
         Index("positions_received_at_idx", text("received_at DESC")),
         Index("ix_positions_geom", "geom", postgresql_using="gist"),
         Index("ix_positions_vessel_mmsi_received_at", "vessel_mmsi", "received_at"),
@@ -40,8 +42,6 @@ class Position(Base):
 
     received_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
     vessel_mmsi: Mapped[int] = mapped_column(Integer, primary_key=True)
-    # Timescale crea este índice al convertir la tabla en hypertable; se declara para que
-    # Alembic no intente eliminarlo durante una comprobación de deriva del esquema.
     geom: Mapped[WKBElement] = mapped_column(
         Geography(geometry_type="POINT", srid=4326, spatial_index=False), nullable=False
     )
