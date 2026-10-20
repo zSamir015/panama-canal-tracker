@@ -63,6 +63,14 @@ else
 fi
 
 expect_ok "canal_app se conecta" canal_app CANAL_APP_PASSWORD "SELECT 1;"
+# La base de los tests de integración (docker/db/initdb/110_canal_test_database.sh).
+if [ "$(docker compose exec -T db bash -c \
+  'PGPASSWORD="$CANAL_APP_PASSWORD" psql -h 127.0.0.1 -U canal_app -d canal_tracker_test -qtAc "SELECT 1"' \
+  2>&1)" = "1" ]; then
+  pass "canal_app se conecta a la base de test"
+else
+  fail "canal_app se conecta a la base de test (ejecuta scripts/create_test_database.sh)"
+fi
 expect_denied "canal_app no puede crear tablas" canal_app CANAL_APP_PASSWORD \
   "CREATE TABLE check_app_ddl (id int);"
 expect_denied "canal_app no puede crear esquemas" canal_app CANAL_APP_PASSWORD \

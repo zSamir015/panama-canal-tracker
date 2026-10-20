@@ -27,6 +27,7 @@ services:
       - db-data:/home/postgres/pgdata
       # Solo este archivo: la imagen trae sus propios scripts de inicio en esa carpeta.
       - ./docker/db/initdb/100_canal_roles.sh:/docker-entrypoint-initdb.d/100_canal_roles.sh:ro
+      - ./docker/db/initdb/110_canal_test_database.sh:/docker-entrypoint-initdb.d/110_canal_test_database.sh:ro
     healthcheck:
       # Por TCP: durante la inicialización el servidor temporal solo escucha en el socket local,
       # así que el servicio no aparece "healthy" hasta que los roles están creados.

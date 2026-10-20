@@ -23,6 +23,16 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 - Tests de integración (marcador `integration`) contra PostgreSQL real con el rol `canal_app`:
   conexión, rol sin DDL, rollback, devolución de conexiones al pool y parámetros enlazados. Si la
   base no está levantada fallan con instrucciones; el CI los excluye hasta la 2.8.
+- Alembic async configurado con `MIGRATIONS_DATABASE_URL` y una migración inicial para `users` y
+  `refresh_tokens`, incluyendo índices, restricciones, expiración, revocación y rotación.
+  `MIGRATIONS_DATABASE_URL` es opcional para la API y Alembic se niega a ejecutarse sin ella.
+  La migración no instala extensiones, y la base exige el email en minúsculas
+  (`ck_users_email_lowercase`) para que la unicidad no dependa de las mayúsculas. Alembic
+  ignora la tabla `spatial_ref_sys` de PostGIS al comparar modelos y base.
+- Base `canal_tracker_test` para los tests de integración, con los mismos roles y permisos
+  (`docker/db/initdb/110_canal_test_database.sh`; en un volumen existente,
+  `scripts/create_test_database.sh`). Los tests de migraciones comprueban upgrade y downgrade,
+  que los modelos coinciden con la base migrada y los permisos reales de `canal_app`.
 
 ## [0.1.0] - 2026-10-15
 
