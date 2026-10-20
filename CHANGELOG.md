@@ -69,6 +69,11 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `rate_limit_unavailable`). Las claves llevan el email como SHA-256, nunca en claro.
 - `REDIS_URL` como `SecretStr`, con esquema `redis`/`rediss` y obligatoria en producción con
   contraseña real.
+- Test de denegar por defecto (`tests/test_deny_by_default.py`): recorre todas las rutas y exige
+  el mismo 401 sin token y con token falso fuera de la lista blanca, que queda documentada en el
+  test. Una ruta-sonda sin autenticación propia en el router protegido comprueba que la protección
+  viene del router. `include_in_schema=False` prohibido en `app/` para que ninguna ruta escape al
+  recorrido.
 
 ### Security
 - `certifi` 2026.10.19 en `requirements-dev.lock` (GHSA-6q48-6c7w-9gw2 en 2026.7.22).

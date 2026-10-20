@@ -219,8 +219,10 @@ Principio general: **denegar por defecto** — todo cerrado salvo lo que se abre
 ### 8.9 Endpoints de la API
 - **Denegar por defecto**: todo endpoint requiere autenticación salvo una lista blanca explícita
   (`/health`, `/ready`, `/auth/register`, `/auth/login`, `/auth/refresh`, docs).
-- Verificación: un test recorre `app.routes` y falla si una ruta fuera de la lista blanca
-  responde sin token.
+- Verificación: `tests/test_deny_by_default.py` recorre todas las rutas (del esquema OpenAPI:
+  desde FastAPI 0.143 `app.routes` no lista las de los routers incluidos) y falla si una ruta
+  fuera de la lista blanca responde sin token. Por eso `include_in_schema=False` está prohibido
+  en `app/`.
 - Paginación con tamaño máximo; rangos de fechas acotados; sin endpoints que devuelvan tablas
   completas.
 - Errores sin stack traces ni detalles internos; los detalles van al log con un id de request.
