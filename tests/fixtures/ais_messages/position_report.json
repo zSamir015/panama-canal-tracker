@@ -1,0 +1,21 @@
+{
+  "MessageType": "PositionReport",
+  "MetaData": {
+    "MMSI": 352001234,
+    "ShipName": "PACIFIC STAR",
+    "Latitude": 9.35,
+    "Longitude": -79.91
+  },
+  "Message": {
+    "PositionReport": {
+      "UserID": 352001234,
+      "Valid": true,
+      "Latitude": 9.35,
+      "Longitude": -79.91,
+      "Sog": 7.8,
+      "Cog": 145.2,
+      "TrueHeading": 146,
+      "NavigationalStatus": 0
+    }
+  }
+}

@@ -9,6 +9,8 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 - Modelos y migración de `vessels` y `positions`: la tabla de posiciones usa una hypertable de
   TimescaleDB, `GEOGRAPHY(Point,4326)`, índices GIST y por buque/tiempo, clave foránea al buque
   y constraints para MMSI y valores AIS básicos.
+- Parser de mensajes `PositionReport` y `ShipStaticData` de AISStream con validación de entrada,
+  normalización de valores AIS no disponibles y protección frente a mensajes sobredimensionados.
 
 ## [0.2.0] - 2026-10-20
 
