@@ -23,6 +23,9 @@ logout probado de extremo a extremo contra PostgreSQL y Redis reales (en local y
   consultas en greenlets y sin esto las líneas tras un `await` a la base salían sin cubrir.
 
 ### Added
+- Modelos y migración de `vessels` y `positions`: la tabla de posiciones usa una hypertable de
+  TimescaleDB, `GEOGRAPHY(Point,4326)`, índices GIST y por buque/tiempo, con constraints para
+  MMSI y valores AIS básicos.
 - `docker-compose.yml` de desarrollo: PostgreSQL 16 + TimescaleDB 2.30 + PostGIS y Redis 8 con
   contraseña, imágenes fijadas por digest, healthchecks, volúmenes y puertos solo en `127.0.0.1`.
 - Roles de la base (`docker/db/initdb/100_canal_roles.sh`): `canal_owner` es dueño de la base y

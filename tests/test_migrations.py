@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 import pytest
@@ -17,10 +18,11 @@ def test_alembic_points_to_the_versioned_migration_directory() -> None:
 
     assert config.get_main_option("script_location").endswith("/alembic")
     assert (ROOT / "alembic" / "versions" / "20261018_0001_users_refresh_tokens.py").is_file()
+    assert (ROOT / "alembic" / "versions" / "20261020_0002_vessels_positions.py").is_file()
 
 
-def test_models_declare_the_initial_tables() -> None:
-    assert set(Base.metadata.tables) == {"users", "refresh_tokens"}
+def test_models_declare_the_persistent_tables() -> None:
+    assert set(Base.metadata.tables) == {"users", "refresh_tokens", "vessels", "positions"}
 
     users = Base.metadata.tables["users"]
     assert {column.name for column in users.primary_key.columns} == {"id"}
@@ -34,6 +36,17 @@ def test_models_declare_the_initial_tables() -> None:
     assert refresh_tokens.c.expires_at.nullable is False
     assert refresh_tokens.c.revoked_at.nullable is True
     assert refresh_tokens.c.replaced_by_jti.nullable is True
+
+    vessels = Base.metadata.tables["vessels"]
+    assert {column.name for column in vessels.primary_key.columns} == {"mmsi"}
+    assert vessels.c.updated_at.nullable is False
+
+    positions = Base.metadata.tables["positions"]
+    assert {column.name for column in positions.primary_key.columns} == {
+        "received_at",
+        "vessel_mmsi",
+    }
+    assert positions.c.geom.nullable is False
 
 
 def alembic_config() -> Config:
@@ -54,10 +67,17 @@ def test_alembic_refuses_to_run_without_the_migrations_url(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     # Sin MIGRATIONS_DATABASE_URL, Alembic no debe caer en otra URL (ni en la de canal_app).
-    monkeypatch.setattr(app.core.config, "get_settings", lambda: Settings(_env_file=None))
+    def settings_without_migrations() -> Settings:
+        return Settings(_env_file=None)
+
+    monkeypatch.delenv("MIGRATIONS_DATABASE_URL", raising=False)
+    monkeypatch.setattr(app.core.config, "get_settings", settings_without_migrations)
+    alembic_module = sys.modules.get("alembic.env")
+    if alembic_module is not None:
+        monkeypatch.setattr(alembic_module, "get_settings", settings_without_migrations)
 
     with pytest.raises(RuntimeError, match="MIGRATIONS_DATABASE_URL no está definida"):
-        command.upgrade(alembic_config(), "head")
+        command.downgrade(alembic_config(), "base")
 
 
 def test_alembic_refuses_offline_mode() -> None:
