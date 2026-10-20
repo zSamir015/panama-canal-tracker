@@ -1,0 +1,22 @@
+{
+  "MessageType": "ShipStaticData",
+  "MetaData": {
+    "MMSI": 352001234,
+    "ShipName": "PACIFIC STAR"
+  },
+  "Message": {
+    "ShipStaticData": {
+      "UserID": 352001234,
+      "Valid": true,
+      "Name": "PACIFIC STAR@@@@@@@",
+      "ImoNumber": 9876543,
+      "Type": 70,
+      "Dimension": {
+        "A": 120,
+        "B": 30,
+        "C": 12,
+        "D": 8
+      }
+    }
+  }
+}
