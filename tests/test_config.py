@@ -8,6 +8,7 @@ from app.core.config import Settings, get_settings
 STRONG_SECRET = "s3cr3t-de-prueba-con-mas-de-32-bytes-de-largo"
 DB_PASSWORD = "pw-db-falsa-de-prueba"
 DB_URL = f"postgresql+asyncpg://canal_app:{DB_PASSWORD}@db:5432/canal_tracker"
+REDIS_URL = "redis://:pw-redis-falsa-de-prueba@redis:6379/0"
 
 
 @pytest.fixture(autouse=True)
@@ -20,6 +21,7 @@ def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
         "JWT_SECRET_KEY",
         "DATABASE_URL",
         "MIGRATIONS_DATABASE_URL",
+        "REDIS_URL",
     ):
         monkeypatch.delenv(name, raising=False)
 
@@ -34,6 +36,7 @@ def production_env(**overrides: str) -> dict[str, str]:
         "cors_origins": "https://tracker.example.com",
         "jwt_secret_key": STRONG_SECRET,
         "database_url": DB_URL,
+        "redis_url": REDIS_URL,
     }
     env.update(overrides)
     return env
@@ -175,6 +178,7 @@ def test_production_values_from_environment_count_as_explicit(
     monkeypatch.setenv("CORS_ORIGINS", "https://tracker.example.com")
     monkeypatch.setenv("JWT_SECRET_KEY", STRONG_SECRET)
     monkeypatch.setenv("DATABASE_URL", DB_URL)
+    monkeypatch.setenv("REDIS_URL", REDIS_URL)
 
     settings = make_settings()
 
@@ -285,3 +289,34 @@ def test_url_scheme_error_names_the_variable_without_leaking_it(field: str) -> N
 
     assert f"{field.upper()} debe usar el esquema postgresql+asyncpg://" in str(error.value)
     assert DB_PASSWORD not in str(error.value)
+
+
+def test_production_requires_explicit_redis_url() -> None:
+    env = production_env()
+    del env["redis_url"]
+
+    with pytest.raises(ValidationError, match="REDIS_URL es obligatoria"):
+        make_settings(**env)
+
+
+@pytest.mark.parametrize(
+    "url",
+    ["redis://localhost:6379/0", "redis://:changeme@redis:6379/0"],
+    ids=["sin_password", "placeholder"],
+)
+def test_production_rejects_redis_url_without_a_real_password(url: str) -> None:
+    with pytest.raises(ValidationError, match="REDIS_URL debe llevar una contraseña real"):
+        make_settings(**production_env(redis_url=url))
+
+
+def test_redis_url_must_use_a_redis_scheme() -> None:
+    with pytest.raises(ValidationError, match="REDIS_URL debe usar el esquema") as caught:
+        make_settings(redis_url="http://:pw-redis-falsa-de-prueba@redis:6379")
+
+    assert "pw-redis-falsa-de-prueba" not in str(caught.value)
+
+
+def test_redis_url_is_masked_in_repr() -> None:
+    settings = make_settings(redis_url=REDIS_URL)
+
+    assert "pw-redis-falsa-de-prueba" not in repr(settings)

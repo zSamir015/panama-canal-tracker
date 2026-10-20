@@ -18,6 +18,14 @@ from fastapi import APIRouter, Cookie, Depends, Response
 from app.core.auth import CurrentUser, get_app_settings
 from app.core.config import Settings
 from app.core.db import DbSession
+from app.core.rate_limit import (
+    LOGIN_PER_EMAIL,
+    Limiter,
+    email_key,
+    limit_login_by_ip,
+    limit_refresh_by_ip,
+    limit_register_by_ip,
+)
 from app.schemas.auth import LoginRequest, TokenResponse, UserCreate, UserResponse
 from app.services.auth import AuthService, IssuedTokens
 
@@ -32,6 +40,16 @@ UNAUTHORIZED: dict[int | str, dict[str, Any]] = {
 }
 INVALID_BODY: dict[int | str, dict[str, Any]] = {
     HTTPStatus.UNPROCESSABLE_ENTITY: {"description": "Datos inválidos", **PROBLEM}
+}
+RATE_LIMITED: dict[int | str, dict[str, Any]] = {
+    HTTPStatus.TOO_MANY_REQUESTS: {
+        "description": "Límite de peticiones superado; ver la cabecera `Retry-After`",
+        **PROBLEM,
+    },
+    HTTPStatus.SERVICE_UNAVAILABLE: {
+        "description": "El contador de peticiones no está disponible",
+        **PROBLEM,
+    },
 }
 
 public_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -71,6 +89,7 @@ def _token_response(response: Response, tokens: IssuedTokens) -> TokenResponse:
 @public_router.post(
     "/register",
     status_code=HTTPStatus.CREATED,
+    dependencies=[Depends(limit_register_by_ip)],
     summary="Crear una cuenta",
     description=(
         "Crea un usuario con rol `user`. El rol no se acepta en el cuerpo: cualquier campo "
@@ -79,6 +98,7 @@ def _token_response(response: Response, tokens: IssuedTokens) -> TokenResponse:
     responses={
         HTTPStatus.CONFLICT: {"description": "El email ya está registrado", **PROBLEM},
         **INVALID_BODY,
+        **RATE_LIMITED,
     },
 )
 async def register(body: UserCreate, service: Service) -> UserResponse:
@@ -88,25 +108,32 @@ async def register(body: UserCreate, service: Service) -> UserResponse:
 
 @public_router.post(
     "/login",
+    dependencies=[Depends(limit_login_by_ip)],
     summary="Iniciar sesión",
     description=(
         "Devuelve un access token y deja el refresh token en la cookie `refresh_token`. "
-        "Las credenciales incorrectas responden siempre el mismo 401, exista o no el email."
+        "Las credenciales incorrectas responden siempre el mismo 401, exista o no el email. "
+        "Límite: 5 intentos por minuto por IP y por email."
     ),
-    responses={**UNAUTHORIZED, **INVALID_BODY},
+    responses={**UNAUTHORIZED, **INVALID_BODY, **RATE_LIMITED},
 )
-async def login(body: LoginRequest, response: Response, service: Service) -> TokenResponse:
+async def login(
+    body: LoginRequest, response: Response, service: Service, limiter: Limiter
+) -> TokenResponse:
+    # Por email además de por IP: frena a quien reparte los intentos entre muchas IPs.
+    await limiter.check_auth(LOGIN_PER_EMAIL, "login", "email", email_key(body.email))
     return _token_response(response, await service.login(body.email, body.password))
 
 
 @public_router.post(
     "/refresh",
+    dependencies=[Depends(limit_refresh_by_ip)],
     summary="Renovar el access token",
     description=(
         "Usa la cookie `refresh_token`, la rota (la anterior deja de valer) y devuelve un access "
         "token nuevo. Reutilizar un refresh ya rotado revoca toda la sesión."
     ),
-    responses=UNAUTHORIZED,
+    responses={**UNAUTHORIZED, **RATE_LIMITED},
 )
 async def refresh(
     response: Response, service: Service, refresh_token: RefreshCookie = None
