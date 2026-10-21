@@ -21,6 +21,7 @@ DATABASE_DRIVER_SCHEME = "postgresql+asyncpg"
 DATABASE_PASSWORD_PLACEHOLDER = "changeme"  # noqa: S105 (placeholder de .env.example)
 REDIS_URL_PLACEHOLDER = "redis://:changeme@localhost:6379/0"
 REDIS_SCHEMES = ("redis", "rediss")
+AISSTREAM_DEFAULT_URL = "wss://stream.aisstream.io/v0/stream"
 
 
 def _is_origin(value: str) -> bool:
@@ -66,6 +67,14 @@ class Settings(BaseSettings):
     # Contador del rate limiting (ADR-0007). Lleva la contraseña de Redis.
     redis_url: SecretStr = SecretStr(REDIS_URL_PLACEHOLDER)
 
+    # Worker AIS (Fase 3). La key solo la lee el proceso `worker` (AGENTS.md §8.1): la API no la
+    # necesita, así que no tiene valor por defecto y el worker se niega a arrancar sin ella.
+    aisstream_api_key: SecretStr | None = None
+    # `ws://` solo para el simulador local (scripts/ais_simulator.py); en producción, `wss://`.
+    aisstream_url: str = AISSTREAM_DEFAULT_URL
+    ais_reconnect_max_seconds: int = Field(default=60, ge=1, le=600)
+    ais_queue_max_size: int = Field(default=10_000, ge=100, le=1_000_000)
+
     @field_validator("database_url", "migrations_database_url")
     @classmethod
     def require_asyncpg_url(cls, value: SecretStr | None, info: ValidationInfo) -> SecretStr | None:
@@ -83,6 +92,17 @@ class Settings(BaseSettings):
     def require_redis_url(cls, value: SecretStr) -> SecretStr:
         if urlsplit(value.get_secret_value()).scheme not in REDIS_SCHEMES:
             raise ValueError("REDIS_URL debe usar el esquema redis:// o rediss://")
+        return value
+
+    @field_validator("aisstream_url")
+    @classmethod
+    def require_websocket_url(cls, value: str) -> str:
+        parts = urlsplit(value)
+        if parts.scheme not in ("ws", "wss") or not parts.hostname:
+            raise ValueError("AISSTREAM_URL debe ser una URL ws:// o wss://")
+        if parts.username or parts.password or parts.query:
+            # La key va en el mensaje de suscripción, nunca en la URL (acabaría en logs).
+            raise ValueError("AISSTREAM_URL no puede llevar credenciales ni parámetros")
         return value
 
     @field_validator("cors_origins", mode="before")
@@ -142,6 +162,9 @@ class Settings(BaseSettings):
             DATABASE_PASSWORD_PLACEHOLDER,
         ):
             errors.append("REDIS_URL debe llevar una contraseña real en producción")
+
+        if urlsplit(self.aisstream_url).scheme != "wss":
+            errors.append("AISSTREAM_URL debe usar wss:// en producción")
 
         if "cors_origins" not in self.model_fields_set:
             errors.append("CORS_ORIGINS es obligatoria en producción")

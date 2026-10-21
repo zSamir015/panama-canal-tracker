@@ -81,7 +81,13 @@ python scripts/ais_simulator.py jsonl --minutes 30 --seed 7 --invalid-ratio 0.05
 python scripts/ais_simulator.py serve --port 8765 --speed 60
 ```
 
-El worker (3.3) se apunta al simulador cambiando solo la URL del WebSocket. El servidor escucha en
+El worker (3.3) se apunta al simulador cambiando solo la URL del WebSocket:
+
+```bash
+python scripts/ais_simulator.py serve --speed 60      # en una terminal
+AISSTREAM_URL=ws://127.0.0.1:8765 AISSTREAM_API_KEY=cualquier-valor \
+  python -m app.workers.ais_consumer                  # en otra
+``` El servidor escucha en
 `127.0.0.1`, acepta cualquier `APIKey` no vacía y no la registra: nunca uses aquí la key real.
 Las coordenadas de la ruta son aproximadas y se contrastan con datos reales en la tarea 3.8.
 Fixtures fijas de un mensaje en `tests/fixtures/ais_messages/`.

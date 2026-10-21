@@ -5,15 +5,11 @@ todo lo que inyecta como inválido el parser lo rechaza con el motivo esperado.
 """
 
 import asyncio
-import importlib.util
 import itertools
 import json
-import sys
 from collections import Counter, defaultdict
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
-from types import ModuleType
 from typing import Any
 
 import pytest
@@ -26,22 +22,12 @@ from app.services.ais_parser import (
     VesselStatic,
     parse_message,
 )
+from tests.scripts_loader import load_script
 
-SCRIPT = Path(__file__).resolve().parent.parent / "scripts" / "ais_simulator.py"
 START = datetime(2026, 10, 20, 12, 0, tzinfo=UTC)
 CANAL_BBOX = [[8.4, -80.2], [9.7, -79.2]]  # orden de AISStream: [lat, lon]
 
-
-def load_simulator() -> ModuleType:
-    spec = importlib.util.spec_from_file_location("ais_simulator", SCRIPT)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    sys.modules["ais_simulator"] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-sim = load_simulator()
+sim = load_script("ais_simulator")
 
 
 def generate(**kwargs: Any) -> list[Any]:

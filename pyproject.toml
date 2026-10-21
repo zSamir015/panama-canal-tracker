@@ -58,7 +58,7 @@ select = ["E", "W", "F", "I", "B", "UP", "N", "ASYNC", "S", "RUF"]
 known-third-party = ["alembic"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101", "S105", "S106"]  # assert y secretos falsos permitidos en tests
+"tests/**" = ["S101", "S105", "S106", "S311"]  # assert, secretos falsos y random de datos de prueba
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
