@@ -2,7 +2,11 @@
   "MessageType": "ShipStaticData",
   "MetaData": {
     "MMSI": 352001234,
-    "ShipName": "PACIFIC STAR"
+    "MMSI_String": 352001234,
+    "ShipName": "PACIFIC STAR        ",
+    "latitude": null,
+    "longitude": null,
+    "time_utc": "2026-10-20 14:30:00.123456789 +0000 UTC"
   },
   "Message": {
     "ShipStaticData": {

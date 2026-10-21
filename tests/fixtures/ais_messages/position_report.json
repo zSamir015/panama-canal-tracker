@@ -2,9 +2,11 @@
   "MessageType": "PositionReport",
   "MetaData": {
     "MMSI": 352001234,
-    "ShipName": "PACIFIC STAR",
-    "Latitude": 9.35,
-    "Longitude": -79.91
+    "MMSI_String": 352001234,
+    "ShipName": "PACIFIC STAR        ",
+    "latitude": 9.35,
+    "longitude": -79.91,
+    "time_utc": "2026-10-20 14:30:00.123456789 +0000 UTC"
   },
   "Message": {
     "PositionReport": {

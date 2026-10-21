@@ -48,7 +48,42 @@ tarea 3.8.
    en 3 s; como mucho una actualización de suscripción por segundo; 200 MMSI por filtro. Las
    conexiones sin compresión tendrán límite de ancho de banda desde septiembre de 2026.
 
-## 3. Zonas geográficas
+## 2b. Prueba con datos reales (tarea 3.8, 2026-10-21)
+
+**Funciona**: la key, la suscripción (confirmada, con compresión) y el parser con el formato real.
+Con el worker congelado 4 minutos, AISStream cerró la conexión y el worker se reconectó y volvió a
+suscribirse en 2 segundos, sin intervención. La key no apareció en ningún log.
+
+**Cobertura del Canal: casi nula.** AISStream depende de receptores terrestres de voluntarios:
+
+| Zona (mismo cliente y cuenta) | Tiempo | Recibido |
+|---|---|---|
+| Róterdam / canal de la Mancha (control) | 45 s | 437 mensajes de 410 buques |
+| bbox del Canal (worker real) | 3 min | 0 mensajes |
+| Panamá amplia (6,5–11,5 N, 83,5–76,5 O) | 10 min | 9 mensajes de 3 buques, ninguno en el Canal |
+| bbox del Canal (`scripts/ais_coverage.py`) | 2 min | 0 mensajes |
+
+Con decenas de buques fondeados emitiendo al menos cada 3 minutos, con cobertura llegarían
+cientos de mensajes cada 10 minutos. **Decisión del dueño**: medir varios días antes de decidir
+(la cobertura de voluntarios varía) y, mientras, la demo usa el simulador rotulado como datos
+simulados. La bbox no se ha podido ajustar con datos reales: se mantiene.
+
+Medir la cobertura (solo recuentos, sin guardar mensajes; `data/` no se sube a git):
+
+```bash
+python scripts/ais_coverage.py --minutes 2 --output data/coverage.jsonl
+```
+
+**Formato real**, distinto del ejemplo de la documentación de AISStream (el parser solo usa
+`MMSI` y `ShipName` de `MetaData`, así que no le afecta):
+
+- `MetaData`: `MMSI`, `MMSI_String` (un entero igual a `MMSI`), `ShipName`, `latitude` y
+  `longitude` **en minúsculas**, y `time_utc` como `2026-10-21 13:43:46.580659461 +0000 UTC`.
+- Los textos (`ShipName`, `Name`, `Destination`) llegan rellenos con **espacios** hasta su
+  longitud fija (el `@` del protocolo ya viene decodificado). El simulador y las fixtures usan
+  este formato.
+
+
 
 Polígonos GeoJSON versionados en `app/services/zones.py` (se definen en Fases 5 y 6):
 

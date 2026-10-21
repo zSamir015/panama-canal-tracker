@@ -310,8 +310,29 @@ def transit_duration(scenario: Scenario = "southbound") -> timedelta:
 
 
 def _padded(text: str, size: int = 20) -> str:
-    # AIS rellena los textos de 6 bits con '@' hasta su longitud fija.
-    return text.upper()[:size].ljust(size, "@")
+    # AIS rellena los textos hasta su longitud fija; AISStream entrega ese relleno ya decodificado
+    # como espacios (observado con datos reales el 2026-10-21; en el protocolo son '@').
+    return text.upper()[:size].ljust(size)
+
+
+def _time_utc(at: datetime) -> str:
+    """`time_utc` tal como lo envía AISStream (formato de Go, nanosegundos): `2026-10-21
+    13:43:46.580659461 +0000 UTC`."""
+    return f"{at:%Y-%m-%d %H:%M:%S}.{at.microsecond * 1000:09d} +0000 UTC"
+
+
+def _metadata(vessel: SimulatedVessel, at: datetime, lat: float, lon: float) -> dict[str, Any]:
+    # Formato real de AISStream (2026-10-21), distinto del ejemplo de su documentación:
+    # `latitude`/`longitude` en minúsculas, `MMSI_String` (un entero, igual que `MMSI`) y
+    # `time_utc`; el nombre llega relleno con espacios hasta 20 caracteres.
+    return {
+        "MMSI": vessel.mmsi,
+        "MMSI_String": vessel.mmsi,
+        "ShipName": _padded(vessel.name),
+        "latitude": lat,
+        "longitude": lon,
+        "time_utc": _time_utc(at),
+    }
 
 
 def _position_payload(
@@ -326,12 +347,7 @@ def _position_payload(
 ) -> dict[str, Any]:
     return {
         "MessageType": "PositionReport",
-        "MetaData": {
-            "MMSI": vessel.mmsi,
-            "ShipName": vessel.name,
-            "Latitude": lat,
-            "Longitude": lon,
-        },
+        "MetaData": _metadata(vessel, at, lat, lon),
         "Message": {
             "PositionReport": {
                 "MessageID": 1,
@@ -365,12 +381,7 @@ def _static_payload(
     to_port = vessel.beam_m // 2
     return {
         "MessageType": "ShipStaticData",
-        "MetaData": {
-            "MMSI": vessel.mmsi,
-            "ShipName": vessel.name,
-            "Latitude": lat,
-            "Longitude": lon,
-        },
+        "MetaData": _metadata(vessel, at, lat, lon),
         "Message": {
             "ShipStaticData": {
                 "MessageID": 5,
@@ -379,7 +390,7 @@ def _static_payload(
                 "Valid": True,
                 "AisVersion": 2,
                 "ImoNumber": vessel.imo,
-                "CallSign": _padded(vessel.call_sign, 7),
+                "CallSign": vessel.call_sign,
                 "Name": _padded(vessel.name),
                 "Type": vessel.ship_type,
                 "Dimension": {
