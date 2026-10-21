@@ -5,6 +5,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Changed
+- El simulador y las fixtures AIS usan el formato real de `MetaData` (`latitude`/`longitude` en
+  minúsculas, `MMSI_String`, `time_utc`) y el relleno con espacios que entrega AISStream.
+
 ### Added
 - Modelos y migración de `vessels` y `positions`: la tabla de posiciones usa una hypertable de
   TimescaleDB, `GEOGRAPHY(Point,4326)`, índices GIST y por buque/tiempo, clave foránea al buque
@@ -48,6 +52,9 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docker-compose.stack.yml` (base y Redis sin puertos publicados, servicio `migrate` con el rol
   de DDL, API, worker y simulador opcional; solo lectura, sin capabilities). Healthcheck del
   worker por la frescura de su estado en Redis. Nuevo job de CI que construye las dos imágenes.
+- Prueba con AISStream real (3.8): suscripción, formato y reconexión tras una desconexión
+  forzada verificados; cobertura del Canal casi nula, documentada en `docs/DATA_SOURCES.md` §2b.
+  `scripts/ais_coverage.py` mide la cobertura (solo recuentos) para seguirla varios días.
 - ADR-0008: AISStream no publica términos de uso; los datos de buques solo se muestran a usuarios
   con sesión, sin modo anónimo. Revisión documentada en `docs/DATA_SOURCES.md`.
 

@@ -280,10 +280,11 @@ def test_static_data_is_sent_regularly_with_padding_removed() -> None:
         assert count >= (2 if scenario_of(mmsi) == "signal_loss" else 5)
 
     first = next(m for m in messages if m.kind == "static")
-    assert "@" in json.loads(first.raw)["Message"]["ShipStaticData"]["Name"]
+    raw_name = json.loads(first.raw)["Message"]["ShipStaticData"]["Name"]
+    assert len(raw_name) == 20 and raw_name != raw_name.rstrip()  # relleno con espacios
     parsed = parse_message(first.raw, received_at=first.at)
     assert isinstance(parsed, VesselStatic)
-    assert parsed.name is not None and "@" not in parsed.name
+    assert parsed.name == raw_name.rstrip()
 
 
 # --- Suscripción ----------------------------------------------------------------------------
@@ -463,3 +464,24 @@ def test_cli_rejects_a_duration_over_the_limit(capsys: pytest.CaptureFixture[str
         sim.main(["jsonl", "--minutes", str(sim.MAX_MINUTES + 1)])
 
     assert "duración" in capsys.readouterr().err
+
+
+def test_metadata_matches_the_real_aisstream_format() -> None:
+    # Observado con la API real el 2026-10-21 (distinto del ejemplo de la documentación).
+    import re
+
+    for message in generate(duration=timedelta(minutes=5)):
+        metadata = json.loads(message.raw)["MetaData"]
+        assert set(metadata) == {
+            "MMSI",
+            "MMSI_String",
+            "ShipName",
+            "latitude",
+            "longitude",
+            "time_utc",
+        }
+        assert metadata["MMSI_String"] == metadata["MMSI"]  # entero, no texto
+        assert len(metadata["ShipName"]) == 20
+        assert re.fullmatch(
+            r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{9} \+0000 UTC", metadata["time_utc"]
+        )
