@@ -43,14 +43,10 @@ from websockets.exceptions import ConnectionClosed, WebSocketException
 from app.core.config import Settings, get_settings
 from app.core.db import create_engine, create_session_factory
 from app.core.logging import configure_logging
+from app.core.redis import create_redis
+from app.schemas.ingestion import WorkerStatus
 from app.services.ais_parser import AisMessageRejected, parse_message
-from app.workers.ais_publisher import (
-    STATUS_INTERVAL_SECONDS,
-    AisPublisher,
-    WorkerStatus,
-    create_redis,
-    worker_status,
-)
+from app.workers.ais_publisher import STATUS_INTERVAL_SECONDS, AisPublisher, worker_status
 from app.workers.ais_writer import AisWriter, WriterStats
 from app.workers.common import BACKOFF_BASE_SECONDS, AisRecord, backoff_delay
 

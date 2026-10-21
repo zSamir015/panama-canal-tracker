@@ -19,7 +19,8 @@ from app.core.middleware import (
     SecurityHeadersMiddleware,
 )
 from app.core.rate_limit import AppRateLimiter, create_storage, limit_api_by_user
-from app.routers import admin, auth
+from app.core.redis import create_redis
+from app.routers import admin, auth, vessels
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -28,18 +29,22 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     configure_logging(settings.log_level)
 
     engine = create_engine(settings)
+    # Lectura del estado del worker (3.9). No conecta hasta la primera consulta.
+    redis = create_redis(settings)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         try:
             yield
         finally:
-            # Devuelve las conexiones abiertas a PostgreSQL antes de que el proceso termine.
+            # Devuelve las conexiones abiertas a PostgreSQL y Redis antes de terminar.
             await engine.dispose()
+            await redis.aclose()
 
     app = FastAPI(title="Panama Canal Tracker", lifespan=lifespan)
     app.state.settings = settings
     app.state.engine = engine
+    app.state.redis = redis
     app.state.session_factory = create_session_factory(engine)
     app.state.rate_limiter = AppRateLimiter(create_storage(settings))
     register_exception_handlers(app)
@@ -68,6 +73,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         dependencies=[Depends(get_current_user), Depends(limit_api_by_user)],
     )
     api_router.include_router(auth.router)
+    api_router.include_router(vessels.router)
     api_router.include_router(admin.router)
     app.include_router(api_router)
 

@@ -31,3 +31,13 @@ class InvalidRefreshTokenError(DomainError):
     # Ausente, caducado, revocado o reutilizado: el cliente no distingue el motivo.
     status_code = HTTPStatus.UNAUTHORIZED
     detail = "Sesión inválida o caducada"
+
+
+class VesselNotFoundError(DomainError):
+    status_code = HTTPStatus.NOT_FOUND
+    detail = "Buque no encontrado"
+
+
+class IngestionStatusUnavailableError(DomainError):
+    status_code = HTTPStatus.SERVICE_UNAVAILABLE
+    detail = "El estado de la ingesta no está disponible"

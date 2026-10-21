@@ -36,6 +36,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   (consumer, cola y writer) se guarda en `canal:ais:worker:status` con `updated_at` y caducidad.
   Redis caído no frena la ingesta: timeout de 1 s, sin reintentos de la librería y pausa de 5 s
   tras un fallo. `redis` pasa a ser dependencia directa (7.4.1, el rango de `limits`).
+- Endpoints de buques: `GET /api/v1/vessels` (paginado, filtros `ship_type` y `seen_since`
+  acotados, parámetros desconocidos → 422) y `GET /api/v1/vessels/{mmsi}` (ficha y última
+  posición; 404 si no existe). Requieren token y cuentan para el límite general.
+- `GET /api/v1/admin/ingestion/status` (solo admin): estado del worker leído de Redis, con
+  `available` y `stale`; 503 si Redis no responde; cada consulta queda en el log `audit`.
+- `app/core/redis.py` (cliente y nombres de claves) y `app/schemas/ingestion.py` (contrato del
+  estado) compartidos por el worker y la API.
 
 ## [0.2.0] - 2026-10-20
 

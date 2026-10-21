@@ -23,22 +23,16 @@ from typing import TYPE_CHECKING, Any, Literal
 import structlog
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, ValidationError
 from redis.asyncio import Redis
-from redis.asyncio.retry import Retry
-from redis.backoff import NoBackoff
 from redis.exceptions import RedisError
 
-from app.core.config import Settings
+from app.core.redis import LIVE_CHANNEL, STATUS_KEY
 from app.repositories.ais import PositionRow
+from app.schemas.ingestion import WorkerStatus
 from app.workers.ais_writer import Batch, WriterStats
 
 if TYPE_CHECKING:
     from app.workers.ais_consumer import ConsumerStats
 
-KEY_PREFIX = "canal:"
-LIVE_CHANNEL = f"{KEY_PREFIX}vessels.live"
-STATUS_KEY = f"{KEY_PREFIX}ais:worker:status"
-
-REDIS_TIMEOUT_SECONDS = 1.0
 # Tras un fallo, cuánto tiempo se deja de intentar publicar.
 COOLDOWN_SECONDS = 5.0
 STATUS_INTERVAL_SECONDS = 5.0
@@ -75,29 +69,6 @@ class LiveUpdate(BaseModel):
     vessels: list[LiveVessel] = Field(max_length=MAX_VESSELS_PER_MESSAGE)
 
 
-class WorkerStatus(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    updated_at: AwareDatetime
-    connected: bool
-    subscribed: bool
-    connections: int
-    last_message_at: AwareDatetime | None
-    last_error: str | None
-    received: int
-    queued: int
-    queue_size: int
-    dropped: int
-    ignored: int
-    rejected: dict[str, int]
-    batches: int
-    positions_written: int
-    positions_duplicated: int
-    rows_rejected_by_db: int
-    batches_dropped: int
-    last_flush_at: AwareDatetime | None
-
-
 @dataclass
 class PublisherStats:
     messages_published: int = 0
@@ -106,21 +77,6 @@ class PublisherStats:
     failures: int = 0
     skipped: int = 0
     invalid: int = 0
-
-
-def create_redis(settings: Settings) -> "Redis":
-    """Cliente con timeouts cortos y sin reintentos: un Redis colgado no frena al worker.
-
-    Por defecto `redis-py` espera sin límite y reintenta. La contraseña va en la URL
-    (`REDIS_URL`, SecretStr); la librería la muestra como `<REDACTED>` en su `repr`.
-    """
-    return Redis.from_url(
-        settings.redis_url.get_secret_value(),
-        socket_timeout=REDIS_TIMEOUT_SECONDS,
-        socket_connect_timeout=REDIS_TIMEOUT_SECONDS,
-        retry=Retry(NoBackoff(), 0),
-        retry_on_timeout=False,
-    )
 
 
 def _chunks[T](items: Sequence[T], size: int) -> list[Sequence[T]]:
