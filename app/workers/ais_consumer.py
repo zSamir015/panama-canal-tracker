@@ -44,6 +44,13 @@ from app.core.config import Settings, get_settings
 from app.core.db import create_engine, create_session_factory
 from app.core.logging import configure_logging
 from app.services.ais_parser import AisMessageRejected, parse_message
+from app.workers.ais_publisher import (
+    STATUS_INTERVAL_SECONDS,
+    AisPublisher,
+    WorkerStatus,
+    create_redis,
+    worker_status,
+)
 from app.workers.ais_writer import AisWriter, WriterStats
 from app.workers.common import BACKOFF_BASE_SECONDS, AisRecord, backoff_delay
 
@@ -276,6 +283,15 @@ def _stats_event(stats: ConsumerStats, writer: WriterStats) -> dict[str, Any]:
     }
 
 
+async def _publish_status(
+    publisher: AisPublisher, status: Callable[[], WorkerStatus], interval: float
+) -> None:
+    """Estado del worker en Redis para `/admin/ingestion/status` (3.9)."""
+    while True:
+        await publisher.publish_status(status())
+        await asyncio.sleep(interval)
+
+
 async def _log_stats(consumer: ConsumerStats, writer: WriterStats, interval: float) -> None:
     while True:
         await asyncio.sleep(interval)
@@ -298,11 +314,12 @@ async def run_worker(
     stop: asyncio.Event | None = None,
     *,
     stats_interval: float = STATS_LOG_INTERVAL_SECONDS,
+    status_interval: float = STATUS_INTERVAL_SECONDS,
 ) -> ConsumerStats:
-    """Consumer y writer juntos; se paran con SIGINT/SIGTERM (o cuando se active `stop`).
+    """Consumer, writer y publisher juntos; se paran con SIGINT/SIGTERM (o cuando se active `stop`).
 
-    Al parar: primero se cierra la conexión con AISStream, después el writer guarda lo que quede
-    en la cola y por último se cierran las conexiones a la base.
+    Al parar: primero se cierra la conexión con AISStream, después el writer guarda (y publica)
+    lo que quede en la cola, se deja el último estado en Redis y se cierran las conexiones.
     """
     api_key = _require_api_key(settings)
     queue: asyncio.Queue[AisRecord] = asyncio.Queue(maxsize=settings.ais_queue_max_size)
@@ -313,11 +330,13 @@ async def run_worker(
         reconnect_max_seconds=settings.ais_reconnect_max_seconds,
     )
     engine = create_engine(settings)
+    publisher = AisPublisher(create_redis(settings))
     writer = AisWriter(
         queue=queue,
         session_factory=create_session_factory(engine),
         batch_size=settings.ais_batch_size,
         flush_seconds=settings.ais_batch_flush_seconds,
+        on_committed=publisher.publish_batch,
     )
     if stop is None:
         stop = asyncio.Event()
@@ -327,6 +346,11 @@ async def run_worker(
     writer_stop = asyncio.Event()
     writer_task = asyncio.create_task(writer.run(writer_stop))
     stats_task = asyncio.create_task(_log_stats(consumer.stats, writer.stats, stats_interval))
+
+    def current_status() -> WorkerStatus:
+        return worker_status(consumer=consumer.stats, writer=writer.stats, queue_size=queue.qsize())
+
+    status_task = asyncio.create_task(_publish_status(publisher, current_status, status_interval))
     logger.info("ais_worker_started", host=urlsplit(settings.aisstream_url).hostname)
     try:
         await consumer.run(stop)
@@ -334,9 +358,13 @@ async def run_worker(
         # El writer vacía la cola después de que el consumer haya dejado de añadir.
         writer_stop.set()
         await writer_task
-        stats_task.cancel()
-        with contextlib.suppress(asyncio.CancelledError):
-            await stats_task
+        for task in (stats_task, status_task):
+            task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await task
+        # Último estado (desconectado) antes de cerrar: caduca solo con su TTL.
+        await publisher.publish_status(current_status())
+        await publisher.close()
         await engine.dispose()
         logger.info("ais_worker_stopped", **_stats_event(consumer.stats, writer.stats))
     return consumer.stats

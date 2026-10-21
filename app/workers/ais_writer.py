@@ -116,8 +116,11 @@ class AisWriter:
         retry_max_seconds: float = RETRY_MAX_SECONDS,
         retry_base_seconds: float = 1.0,
         rng: random.Random | None = None,
+        on_committed: Callable[[Batch], Awaitable[None]] | None = None,
     ) -> None:
         self._queue = queue
+        # Se llama con lo que quedó guardado, después del commit (3.5: publicar en Redis).
+        self._on_committed = on_committed
         self._session_factory = session_factory
         self._batch_size = batch_size
         self._flush_seconds = flush_seconds
@@ -188,10 +191,9 @@ class AisWriter:
         for attempt in range(self._max_attempts):
             try:
                 if row_by_row:
-                    await self._write_row_by_row(batch)
+                    committed = await self._write_row_by_row(batch)
                 else:
-                    await self._write(batch)
-                return
+                    committed = await self._write(batch)
             except (IntegrityError, DataError) as error:
                 # Un dato que la base no acepta: reintentar el lote igual fallaría siempre.
                 # Se pasa a fila a fila (que también puede encontrarse la base caída y reintentar).
@@ -217,11 +219,23 @@ class AisWriter:
                     error=type(error).__name__,
                 )
                 await asyncio.sleep(delay)
+            else:
+                await self._notify(committed)
+                return
         self.stats.batches_dropped += 1
         self.stats.records_dropped += batch.size
         logger.error("ais_batch_dropped", size=batch.size, error=self.stats.last_error)
 
-    async def _write(self, batch: Batch) -> None:
+    async def _notify(self, committed: Batch) -> None:
+        """Avisa de lo guardado. Un fallo aquí nunca cuenta como fallo de la base."""
+        if self._on_committed is None or not committed.positions:
+            return
+        try:
+            await self._on_committed(committed)
+        except Exception as error:  # el aviso es secundario: la base ya tiene los datos
+            logger.warning("ais_commit_hook_failed", error=type(error).__name__)
+
+    async def _write(self, batch: Batch) -> Batch:
         async with self._session_factory() as session:
             try:
                 repository = AisRepository(session)
@@ -236,11 +250,12 @@ class AisWriter:
             written=written,
             duplicated=len(batch.positions) - written,
         )
+        return batch
 
-    async def _write_row_by_row(self, batch: Batch) -> None:
+    async def _write_row_by_row(self, batch: Batch) -> Batch:
         """Cada buque y cada posición en su propio savepoint: solo se pierden los que fallan."""
         written = 0
-        accepted_positions = 0
+        accepted: list[PositionRow] = []
         rejected = 0
         upserted: set[int] = set()
         async with self._session_factory() as session:
@@ -264,7 +279,7 @@ class AisWriter:
                     if isinstance(inserted, _Rejected):
                         rejected += 1
                     else:
-                        accepted_positions += 1
+                        accepted.append(position)
                         written += inserted
                 await session.commit()
             except BaseException:
@@ -273,7 +288,12 @@ class AisWriter:
         self.stats.rows_rejected_by_db += rejected
         logger.warning("ais_rows_rejected_by_db", rejected=rejected, size=batch.size)
         self._record_success(
-            vessels=len(upserted), written=written, duplicated=accepted_positions - written
+            vessels=len(upserted), written=written, duplicated=len(accepted) - written
+        )
+        return Batch(
+            vessels=[vessel for vessel in batch.vessels if vessel.mmsi in upserted],
+            positions=accepted,
+            size=batch.size,
         )
 
     def _record_success(self, *, vessels: int, written: int, duplicated: int) -> None:

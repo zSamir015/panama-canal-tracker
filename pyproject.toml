@@ -29,6 +29,8 @@ dependencies = [
     "limits[redis]>=5.8.0,<6.0",
     "geoalchemy2>=0.20.0,<1.0",
     "websockets>=17.2,<18.0",
+    # limits 5.8 declara redis<8: mismo rango para no romper el rate limiting (ADR-0007).
+    "redis>=7.4.1,<8.0",
 ]
 
 [project.optional-dependencies]

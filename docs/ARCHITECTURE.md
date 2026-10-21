@@ -14,7 +14,7 @@
 │  · detección de tránsitos│                     ▲
 │  · publica en Redis      │                     │ lecturas
 └────────────┬────────────┘                     │
-             │ PUBLISH vessels.live              │
+             │ PUBLISH canal:vessels.live        │
              ▼                                   │
         ┌─────────┐   SUBSCRIBE   ┌──────────────┴───────────┐
         │  Redis  │──────────────▶│  api (N réplicas)         │
@@ -55,8 +55,14 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
      descarta la fila mala; si la base no responde, se reintenta el lote con backoff y, al final,
      se descarta contándolo. Al parar, vacía la cola antes de salir.
   4. **TransitDetector** (desde Fase 5): máquina de estados por buque.
-  5. **Publisher** (3.5): publica la posición procesada en Redis (`vessels.live`).
-- Expone su estado (último mensaje, reconexiones, cola) en Redis para `/admin/ingestion/status`.
+  5. **Publisher** (`app/workers/ais_publisher.py`): tras el commit de cada lote, un `PUBLISH` en
+     `canal:vessels.live` con la última posición de cada buque del lote, con el formato de
+     `/ws/live` (`{"type": "update", "vessels": [...]}`, como mucho 200 buques por mensaje) y
+     validado con Pydantic. Si Redis no responde (timeout de 1 s, sin reintentos), se cuenta el
+     fallo, se deja de intentar 5 s y la ingesta sigue: la base es la fuente de verdad.
+- Expone su estado en `canal:ais:worker:status` (cada 5 s, con `updated_at` y caducidad de 15 s):
+  conexión, último mensaje, reconexiones, cola, rechazos por motivo y contadores del writer, para
+  `/admin/ingestion/status` (3.9). Si el worker muere, la clave caduca sola.
 
 ### 2.2 API (`app/main.py`, `app/routers/`)
 - FastAPI async, sin estado: cualquier réplica atiende cualquier request.
@@ -64,7 +70,7 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
 - Contrato completo en `API_DESIGN.md`.
 
 ### 2.3 WebSocket `/ws/live`
-- Cada réplica se suscribe a `vessels.live` en Redis y reenvía a sus clientes conectados.
+- Cada réplica se suscribe a `canal:vessels.live` en Redis y reenvía a sus clientes conectados.
 - **Escalable por diseño**:
   - El cliente envía su **viewport** (bbox del mapa) y solo recibe buques dentro de él.
   - Las actualizaciones se **agrupan** y se envían como máximo 1 vez por segundo por cliente.

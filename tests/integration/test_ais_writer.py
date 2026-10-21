@@ -272,3 +272,23 @@ def test_writer_module_never_builds_sql_from_strings() -> None:
         content = handle.read()
     assert "text(" not in content
     assert "execute(" not in content
+
+
+async def test_a_failing_commit_hook_never_undoes_or_retries_the_batch(
+    sessions: SessionFactory,
+) -> None:
+    calls = 0
+
+    async def broken_hook(batch: Any) -> None:
+        nonlocal calls
+        calls += 1
+        raise RuntimeError("fallo inesperado del publisher")
+
+    writer = make_writer(sessions, on_committed=broken_hook)
+
+    await writer.flush([static(), position()])
+
+    assert calls == 1  # ni reintentos ni nada que rehacer: la base ya tiene los datos
+    assert await fetch(sessions, select(Position.vessel_mmsi)) == [(352000001,)]
+    assert writer.stats.batches_retried == 0
+    assert writer.stats.batches_dropped == 0
