@@ -43,6 +43,11 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `available` y `stale`; 503 si Redis no responde; cada consulta queda en el log `audit`.
 - `app/core/redis.py` (cliente y nombres de claves) y `app/schemas/ingestion.py` (contrato del
   estado) compartidos por el worker y la API.
+- Imágenes Docker de la API y del worker (`Dockerfile` multi-stage, base fijada por digest,
+  dependencias con hashes, usuario sin privilegios, sin secretos en capas) y pila completa en
+  `docker-compose.stack.yml` (base y Redis sin puertos publicados, servicio `migrate` con el rol
+  de DDL, API, worker y simulador opcional; solo lectura, sin capabilities). Healthcheck del
+  worker por la frescura de su estado en Redis. Nuevo job de CI que construye las dos imágenes.
 
 ## [0.2.0] - 2026-10-20
 

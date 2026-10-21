@@ -65,13 +65,22 @@ conexión a AISStream. Detalle en [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 Plan completo: [docs/ROADMAP.md](docs/ROADMAP.md).
 
-## Inicio rápido (disponible desde la Fase 3)
+## Inicio rápido
+
+Toda la pila (PostgreSQL, Redis, migraciones, API y worker AIS) corre en contenedores. No hace
+falta API key de AISStream: un simulador reproduce tráfico realista del Canal.
 
 ```bash
-cp .env.example .env            # completar valores; nunca commitear .env
-docker compose up -d            # db + redis + api + worker
-python scripts/ais_simulator.py # opcional: buques simulados, sin API key
+cp .env.example .env            # contraseñas aleatorias y JWT_SECRET_KEY; nunca commitear .env
+AISSTREAM_URL=ws://simulator:8765 AISSTREAM_API_KEY=simulador \
+  docker compose -f docker-compose.stack.yml --profile simulator up -d --build --wait
+# Documentación de la API: http://localhost:8000/docs (registro, login y GET /api/v1/vessels)
+docker compose -f docker-compose.stack.yml --profile simulator down   # parar (-v borra los datos)
 ```
+
+Con una key real, ponla en `AISSTREAM_API_KEY` dentro de `.env` y quita las variables y el
+perfil del simulador. Para desarrollar (API en el host con `--reload`), ver
+[AGENTS.md](AGENTS.md#10-comandos-útiles).
 
 ## Licencia
 

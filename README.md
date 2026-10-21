@@ -65,13 +65,21 @@ keeping a single upstream AIS connection. Details in [docs/ARCHITECTURE.md](docs
 
 Full plan: [docs/ROADMAP.md](docs/ROADMAP.md).
 
-## Quick start (available from Phase 3)
+## Quick start
+
+The whole stack (PostgreSQL, Redis, migrations, API and AIS worker) runs in containers. No
+AISStream API key is needed: a simulator replays realistic canal traffic.
 
 ```bash
-cp .env.example .env            # fill in values; never commit .env
-docker compose up -d            # db + redis + api + worker
-python scripts/ais_simulator.py # optional: simulated vessels, no API key needed
+cp .env.example .env            # fill in random passwords and JWT_SECRET_KEY; never commit .env
+AISSTREAM_URL=ws://simulator:8765 AISSTREAM_API_KEY=simulator \
+  docker compose -f docker-compose.stack.yml --profile simulator up -d --build --wait
+# API docs: http://localhost:8000/docs (register, log in, then GET /api/v1/vessels)
+docker compose -f docker-compose.stack.yml --profile simulator down   # stop (add -v to wipe data)
 ```
+
+With a real key, set `AISSTREAM_API_KEY` in `.env` and drop the simulator variables and profile.
+For development (API on the host with `--reload`), see [AGENTS.md](AGENTS.md#10-comandos-útiles).
 
 ## Documentation
 
