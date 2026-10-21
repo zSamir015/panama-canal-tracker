@@ -21,11 +21,12 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from app.core.config import Settings
 from app.core.db import SessionFactory
 from app.core.logging import configure_logging
+from app.core.redis import LIVE_CHANNEL, STATUS_KEY, create_redis
 from app.models.position import Position
 from app.repositories.ais import AisRepository
 from app.services.ais_parser import PositionUpdate, VesselStatic
 from app.workers.ais_consumer import run_worker
-from app.workers.ais_publisher import LIVE_CHANNEL, STATUS_KEY, AisPublisher, create_redis
+from app.workers.ais_publisher import AisPublisher
 from app.workers.ais_writer import AisWriter
 from tests.scripts_loader import load_script
 

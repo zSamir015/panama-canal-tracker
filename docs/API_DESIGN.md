@@ -59,6 +59,15 @@
 | GET | `/vessels/{mmsi}` | ✅ | Ficha del buque + última posición |
 | GET | `/vessels/{mmsi}/history` | ✅ | Trayectoria GeoJSON `LineString` (`from`, `to`, máx. 7 días) |
 
+- `GET /vessels`: `?page=1&size=50` (máx. 200), `ship_type` (1–99) y `seen_since` (con zona
+  horaria, máx. 90 días atrás); cualquier otro parámetro → 422. Orden: última señal más reciente
+  primero (los nunca vistos al final), desempate por MMSI. Respuesta `{items, total, page, size}`
+  con `{mmsi, name, imo, ship_type, length_m, beam_m, last_seen_at}` por buque.
+- `GET /vessels/{mmsi}`: lo mismo más `last_position` (`{received_at, lat, lon, sog, cog,
+  heading, nav_status}` o `null`). MMSI que no tiene 9 dígitos → 422; inexistente → 404.
+- `name` es texto AIS tal cual (puede contener `<`, `>`...): el cliente lo muestra como texto.
+- `/vessels/{mmsi}/history` queda para una tarea posterior (no está en la 3.9).
+
 ## Transits
 
 | Método | Ruta | Auth | Descripción |
@@ -83,6 +92,11 @@ rol `user` → 403. No hay endpoint para crear admins (se crean con `scripts/cre
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
 | GET | `/admin/ingestion/status` | admin | Estado del worker: último mensaje, reconexiones, cola |
+
+- Respuesta `{available, stale, age_seconds, status}`. `available=false` si no hay estado en
+  Redis (worker parado: la clave caduca a los 15 s); `stale=true` si tiene más de 30 s. `status`
+  lleva conexión, último mensaje, reconexiones, cola, rechazos por motivo y contadores del
+  writer. Redis sin responder → 503. Cada consulta queda en el log de auditoría.
 
 ## WebSocket `/ws/live`
 
