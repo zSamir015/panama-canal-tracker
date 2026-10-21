@@ -24,6 +24,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   SIGTERM. Configuración: `AISSTREAM_API_KEY` (solo el worker; obligatoria para arrancar),
   `AISSTREAM_URL` (`wss://` en producción, sin credenciales en la URL),
   `AIS_RECONNECT_MAX_SECONDS` y `AIS_QUEUE_MAX_SIZE`. La key no aparece en los logs ni en DEBUG.
+- Writer del worker AIS (`app/workers/ais_writer.py`, `app/repositories/ais.py`): guarda la cola
+  en PostgreSQL por lotes (`AIS_BATCH_SIZE`, `AIS_BATCH_FLUSH_SECONDS`) en una transacción por
+  lote; upsert de `vessels` que no borra datos conocidos con un `NULL` y solo adelanta
+  `last_seen_at`; `positions` con `ON CONFLICT DO NOTHING` para mensajes repetidos; fila a fila
+  con savepoints si la base rechaza un dato; reintentos con backoff si la base no responde. El
+  worker vacía la cola antes de terminar.
 
 ## [0.2.0] - 2026-10-20
 

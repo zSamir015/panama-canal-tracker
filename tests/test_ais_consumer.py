@@ -26,6 +26,7 @@ from app.core.logging import configure_logging
 from app.services.ais_parser import PositionUpdate, VesselStatic
 from app.workers import ais_consumer
 from app.workers.ais_consumer import AisConsumer, AisRecord, backoff_delay, run_worker
+from app.workers.ais_writer import WriterStats
 from tests.scripts_loader import load_script
 
 sim = load_script("ais_simulator")
@@ -382,6 +383,28 @@ def test_websocket_library_logger_never_logs_frames() -> None:
 # --- Proceso del worker ---------------------------------------------------------------------
 
 
+class DrainingWriter:
+    """Writer falso para los tests sin base: vacía la cola y cuenta (el real, en integración)."""
+
+    def __init__(self, *, queue: asyncio.Queue[AisRecord], **_: Any) -> None:
+        self._queue = queue
+        self.stats = WriterStats()
+
+    async def run(self, stop: asyncio.Event) -> None:
+        while not (stop.is_set() and self._queue.empty()):
+            try:
+                await asyncio.wait_for(self._queue.get(), timeout=0.01)
+            except TimeoutError:
+                continue
+            self._queue.task_done()
+            self.stats.positions_written += 1
+
+
+@pytest.fixture(autouse=True)
+def no_database_writer(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(ais_consumer, "AisWriter", DrainingWriter)
+
+
 def worker_settings(**overrides: Any) -> Settings:
     # Nunca la URL real por defecto: ningún test debe poder conectarse a AISStream.
     options: dict[str, Any] = {
@@ -494,7 +517,15 @@ async def test_worker_logs_its_stats_periodically() -> None:
         await asyncio.wait_for(task, timeout=5)
 
     [first, *_] = [e for e in log_events(stream) if e["event"] == "ais_stats"]
-    assert set(first) >= {"connected", "received", "queued", "dropped", "ignored", "rejected"}
+    assert set(first) >= {
+        "connected",
+        "received",
+        "queued",
+        "dropped",
+        "ignored",
+        "rejected",
+        "positions_written",
+    }
     assert API_KEY not in stream.getvalue()
 
 

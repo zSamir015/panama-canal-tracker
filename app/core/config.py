@@ -74,6 +74,9 @@ class Settings(BaseSettings):
     aisstream_url: str = AISSTREAM_DEFAULT_URL
     ais_reconnect_max_seconds: int = Field(default=60, ge=1, le=600)
     ais_queue_max_size: int = Field(default=10_000, ge=100, le=1_000_000)
+    # Writer (3.4): un lote se escribe al llegar a este tamaño o tras estos segundos.
+    ais_batch_size: int = Field(default=500, ge=1, le=5_000)
+    ais_batch_flush_seconds: float = Field(default=2.0, gt=0, le=60)
 
     @field_validator("database_url", "migrations_database_url")
     @classmethod

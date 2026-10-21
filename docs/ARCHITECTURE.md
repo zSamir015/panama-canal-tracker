@@ -48,7 +48,12 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
      objetos de dominio validados. Los rechazos se cuentan por motivo, no se encolan.
   2. **Cola acotada** (`asyncio.Queue`, `AIS_QUEUE_MAX_SIZE`): la lectura del WebSocket nunca
      espera; si el writer no da abasto, se descartan los mensajes más antiguos y se cuentan.
-  3. **Writer** (3.4): inserciones por lotes (`AIS_BATCH_SIZE` o cada `AIS_BATCH_FLUSH_SECONDS`).
+  3. **Writer** (`app/workers/ais_writer.py`): lotes de `AIS_BATCH_SIZE` registros o cada
+     `AIS_BATCH_FLUSH_SECONDS`, en una transacción: upsert de `vessels` (un `NULL` no borra un
+     dato conocido; `last_seen_at` solo avanza) y después `positions` con `ON CONFLICT DO
+     NOTHING`. Si la base rechaza un dato, se reintenta fila a fila con savepoints y solo se
+     descarta la fila mala; si la base no responde, se reintenta el lote con backoff y, al final,
+     se descarta contándolo. Al parar, vacía la cola antes de salir.
   4. **TransitDetector** (desde Fase 5): máquina de estados por buque.
   5. **Publisher** (3.5): publica la posición procesada en Redis (`vessels.live`).
 - Expone su estado (último mensaje, reconexiones, cola) en Redis para `/admin/ingestion/status`.
