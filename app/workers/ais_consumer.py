@@ -6,7 +6,8 @@ conecta, nunca la API ni el navegador. El worker:
 1. abre el WebSocket y envía la suscripción (bbox del Canal y tipos de mensaje) al instante:
    AISStream cierra la conexión si no llega en 3 segundos;
 2. espera la `SubscriptionConfirmation` (AISStream no confirma una suscripción inválida);
-3. pasa cada frame por el parser (3.2) y deja los resultados en una cola acotada para el writer;
+3. pasa cada frame por el parser (3.2) y deja los resultados en una cola acotada que vacía el
+   writer (3.4, `app/workers/ais_writer.py`) guardándolos en la base por lotes;
 4. si la conexión cae, reintenta con backoff exponencial y jitter, de 1 s hasta
    `AIS_RECONNECT_MAX_SECONDS`.
 
@@ -40,13 +41,11 @@ from websockets.asyncio.client import ClientConnection, connect
 from websockets.exceptions import ConnectionClosed, WebSocketException
 
 from app.core.config import Settings, get_settings
+from app.core.db import create_engine, create_session_factory
 from app.core.logging import configure_logging
-from app.services.ais_parser import (
-    AisMessageRejected,
-    PositionUpdate,
-    VesselStatic,
-    parse_message,
-)
+from app.services.ais_parser import AisMessageRejected, parse_message
+from app.workers.ais_writer import AisWriter, WriterStats
+from app.workers.common import BACKOFF_BASE_SECONDS, AisRecord, backoff_delay
 
 # Área del Canal en el orden de AISStream, [lat, lon] (docs/DATA_SOURCES.md §1).
 CANAL_BOUNDING_BOXES: tuple[tuple[tuple[float, float], tuple[float, float]], ...] = (
@@ -54,7 +53,6 @@ CANAL_BOUNDING_BOXES: tuple[tuple[tuple[float, float], tuple[float, float]], ...
 )
 MESSAGE_TYPES = ("PositionReport", "ShipStaticData")
 
-BACKOFF_BASE_SECONDS = 1.0
 CONFIRMATION_TIMEOUT_SECONDS = 10.0
 OPEN_TIMEOUT_SECONDS = 10.0
 # Un frame AIS ocupa cientos de bytes; el parser rechaza los de más de 8 KB. Por encima de esto,
@@ -63,8 +61,6 @@ MAX_FRAME_BYTES = 64 * 1024
 # Cada cuántos descartes por cola llena se avisa en el log (avisar de todos sería otro problema).
 DROP_LOG_EVERY = 1000
 STATS_LOG_INTERVAL_SECONDS = 60.0
-
-AisRecord = PositionUpdate | VesselStatic
 
 logger = structlog.get_logger(__name__)
 
@@ -76,19 +72,6 @@ _websocket_logger.setLevel(logging.INFO)
 
 class AisServerError(Exception):
     """AISStream envió `{"error": ...}` (key inválida, suscripción incorrecta...)."""
-
-
-def backoff_delay(
-    attempt: int, *, cap: float, rng: random.Random, base: float = BACKOFF_BASE_SECONDS
-) -> float:
-    """Espera antes del reintento `attempt` (0 = el primero): exponencial con jitter.
-
-    El techo se duplica en cada intento hasta `cap`, y la espera es un valor aleatorio entre la
-    mitad del techo y el techo ("equal jitter"). Así nunca se reintenta al instante y, si caen
-    muchos clientes a la vez, no vuelven todos en el mismo segundo.
-    """
-    ceiling = min(cap, base * 2.0 ** min(attempt, 30))
-    return ceiling / 2 + rng.uniform(0, ceiling / 2)
 
 
 @dataclass
@@ -278,7 +261,7 @@ class AisConsumer:
 # --- Proceso del worker ---------------------------------------------------------------------
 
 
-def _stats_event(stats: ConsumerStats) -> dict[str, Any]:
+def _stats_event(stats: ConsumerStats, writer: WriterStats) -> dict[str, Any]:
     return {
         "connected": stats.connected,
         "received": stats.received,
@@ -286,20 +269,17 @@ def _stats_event(stats: ConsumerStats) -> dict[str, Any]:
         "dropped": stats.dropped,
         "ignored": stats.ignored,
         "rejected": dict(stats.rejected),
+        "positions_written": writer.positions_written,
+        "positions_duplicated": writer.positions_duplicated,
+        "rows_rejected_by_db": writer.rows_rejected_by_db,
+        "batches_dropped": writer.batches_dropped,
     }
 
 
-async def _drain(queue: asyncio.Queue[AisRecord], stats: ConsumerStats, interval: float) -> None:
-    """Vacía la cola hasta que llegue el writer (3.4) y registra el estado cada `interval` s."""
-    loop = asyncio.get_running_loop()
-    next_log = loop.time() + interval
+async def _log_stats(consumer: ConsumerStats, writer: WriterStats, interval: float) -> None:
     while True:
-        with contextlib.suppress(TimeoutError):
-            await asyncio.wait_for(queue.get(), timeout=interval)
-            queue.task_done()
-        if loop.time() >= next_log:
-            logger.info("ais_stats", **_stats_event(stats))
-            next_log = loop.time() + interval
+        await asyncio.sleep(interval)
+        logger.info("ais_stats", **_stats_event(consumer, writer))
 
 
 def _require_api_key(settings: Settings) -> SecretStr:
@@ -319,7 +299,11 @@ async def run_worker(
     *,
     stats_interval: float = STATS_LOG_INTERVAL_SECONDS,
 ) -> ConsumerStats:
-    """Arranca el consumer y lo para con SIGINT/SIGTERM (o cuando se active `stop`)."""
+    """Consumer y writer juntos; se paran con SIGINT/SIGTERM (o cuando se active `stop`).
+
+    Al parar: primero se cierra la conexión con AISStream, después el writer guarda lo que quede
+    en la cola y por último se cierran las conexiones a la base.
+    """
     api_key = _require_api_key(settings)
     queue: asyncio.Queue[AisRecord] = asyncio.Queue(maxsize=settings.ais_queue_max_size)
     consumer = AisConsumer(
@@ -328,20 +312,33 @@ async def run_worker(
         queue=queue,
         reconnect_max_seconds=settings.ais_reconnect_max_seconds,
     )
+    engine = create_engine(settings)
+    writer = AisWriter(
+        queue=queue,
+        session_factory=create_session_factory(engine),
+        batch_size=settings.ais_batch_size,
+        flush_seconds=settings.ais_batch_flush_seconds,
+    )
     if stop is None:
         stop = asyncio.Event()
         loop = asyncio.get_running_loop()
         for sig in (signal.SIGINT, signal.SIGTERM):
             loop.add_signal_handler(sig, stop.set)
-    drain = asyncio.create_task(_drain(queue, consumer.stats, stats_interval))
+    writer_stop = asyncio.Event()
+    writer_task = asyncio.create_task(writer.run(writer_stop))
+    stats_task = asyncio.create_task(_log_stats(consumer.stats, writer.stats, stats_interval))
     logger.info("ais_worker_started", host=urlsplit(settings.aisstream_url).hostname)
     try:
         await consumer.run(stop)
     finally:
-        drain.cancel()
+        # El writer vacía la cola después de que el consumer haya dejado de añadir.
+        writer_stop.set()
+        await writer_task
+        stats_task.cancel()
         with contextlib.suppress(asyncio.CancelledError):
-            await drain
-        logger.info("ais_worker_stopped", **_stats_event(consumer.stats))
+            await stats_task
+        await engine.dispose()
+        logger.info("ais_worker_stopped", **_stats_event(consumer.stats, writer.stats))
     return consumer.stats
 
 
