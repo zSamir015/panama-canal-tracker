@@ -1,0 +1,116 @@
+# Pila completa en contenedores (tarea 3.10): base, Redis, migraciones, API y worker AIS.
+#
+#   docker compose -f docker-compose.stack.yml up -d --build --wait
+#   # sin API key de AISStream, con el simulador:
+#   AISSTREAM_URL=ws://simulator:8765 AISSTREAM_API_KEY=simulador \
+#     docker compose -f docker-compose.stack.yml --profile simulator up -d --build --wait
+#
+# Distinto del docker-compose.yml de desarrollo (que publica la base y Redis en 127.0.0.1 para la
+# API en el host y para el CI):
+# - **db y redis sin puertos publicados**: solo los alcanzan los demás contenedores (§8.16).
+# - **Cada servicio recibe solo sus variables** (nada de `env_file`): la API no ve la key de
+#   AISStream ni la contraseña de canal_owner; el worker no ve el secreto de los JWT; solo
+#   `migrate` tiene la URL del rol con DDL.
+# - Contenedores con sistema de archivos de solo lectura, sin capabilities y sin escalar
+#   privilegios.
+#
+# Las contraseñas salen del mismo `.env` que el compose de desarrollo. Van dentro de URLs: usa
+# contraseñas sin `@ : / ? #` (las de `secrets.token_urlsafe` sirven).
+name: panama-canal-tracker-stack
+
+x-hardening: &hardening
+  read_only: true
+  tmpfs:
+    - /tmp
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  restart: unless-stopped
+
+x-app-environment: &app-environment
+  APP_ENV: ${APP_ENV:-development}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  DATABASE_URL: postgresql+asyncpg://canal_app:${CANAL_APP_PASSWORD:?Define CANAL_APP_PASSWORD en .env}@db:5432/canal_tracker
+  REDIS_URL: redis://:${REDIS_PASSWORD:?Define REDIS_PASSWORD en .env}@redis:6379/0
+
+services:
+  db:
+    extends:
+      file: docker-compose.yml
+      service: db
+    ports: !reset []
+
+  redis:
+    extends:
+      file: docker-compose.yml
+      service: redis
+    ports: !reset []
+
+  # Aplica las migraciones y termina. Es el único servicio con el rol canal_owner.
+  migrate:
+    build:
+      context: .
+      target: api
+    image: panama-canal-tracker/api:local
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      MIGRATIONS_DATABASE_URL: postgresql+asyncpg://canal_owner:${CANAL_OWNER_PASSWORD:?Define CANAL_OWNER_PASSWORD en .env}@db:5432/canal_tracker
+    depends_on:
+      db:
+        condition: service_healthy
+    <<: *hardening
+    restart: "no"
+
+  api:
+    image: panama-canal-tracker/api:local
+    environment:
+      <<: *app-environment
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Define JWT_SECRET_KEY en .env}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+    # Solo en el host local: en producción, delante irá el reverse proxy (Fase 4).
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    <<: *hardening
+
+  worker:
+    build:
+      context: .
+      target: worker
+    image: panama-canal-tracker/worker:local
+    environment:
+      <<: *app-environment
+      # Vacía, el worker no arranca y explica por qué (no se usa `:?` para que el simulador
+      # pueda funcionar con cualquier valor).
+      AISSTREAM_API_KEY: ${AISSTREAM_API_KEY:-}
+      AISSTREAM_URL: ${AISSTREAM_URL:-wss://stream.aisstream.io/v0/stream}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    <<: *hardening
+
+  # Tráfico simulado sin API key (scripts/ais_simulator.py). Solo con `--profile simulator`.
+  simulator:
+    image: panama-canal-tracker/worker:local
+    profiles: ["simulator"]
+    command:
+      ["python", "scripts/ais_simulator.py", "serve", "--host", "0.0.0.0", "--port", "8765", "--speed", "60"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 8765), 2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    <<: *hardening
+
+volumes:
+  db-data:
+  redis-data:

@@ -334,6 +334,8 @@ docker compose up -d --wait      # db + redis (desde Fase 2); contraseñas en .e
 scripts/check_dev_services.sh    # verifica roles de la DB y contraseña de Redis
 uvicorn app.main:app --reload    # API
 python -m app.workers.ais_consumer  # worker AIS (desde Fase 3)
+python scripts/ais_simulator.py serve  # tráfico AIS simulado (AISSTREAM_URL=ws://127.0.0.1:8765)
+docker compose -f docker-compose.stack.yml up -d --build --wait  # pila completa en contenedores
 ```
 
 ## 11. Si algo no está claro

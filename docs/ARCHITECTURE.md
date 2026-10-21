@@ -200,6 +200,11 @@ flowchart LR
 ```
 
 - Solo el reverse proxy publica puertos (80/443). DB y Redis viven en la red interna.
+- Contenedores (`Dockerfile`, `docker-compose.stack.yml`): imágenes `api` y `worker` desde una
+  base fijada por digest, dependencias solo de `requirements.lock` con hashes, usuario sin
+  privilegios (uid 10001), sistema de archivos de solo lectura, sin capabilities. Cada servicio
+  recibe solo sus variables: la key de AISStream solo el worker; el rol `canal_owner` solo el
+  servicio `migrate`, que aplica las migraciones y termina antes de que arranquen API y worker.
 - La API no conoce la key de AISStream; solo el worker la tiene.
 - Migraciones con el rol `canal_owner`; la app corre con `canal_app` (sin DDL).
 - Autorización denegada por defecto y verificada por un test que recorre todas las rutas.

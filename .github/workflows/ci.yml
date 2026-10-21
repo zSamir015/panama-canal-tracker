@@ -123,6 +123,31 @@ jobs:
         if: failure()
         run: docker compose logs --no-color --tail 200
 
+  images:
+    name: Imágenes (docker build)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Sin secretos: las imágenes no los necesitan para construirse (llegan por entorno al
+      # arrancar). Si un cambio rompe el Dockerfile, falla aquí y no al desplegar.
+      - name: Construir api y worker
+        run: |
+          docker build --target api -t panama-canal-tracker/api:ci .
+          docker build --target worker -t panama-canal-tracker/worker:ci .
+      - name: Comprobar que no corren como root y no llevan tests ni .env
+        run: |
+          for image in api worker; do
+            uid=$(docker run --rm --entrypoint id "panama-canal-tracker/${image}:ci" -u)
+            test "${uid}" = "10001"
+            docker run --rm --entrypoint sh "panama-canal-tracker/${image}:ci" \
+              -c 'test ! -e /srv/tests && test ! -e /srv/.env && test ! -e /srv/.git'
+          done
+
   audit:
     name: Dependencias (pip-audit)
     runs-on: ubuntu-24.04
