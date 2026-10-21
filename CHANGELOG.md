@@ -48,6 +48,8 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docker-compose.stack.yml` (base y Redis sin puertos publicados, servicio `migrate` con el rol
   de DDL, API, worker y simulador opcional; solo lectura, sin capabilities). Healthcheck del
   worker por la frescura de su estado en Redis. Nuevo job de CI que construye las dos imágenes.
+- ADR-0008: AISStream no publica términos de uso; los datos de buques solo se muestran a usuarios
+  con sesión, sin modo anónimo. Revisión documentada en `docs/DATA_SOURCES.md`.
 
 ## [0.2.0] - 2026-10-20
 

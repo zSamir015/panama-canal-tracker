@@ -39,8 +39,14 @@ tarea 3.8.
 3. **Solo AIS terrestre**: cobertura hasta ~40 NM de la costa. Suficiente para el Canal.
 4. **Sin histórico**: nuestra base de datos es el archivo histórico. El worker debe ser robusto.
 5. **Reconexión**: backoff exponencial con jitter (1 s → máx. 60 s), loguear cada caída.
-6. **Términos de uso**: pendiente revisar si permiten mostrar los datos en una demo pública y
-   con qué condiciones (tarea 3.7). Documentar aquí la conclusión con enlace a la fuente.
+6. **Términos de uso** (revisado el 2026-10-21, tarea 3.7, ADR-0008): AISStream **no publica
+   términos de uso** (`https://aisstream.io/terms` da 404; solo hay política de privacidad en
+   `https://aisstream.io/privacypolicy`). Su documentación asume que el servidor reenvía los datos
+   a sus clientes (*"proxy only the information each client needs"*). Sin permiso explícito para
+   mostrarlos a cualquiera, **los datos solo se muestran a usuarios con sesión**: sin modo anónimo.
+7. **Límites del servicio**: 3 conexiones suscritas por cuenta y 3 abiertas por IP; suscripción
+   en 3 s; como mucho una actualización de suscripción por segundo; 200 MMSI por filtro. Las
+   conexiones sin compresión tendrán límite de ancho de banda desde septiembre de 2026.
 
 ## 3. Zonas geográficas
 
