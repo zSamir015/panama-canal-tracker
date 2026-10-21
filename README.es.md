@@ -57,7 +57,7 @@ conexión a AISStream. Detalle en [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 | 0 | Scaffold y documentación | ✅ |
 | 1 | Esqueleto FastAPI, CI, seguridad del repo | ✅ |
 | 2 | Base de datos y autenticación | ✅ |
-| 3 | Worker de ingesta AIS | ⏳ |
+| 3 | Worker de ingesta AIS | ✅ |
 | 4 | Mapa en tiempo real y demo | ⏳ |
 | 5 | Detección de tránsitos y validación | ⏳ |
 | 6 | Esperas en fondeo y estadísticas | ⏳ |

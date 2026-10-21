@@ -74,21 +74,23 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` terminada
 
 ---
 
-## Fase 3 — Ingesta AIS (worker) y tiempo real interno `[ ]`
+## Fase 3 — Ingesta AIS (worker) y tiempo real interno `[x]`
 **Objetivo**: el worker consume AISStream, persiste posiciones y las publica en Redis.
 
-- [ ] 3.1 Modelos `vessels` y `positions` (hypertable, índices GIST y por buque/tiempo)
-- [ ] 3.2 Parser puro de `PositionReport` y `ShipStaticData` con validación, longitudes máximas y
+- [x] 3.1 Modelos `vessels` y `positions` (hypertable, índices GIST y por buque/tiempo)
+- [x] 3.2 Parser puro de `PositionReport` y `ShipStaticData` con validación, longitudes máximas y
       filtros de calidad (los datos AIS son entrada no confiable)
-- [ ] 3.3 `app/workers/ais_consumer.py`: conexión única, bbox, backoff con jitter, cola acotada
-- [ ] 3.4 Writer con batch inserts y upsert de `vessels`
-- [ ] 3.5 Publisher a Redis (`vessels.live`) y estado del worker
-- [ ] 3.6 `scripts/ais_simulator.py`: trayectorias realistas por el Canal, mismo formato que AISStream
-- [ ] 3.7 Revisar términos de uso de AISStream respecto a mostrar datos públicamente; documentar
+- [x] 3.3 `app/workers/ais_consumer.py`: conexión única, bbox, backoff con jitter, cola acotada
+- [x] 3.4 Writer con batch inserts y upsert de `vessels`
+- [x] 3.5 Publisher a Redis (`canal:vessels.live`) y estado del worker (`canal:ais:worker:status`)
+- [x] 3.6 `scripts/ais_simulator.py`: trayectorias realistas por el Canal, mismo formato que AISStream
+- [x] 3.7 Revisar términos de uso de AISStream respecto a mostrar datos públicamente; documentar
       conclusión en `DATA_SOURCES.md` (decide si la demo es pública, con login o con retraso)
-- [ ] 3.8 Prueba de humo real con API key; ajustar bbox con datos reales
-- [ ] 3.9 `GET /vessels`, `GET /vessels/{mmsi}`, `GET /admin/ingestion/status`
-- [ ] 3.10 Dockerfiles (api y worker, multi-stage, no root, sin secretos en capas) y compose
+- [x] 3.8 Prueba de humo real con API key: funciona y se recupera de una desconexión forzada,
+      pero la cobertura de AISStream en el Canal es casi nula (bbox sin ajustar; ver
+      `DATA_SOURCES.md` §2b). Se mide varios días con `scripts/ais_coverage.py`
+- [x] 3.9 `GET /vessels`, `GET /vessels/{mmsi}`, `GET /admin/ingestion/status`
+- [x] 3.10 Dockerfiles (api y worker, multi-stage, no root, sin secretos en capas) y compose
       completo sin puertos publicados para db y redis
 
 **Aceptación**: con el simulador, `positions` crece, Redis recibe eventos y `GET /vessels` lista
@@ -100,6 +102,8 @@ buques. Con la key real, el worker aguanta una desconexión forzada y se recuper
 ## Fase 4 — Mapa en tiempo real y demo desplegada `[ ]`
 **Objetivo**: lo visible. Un mapa en vivo del Canal, desplegado y enlazado desde el README.
 
+- [ ] 4.0 Buques de todo el mundo con destino declarado al Canal (#59, ADR-0009: segunda
+      conexión a AISStream con `ShipStaticData` global)
 - [ ] 4.1 Inicializar `web/` (Vite + React + TypeScript strict + ESLint/Prettier + Vitest)
 - [ ] 4.2 `WS /ws/live`: suscripción a Redis, snapshot inicial, filtro por viewport, batching 1 Hz,
       validación de `Origin`, auth en el primer mensaje, límites de conexiones y tamaño
@@ -113,7 +117,8 @@ buques. Con la key real, el worker aguanta una desconexión forzada y se recuper
 - [ ] 4.8 Prueba de carga del WebSocket (p. ej. 500 clientes simulados); documentar resultados
 - [ ] 4.9 GIF del mapa en vivo en el README y enlace a la demo
 
-**Aceptación**: la demo pública muestra buques moviéndose en tiempo real; el WS soporta la carga
+**Aceptación**: la demo muestra buques moviéndose en tiempo real (datos reales si la cobertura lo
+permite; si no, el simulador, rotulado como datos simulados); el WS soporta la carga
 objetivo sin degradar la ingesta.
 **Release**: `v0.4.0`.
 

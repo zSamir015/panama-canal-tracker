@@ -5,6 +5,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-21
+
+Fase 3: ingesta AIS. Worker con una única conexión a AISStream → parser → PostgreSQL por lotes
+→ Redis en vivo, API de buques y estado de la ingesta, simulador y pila completa en contenedores.
+La prueba con la key real funciona, pero la cobertura de AISStream en el Canal es casi nula.
+
 ### Changed
 - El simulador y las fixtures AIS usan el formato real de `MetaData` (`latitude`/`longitude` en
   minúsculas, `MMSI_String`, `time_utc`) y el relleno con espacios que entrega AISStream.
