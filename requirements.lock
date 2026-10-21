@@ -903,7 +903,9 @@ pyyaml==6.0.3 \
 redis==7.4.1 \
     --hash=sha256:1a1df5067062cf7cbe677994e391f8ee0840f499d370f1a71266e0dd3aa9308e \
     --hash=sha256:1fa4647af1c5e93a2c685aa248ee44cce092691146d41390518dabe9a99839b0
-    # via limits
+    # via
+    #   panama-canal-tracker (pyproject.toml)
+    #   limits
 sqlalchemy==2.1.5 \
     --hash=sha256:061d089901319463a1160e4596191e355d2a9b4cce4852dac5adc301b085ac2f \
     --hash=sha256:09b10bd68223d57cce39c08947efae3f91ac40b552e07c7c869c3350a0fc4c23 \

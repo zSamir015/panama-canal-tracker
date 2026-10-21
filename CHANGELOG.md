@@ -30,6 +30,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `last_seen_at`; `positions` con `ON CONFLICT DO NOTHING` para mensajes repetidos; fila a fila
   con savepoints si la base rechaza un dato; reintentos con backoff si la base no responde. El
   worker vacía la cola antes de terminar.
+- Publisher del worker AIS (`app/workers/ais_publisher.py`): tras guardar cada lote, publica en
+  `canal:vessels.live` la última posición de cada buque con el formato de `/ws/live`, validada con
+  Pydantic y con el nombre y el tipo aprendidos de los `ShipStaticData`. El estado del worker
+  (consumer, cola y writer) se guarda en `canal:ais:worker:status` con `updated_at` y caducidad.
+  Redis caído no frena la ingesta: timeout de 1 s, sin reintentos de la librería y pausa de 5 s
+  tras un fallo. `redis` pasa a ser dependencia directa (7.4.1, el rango de `limits`).
 
 ## [0.2.0] - 2026-10-20
 

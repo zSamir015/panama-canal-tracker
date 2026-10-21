@@ -400,9 +400,30 @@ class DrainingWriter:
             self.stats.positions_written += 1
 
 
+class SilentRedis:
+    """Redis falso para los tests sin red: acepta todo y recuerda los estados guardados."""
+
+    def __init__(self) -> None:
+        self.statuses: list[dict[str, Any]] = []
+
+    async def publish(self, *_: Any) -> int:
+        return 0
+
+    async def set(self, _key: str, payload: bytes, **__: Any) -> bool:
+        self.statuses.append(json.loads(payload))
+        return True
+
+    async def aclose(self) -> None:
+        return None
+
+
 @pytest.fixture(autouse=True)
 def no_database_writer(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(ais_consumer, "AisWriter", DrainingWriter)
+    monkeypatch.setattr(ais_consumer, "create_redis", lambda _settings: silent_redis)
+
+
+silent_redis = SilentRedis()
 
 
 def worker_settings(**overrides: Any) -> Settings:
@@ -538,3 +559,22 @@ async def test_worker_stops_cleanly_on_sigterm() -> None:
 
     assert stats.connections >= 1
     assert stats.connected is False
+
+
+async def test_worker_leaves_a_final_disconnected_status_when_it_stops() -> None:
+    silent_redis.statuses.clear()
+    stop = asyncio.Event()
+    async with simulator() as url:
+        # Intervalo de una hora: solo hay el estado inicial y el final.
+        task = asyncio.create_task(
+            run_worker(worker_settings(aisstream_url=url), stop, status_interval=3600)
+        )
+        await eventually(lambda: len(silent_redis.statuses) >= 1)
+        await asyncio.sleep(0.2)
+        stop.set()
+        stats = await asyncio.wait_for(task, timeout=5)
+
+    assert len(silent_redis.statuses) == 2
+    final = silent_redis.statuses[-1]
+    assert final["connected"] is False
+    assert final["received"] == stats.received
