@@ -222,9 +222,10 @@ flowchart LR
 5. **AIS como vector de ataque**: cualquiera puede emitir AIS con texto arbitrario (nombres con
    HTML o scripts). Mitigación: validación y longitud máxima en el parser; el frontend nunca
    renderiza esos campos como HTML (AGENTS.md §8.7).
-6. **Términos de AISStream**: verificar si permiten mostrar datos en una demo pública (Fase 3.7).
+6. **Términos de AISStream**: no hay términos publicados (revisado en la 3.7). Mitigación: los
+   datos solo se muestran a usuarios con sesión, sin modo anónimo (ADR-0008).
 
 ## 9. Decisiones
 
 Ver `docs/adr/`: 0001 stack · 0002 AISStream · 0003 auth · 0004 worker + Redis ·
-0005 TimescaleDB · 0006 mapa web.
+0005 TimescaleDB · 0006 mapa web · 0007 rate limiting · 0008 datos solo con sesión.

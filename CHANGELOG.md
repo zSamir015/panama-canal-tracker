@@ -43,6 +43,8 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `available` y `stale`; 503 si Redis no responde; cada consulta queda en el log `audit`.
 - `app/core/redis.py` (cliente y nombres de claves) y `app/schemas/ingestion.py` (contrato del
   estado) compartidos por el worker y la API.
+- ADR-0008: AISStream no publica términos de uso; los datos de buques solo se muestran a usuarios
+  con sesión, sin modo anónimo. Revisión documentada en `docs/DATA_SOURCES.md`.
 
 ## [0.2.0] - 2026-10-20
 
