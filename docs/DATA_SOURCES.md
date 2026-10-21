@@ -65,9 +65,26 @@ Convención de dirección (la de la ACP): **southbound** = Atlántico → Pacíf
 
 ## 5. Simulador para desarrollo offline
 
-`scripts/ais_simulator.py` (tarea 3.6) genera mensajes con el formato de AISStream: buques que
-esperan en fondeo, cruzan el Canal en ambos sentidos y pierden señal. Permite desarrollar, hacer
-demos y correr CI sin API key. Fixtures en `tests/fixtures/ais_messages/`.
+`scripts/ais_simulator.py` (tarea 3.6) genera mensajes con el formato de AISStream (todos los
+campos obligatorios de su esquema OpenAPI): buques que esperan en los dos fondeaderos, cruzan el
+Canal en ambos sentidos (≈ 7 h de fondeadero a fondeadero, a ~2 nudos en las esclusas) y uno que
+pierde la señal a mitad de tránsito. Es reproducible: la misma `--seed` da los mismos mensajes.
+Permite desarrollar, hacer demos y correr CI sin API key.
+
+```bash
+# Mensajes en JSON Lines (opcionalmente con un 5 % de mensajes inválidos para probar filtros)
+python scripts/ais_simulator.py jsonl --minutes 30 --seed 7 --invalid-ratio 0.05
+
+# Servidor WebSocket local que imita el protocolo de AISStream: suscripción en 3 s,
+# `SubscriptionConfirmation`, frames binarios, `permessage-deflate` y filtros por caja, tipo y MMSI.
+# --speed 60 reproduce una hora de tráfico en un minuto.
+python scripts/ais_simulator.py serve --port 8765 --speed 60
+```
+
+El worker (3.3) se apunta al simulador cambiando solo la URL del WebSocket. El servidor escucha en
+`127.0.0.1`, acepta cualquier `APIKey` no vacía y no la registra: nunca uses aquí la key real.
+Las coordenadas de la ruta son aproximadas y se contrastan con datos reales en la tarea 3.8.
+Fixtures fijas de un mensaje en `tests/fixtures/ais_messages/`.
 
 ## 6. Otras fuentes (referencia, no usar por ahora)
 

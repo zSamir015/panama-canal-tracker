@@ -11,6 +11,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   y constraints para MMSI y valores AIS básicos.
 - Parser de mensajes `PositionReport` y `ShipStaticData` de AISStream con validación de entrada,
   normalización de valores AIS no disponibles y protección frente a mensajes sobredimensionados.
+- Simulador AIS (`scripts/ais_simulator.py`): tráfico reproducible por semilla con el formato de
+  AISStream (tránsitos en ambos sentidos con velocidades por tramo, fondeos, pérdida de señal e
+  inyección opcional de mensajes inválidos), en JSON Lines o como servidor WebSocket local que
+  imita el protocolo de suscripción de AISStream. Todo lo que genera lo acepta el parser, y lo
+  inválido lo rechaza con el motivo esperado.
+- `websockets` como dependencia directa (ya llegaba con `uvicorn[standard]`, versión 17.2).
 
 ## [0.2.0] - 2026-10-20
 

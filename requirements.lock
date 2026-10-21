@@ -1262,7 +1262,9 @@ websockets==17.2 \
     --hash=sha256:faa763b677e96f1beccc6b4d7e8c079dfeed2f249f57a19debc321b519ee64ec \
     --hash=sha256:fb78fb4158c12f77a934a003006784108a27a6553cfc0c6f10483c9c02e94f48 \
     --hash=sha256:fcce735ffd72ac4056db05325d9f0232382b74826f0196eb6a15ca903abdaa0f
-    # via uvicorn
+    # via
+    #   panama-canal-tracker (pyproject.toml)
+    #   uvicorn
 wrapt==2.5.1 \
     --hash=sha256:016602dd8827d190280a707c5e67f9a80038f54bac1782cc8ff68a2a16c618bc \
     --hash=sha256:03aa7d2256309b57ddbf317bff2cae5f47e50ea9ae8d582780ebe0b554347b42 \
