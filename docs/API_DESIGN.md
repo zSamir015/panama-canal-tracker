@@ -116,8 +116,7 @@ rol `user` → 403. No hay endpoint para crear admins (se crean con `scripts/cre
 {"type": "remove", "mmsi": [352001234]}
 ```
 
-Si la demo pública lo permite (DATA_SOURCES.md, tarea 3.7), se habilitará un modo anónimo de
-solo lectura con límite de conexiones por IP.
+Sin modo anónimo: los datos de AISStream solo se muestran a usuarios con sesión (ADR-0008).
 
 ## Convenciones
 
