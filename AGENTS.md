@@ -230,6 +230,8 @@ Principio general: **denegar por defecto** — todo cerrado salvo lo que se abre
 - `/metrics` no se expone a Internet (solo red interna).
 - WebSocket `/ws/live`: autenticación en el primer mensaje, validación del header `Origin`
   contra la lista de orígenes permitidos (CORS no protege WebSockets), límites de mensajes.
+  La librería `websockets` escribe cada frame en DEBUG (`websockets.server` / `.client`): con
+  tokens o API keys en los mensajes, su logger se fija en INFO como mínimo (ver el worker AIS).
 
 ### 8.10 CORS
 - Lista explícita de orígenes desde `CORS_ORIGINS`; nunca `*` (y nunca `*` con credenciales).

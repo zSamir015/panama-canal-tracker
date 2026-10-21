@@ -17,6 +17,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   imita el protocolo de suscripción de AISStream. Todo lo que genera lo acepta el parser, y lo
   inválido lo rechaza con el motivo esperado.
 - `websockets` como dependencia directa (ya llegaba con `uvicorn[standard]`, versión 17.2).
+- Worker de ingesta (`python -m app.workers.ais_consumer`): una única conexión WebSocket con
+  AISStream, suscripción al área del Canal al conectar, espera de la confirmación, backoff
+  exponencial con jitter que se reinicia tras una conexión sana, cola acotada que descarta los
+  mensajes más antiguos sin bloquear la lectura, rechazos contados por motivo y parada limpia con
+  SIGTERM. Configuración: `AISSTREAM_API_KEY` (solo el worker; obligatoria para arrancar),
+  `AISSTREAM_URL` (`wss://` en producción, sin credenciales en la URL),
+  `AIS_RECONNECT_MAX_SECONDS` y `AIS_QUEUE_MAX_SIZE`. La key no aparece en los logs ni en DEBUG.
 
 ## [0.2.0] - 2026-10-20
 

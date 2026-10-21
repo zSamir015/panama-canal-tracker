@@ -38,14 +38,19 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
 - Proceso independiente: `python -m app.workers.ais_consumer`. **Una sola réplica.**
 - Única conexión a `wss://stream.aisstream.io/v0/stream`, suscrita por bounding box.
 - Mensajes: `PositionReport` y `ShipStaticData`.
-- Reconexión con backoff exponencial con jitter (1 s → máx. 60 s); cada caída se loguea y se
-  cuenta en métricas.
-- Pipeline interno con `asyncio.Queue` acotada:
-  1. **Parser** (puro, sin I/O): JSON AIS → objetos de dominio validados (Pydantic). Descarta
-     posiciones inválidas (lat 91, lon 181, MMSI fuera de rango).
-  2. **Writer**: inserciones por lotes (`AIS_BATCH_SIZE` o cada `AIS_BATCH_FLUSH_SECONDS`).
-  3. **TransitDetector** (desde Fase 5): máquina de estados por buque.
-  4. **Publisher**: publica la posición procesada en Redis (`vessels.live`).
+- Suscripción enviada al abrir la conexión (AISStream cierra si no llega en 3 s); se espera la
+  `SubscriptionConfirmation`. La API key solo viaja en ese mensaje y nunca se registra (el logger
+  de la librería `websockets` está fijado en INFO porque en DEBUG escribe los frames).
+- Reconexión con backoff exponencial con jitter (1 s → máx. `AIS_RECONNECT_MAX_SECONDS`, 60 s);
+  el backoff vuelve a 1 s tras una conexión que confirmó la suscripción. Cada caída se loguea.
+- Pipeline interno:
+  1. **Parser** (`app/services/ais_parser.py`, puro, sin I/O) al leer cada frame: JSON AIS →
+     objetos de dominio validados. Los rechazos se cuentan por motivo, no se encolan.
+  2. **Cola acotada** (`asyncio.Queue`, `AIS_QUEUE_MAX_SIZE`): la lectura del WebSocket nunca
+     espera; si el writer no da abasto, se descartan los mensajes más antiguos y se cuentan.
+  3. **Writer** (3.4): inserciones por lotes (`AIS_BATCH_SIZE` o cada `AIS_BATCH_FLUSH_SECONDS`).
+  4. **TransitDetector** (desde Fase 5): máquina de estados por buque.
+  5. **Publisher** (3.5): publica la posición procesada en Redis (`vessels.live`).
 - Expone su estado (último mensaje, reconexiones, cola) en Redis para `/admin/ingestion/status`.
 
 ### 2.2 API (`app/main.py`, `app/routers/`)
