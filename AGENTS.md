@@ -41,8 +41,9 @@ Documentos de referencia (leer según la tarea):
 3. Contraseñas hasheadas con **Argon2id** vía `pwdlib`. JWT con **PyJWT**. (ADR-0003)
 4. Todo endpoint protegido valida JWT; los endpoints de admin validan rol.
 5. **Ninguna tarea se da por terminada sin tests pasando** (`pytest` verde) y `ruff` limpio.
-6. AISStream: **una sola conexión WebSocket por API key**, solo desde el proceso `worker`, con
-   reconexión y backoff exponencial. Nunca desde el navegador ni desde la API. (ADR-0002, ADR-0004)
+6. AISStream: **como máximo dos conexiones WebSocket por API key** (área del Canal y destinos al
+   Canal, cada una con su suscripción), solo desde el proceso `worker`, con reconexión y backoff
+   exponencial. Nunca desde el navegador ni desde la API. (ADR-0002, ADR-0004, ADR-0009)
 7. No modificar `docs/` salvo para reflejar una decisión real; toda decisión nueva va en un ADR
    en `docs/adr/` con el siguiente número libre.
 8. **Seguridad**: cumplir la sección 8 completa en cada cambio. Denegar por defecto.

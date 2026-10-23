@@ -18,10 +18,17 @@ def test_alembic_points_to_the_versioned_migration_directory() -> None:
     assert config.get_main_option("script_location").endswith("/alembic")
     assert (ROOT / "alembic" / "versions" / "20261018_0001_users_refresh_tokens.py").is_file()
     assert (ROOT / "alembic" / "versions" / "20261020_0002_vessels_positions.py").is_file()
+    assert (ROOT / "alembic" / "versions" / "20261022_0003_canal_bound_vessels.py").is_file()
 
 
 def test_models_declare_the_persistent_tables() -> None:
-    assert set(Base.metadata.tables) == {"users", "refresh_tokens", "vessels", "positions"}
+    assert set(Base.metadata.tables) == {
+        "users",
+        "refresh_tokens",
+        "vessels",
+        "positions",
+        "canal_bound_vessels",
+    }
 
     users = Base.metadata.tables["users"]
     assert {column.name for column in users.primary_key.columns} == {"id"}
@@ -46,6 +53,12 @@ def test_models_declare_the_persistent_tables() -> None:
         "vessel_mmsi",
     }
     assert positions.c.geom.nullable is False
+
+    canal_bound = Base.metadata.tables["canal_bound_vessels"]
+    assert {column.name for column in canal_bound.primary_key.columns} == {"mmsi"}
+    assert canal_bound.c.destination.nullable is False
+    assert canal_bound.c.port_locode.nullable is False
+    assert canal_bound.c.reported_at.nullable is False
 
 
 def alembic_config() -> Config:

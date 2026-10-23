@@ -30,7 +30,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import SessionFactory
 from app.repositories.ais import AisRepository, PositionRow, VesselRow
 from app.services.ais_parser import PositionUpdate, VesselStatic
-from app.workers.common import AisRecord, backoff_delay
+from app.workers.common import AisRecord, backoff_delay, collect_batch
 
 DEFAULT_BATCH_SIZE = 500
 DEFAULT_FLUSH_SECONDS = 2.0
@@ -140,50 +140,9 @@ class AisWriter:
                 return
 
     async def _collect(self, stop: asyncio.Event) -> list[AisRecord]:
-        """Junta registros hasta llenar el lote o agotar el plazo desde el primero.
-
-        Con `stop` activo no espera: recoge lo que quede en la cola para vaciarla antes de salir.
-        """
-        loop = asyncio.get_running_loop()
-        records: list[AisRecord] = []
-        deadline: float | None = None
-        while len(records) < self._batch_size:
-            if stop.is_set():
-                try:
-                    records.append(self._queue.get_nowait())
-                except asyncio.QueueEmpty:
-                    break
-                self._queue.task_done()
-                continue
-            timeout = self._flush_seconds if deadline is None else deadline - loop.time()
-            if timeout <= 0:
-                break
-            record = await self._next(stop, timeout)
-            if record is None:
-                if stop.is_set():
-                    continue  # vaciar la cola sin esperar (rama de arriba)
-                break  # plazo agotado
-            records.append(record)
-            if deadline is None:
-                deadline = loop.time() + self._flush_seconds
-        return records
-
-    async def _next(self, stop: asyncio.Event, wait_seconds: float) -> AisRecord | None:
-        """El siguiente registro, o None si vence el plazo o se activa `stop` antes."""
-        getter = asyncio.ensure_future(self._queue.get())
-        stopper = asyncio.ensure_future(stop.wait())
-        try:
-            await asyncio.wait(
-                {getter, stopper}, timeout=wait_seconds, return_when=asyncio.FIRST_COMPLETED
-            )
-        finally:
-            stopper.cancel()
-            getter.cancel()
-        # `get` pudo terminar justo a la vez que `stop`: ese registro no se puede perder.
-        if getter.done() and not getter.cancelled():
-            self._queue.task_done()
-            return getter.result()
-        return None
+        return await collect_batch(
+            self._queue, stop, batch_size=self._batch_size, flush_seconds=self._flush_seconds
+        )
 
     async def flush(self, records: Sequence[AisRecord]) -> None:
         batch = build_batch(records)

@@ -56,6 +56,7 @@
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
 | GET | `/vessels` | ✅ | Buques vistos (paginado, filtros `ship_type`, `seen_since`) |
+| GET | `/vessels/canal-bound` | ✅ | Buques de todo el mundo con destino declarado al Canal |
 | GET | `/vessels/{mmsi}` | ✅ | Ficha del buque + última posición |
 | GET | `/vessels/{mmsi}/history` | ✅ | Trayectoria GeoJSON `LineString` (`from`, `to`, máx. 7 días) |
 
@@ -67,6 +68,14 @@
   heading, nav_status}` o `null`). MMSI que no tiene 9 dígitos → 422; inexistente → 404.
 - `name` es texto AIS tal cual (puede contener `<`, `>`...): el cliente lo muestra como texto.
 - `/vessels/{mmsi}/history` queda para una tarea posterior (no está en la 3.9).
+- `GET /vessels/canal-bound` (#59, ADR-0009): `?page=1&size=50` (máx. 200), `port` (`PA` o el
+  UN/LOCODE de un puerto del Canal, p. ej. `PABLB`) y `reported_since` (con zona horaria; por
+  defecto 30 días, máx. 90). Orden: ETA próximas primero (incluidas las de las últimas 24 h);
+  después las vencidas, que suelen ser datos que la tripulación no actualizó; al final, sin ETA;
+  desempate por MMSI. Respuesta `{items, total, page, size}` con `{mmsi, name, imo, ship_type, length_m,
+  destination, port_locode, eta, lat, lon, reported_at}`. `destination` es el texto AIS tal cual
+  (se muestra como texto); `lat`/`lon` son la última posición conocida, que puede estar lejos del
+  Canal. Solo aparecen los buques que **declaran** el Canal y están al alcance de un receptor.
 
 ## Transits
 

@@ -30,11 +30,42 @@ tarea 3.8.
 | Tipo | Contenido | Uso |
 |---|---|---|
 | `PositionReport` | MMSI, lat/lon, SOG, COG, heading, estado de navegación | posiciones, tránsitos, fondeo |
-| `ShipStaticData` | nombre, IMO, tipo, dimensiones, destino | ficha del buque (`vessels`) |
+| `ShipStaticData` | nombre, IMO, tipo, dimensiones, destino, ETA | ficha del buque (`vessels`); destinos al Canal (`canal_bound_vessels`) |
+
+### Segunda suscripción: buques con destino al Canal (ADR-0009)
+
+```json
+{
+  "APIKey": "<AISSTREAM_API_KEY>",
+  "BoundingBoxes": [[[-90, -180], [90, 180]]],
+  "FilterMessageTypes": ["ShipStaticData"]
+}
+```
+
+Datos estáticos de todo el mundo (~16 mensajes/s). El worker solo guarda los buques cuyo destino
+declarado es el Canal (`app/services/canal_destination.py`); la posición es la que AISStream
+adjunta en `MetaData`. Se desactiva con `AIS_CANAL_BOUND_ENABLED=false`.
+
+**Qué se detecta**: códigos UN/LOCODE de puertos del Canal (`PABLB` Balboa, `PACTB` Cristóbal,
+`PAONX` Colón, `PAMIT` Manzanillo, `PAPTY`, `PAROD`, `PAGTN`, `PAMFS`, `PAGBA`, `PAPBM`, `PAPAY`,
+`PATBG`; verificados contra la lista de la UNECE el 2026-10-22), con o sin separador
+(`PA BLB`); los nombres `BALBOA`, `CRISTOBAL`, `COLON`, `RODMAN`, `MANZANILLO PA` y `PANAMA`; en
+una ruta (`USHOU>PABLB`), el destino final y los pasos intermedios.
+
+**Qué NO se detecta**:
+- buques que cruzan el Canal sin declararlo: el destino suele ser el puerto final (`CNSHA`);
+- buques en alta mar, fuera del alcance de los receptores terrestres (~40 NM de la costa);
+- rutas que **salen** de Panamá (`PAMIT>ITVDL`: el primer tramo es el origen);
+- nombres ambiguos: `MANZANILLO` solo (México), `PANAMA CITY` (Florida), un nombre junto a otro
+  país (`COLON AR`, `BALBOA CA`) y otros canales (`KIEL CANAL`, `HARVEY CANAL`).
+
+Muestra real de 7 min (2026-10-22): 5847 buques, todos con posición en `MetaData`, 86 % con
+destino; **2 hacia el Canal** (`PA BLB`, `PANAMA`).
 
 ## 2. Reglas y límites de AISStream (obligatorias)
 
-1. **Una conexión WebSocket por API key.** Solo el proceso `worker` se conecta.
+1. **Como máximo dos conexiones por API key** (ADR-0009): área del Canal y destinos al Canal.
+   Solo el proceso `worker` se conecta.
 2. **No conectar desde el navegador**: la API reenvía lo necesario por `/ws/live`.
 3. **Solo AIS terrestre**: cobertura hasta ~40 NM de la costa. Suficiente para el Canal.
 4. **Sin histórico**: nuestra base de datos es el archivo histórico. El worker debe ser robusto.
@@ -44,7 +75,8 @@ tarea 3.8.
    `https://aisstream.io/privacypolicy`). Su documentación asume que el servidor reenvía los datos
    a sus clientes (*"proxy only the information each client needs"*). Sin permiso explícito para
    mostrarlos a cualquiera, **los datos solo se muestran a usuarios con sesión**: sin modo anónimo.
-7. **Límites del servicio**: 3 conexiones suscritas por cuenta y 3 abiertas por IP; suscripción
+7. **Límites del servicio**: 3 conexiones suscritas por cuenta y 3 abiertas por IP (el worker usa
+   2; `scripts/ais_coverage.py` abre una tercera); suscripción
    en 3 s; como mucho una actualización de suscripción por segundo; 200 MMSI por filtro. Las
    conexiones sin compresión tendrán límite de ancho de banda desde septiembre de 2026.
 

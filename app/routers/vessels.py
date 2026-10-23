@@ -11,6 +11,10 @@ from fastapi import APIRouter, Depends, Path, Query
 
 from app.core.db import DbSession
 from app.schemas.vessels import (
+    DEFAULT_REPORTED_DAYS,
+    CanalBoundFilters,
+    CanalBoundPageResponse,
+    CanalBoundVesselResponse,
     Mmsi,
     PositionResponse,
     VesselDetailResponse,
@@ -53,6 +57,39 @@ async def list_vessels(
     )
     return VesselPageResponse(
         items=[VesselResponse.model_validate(item) for item in page.items],
+        total=page.total,
+        page=page.page,
+        size=page.size,
+    )
+
+
+# Antes de `/{mmsi}`: si no, "canal-bound" se tomaría por un MMSI (y daría 422).
+@router.get(
+    "/canal-bound",
+    summary="Buques con destino al Canal",
+    description=(
+        "Buques de cualquier parte del mundo cuyo destino AIS declarado es el Canal de Panamá o "
+        "uno de sus puertos, con su última posición conocida y la ETA declarada. Orden: ETA "
+        "próximas primero; después las vencidas hace más de un día (suelen ser datos sin "
+        "actualizar) y al final los buques sin ETA. Solo aparecen los que lo **declaran** y "
+        "están al alcance de un receptor terrestre de AISStream (ADR-0009). `port` filtra por "
+        "UN/LOCODE (`PABLB`, `PACTB`...; `PA` = solo Panamá). Por defecto, informes de los últimos "
+        f"{DEFAULT_REPORTED_DAYS} días (`reported_since`, máx. 90). `size` máximo: 200."
+    ),
+    responses={HTTPStatus.UNPROCESSABLE_ENTITY: {"description": "Parámetros inválidos", **PROBLEM}},
+)
+async def list_canal_bound(
+    filters: Annotated[CanalBoundFilters, Query()], service: Service
+) -> CanalBoundPageResponse:
+    page = await service.canal_bound(
+        page=filters.page,
+        size=filters.size,
+        default_days=DEFAULT_REPORTED_DAYS,
+        port=filters.port,
+        reported_since=filters.reported_since,
+    )
+    return CanalBoundPageResponse(
+        items=[CanalBoundVesselResponse.model_validate(item) for item in page.items],
         total=page.total,
         page=page.page,
         size=page.size,

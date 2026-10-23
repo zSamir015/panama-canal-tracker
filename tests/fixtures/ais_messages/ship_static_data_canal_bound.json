@@ -1,0 +1,33 @@
+{
+  "MessageType": "ShipStaticData",
+  "MetaData": {
+    "MMSI": 636012345,
+    "MMSI_String": 636012345,
+    "ShipName": "GULF TRADER         ",
+    "latitude": 28.91,
+    "longitude": -94.62,
+    "time_utc": "2026-10-20 14:30:00.123456789 +0000 UTC"
+  },
+  "Message": {
+    "ShipStaticData": {
+      "UserID": 636012345,
+      "Valid": true,
+      "Name": "GULF TRADER         ",
+      "ImoNumber": 9123456,
+      "Type": 80,
+      "Dimension": {
+        "A": 150,
+        "B": 33,
+        "C": 16,
+        "D": 16
+      },
+      "Destination": "USHOU>PABLB         ",
+      "Eta": {
+        "Month": 10,
+        "Day": 27,
+        "Hour": 6,
+        "Minute": 30
+      }
+    }
+  }
+}
