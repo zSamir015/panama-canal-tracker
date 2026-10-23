@@ -6,6 +6,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- `web/` inicializado (#63, tarea 4.1): Vite + React + TypeScript `strict`, ESLint (reglas con
+  tipos, hooks de React y prohibición de `dangerouslySetInnerHTML`/`innerHTML`/`setHTML`, con un
+  test que comprueba que sigue activa), Prettier, Vitest + Testing Library, configuración `VITE_*`
+  validada (solo `http(s)`, sin credenciales), build sin source maps y Dependabot para `npm`.
 - Buques de todo el mundo con destino declarado al Canal (#59, ADR-0009): segunda conexión del
   worker a AISStream (bbox mundial, solo `ShipStaticData`, `AIS_CANAL_BOUND_ENABLED`) con cola y
   writer propios; detección de destinos (`app/services/canal_destination.py`) con códigos

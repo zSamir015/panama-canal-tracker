@@ -88,6 +88,11 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
 
 ### 2.4 Mapa web (`web/`)
 - React + TypeScript + Vite + MapLibre GL JS (ADR-0006).
+- Base (4.1): TypeScript `strict` (con `noUncheckedIndexedAccess` y
+  `exactOptionalPropertyTypes`), ESLint con reglas que usan los tipos y una regla que prohíbe
+  insertar HTML (`dangerouslySetInnerHTML`, `innerHTML`, `setHTML`), Prettier, Vitest con
+  Testing Library y jsdom. La configuración pública (`VITE_*`) se lee y valida en
+  `web/src/config.ts`. Comandos en `web/README.md`.
 - Buques como **una capa GeoJSON** renderizada por WebGL (escala a miles de puntos), icono rotado
   según rumbo (COG/heading) y color por tipo de buque.
 - Funciones: posiciones en vivo, ficha del buque al hacer clic, estela de los últimos N minutos,

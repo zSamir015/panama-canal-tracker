@@ -336,6 +336,7 @@ uvicorn app.main:app --reload    # API
 python -m app.workers.ais_consumer  # worker AIS (desde Fase 3)
 python scripts/ais_simulator.py serve  # tráfico AIS simulado (AISSTREAM_URL=ws://127.0.0.1:8765)
 docker compose -f docker-compose.stack.yml up -d --build --wait  # pila completa en contenedores
+cd web && npm ci && npm run lint && npm run typecheck && npm test && npm run build  # frontend (Fase 4)
 ```
 
 ## 11. Si algo no está claro

@@ -12,4 +12,11 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-  # Fase 4: añadir "npm" con directory "/web"
+  - package-ecosystem: "npm"
+    directory: "/web"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      dev-tools:
+        dependency-type: "development"

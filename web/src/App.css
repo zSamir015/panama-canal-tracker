@@ -1,0 +1,29 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app__header {
+  padding: 1rem 1.5rem;
+  background: #0b3d5c;
+  color: #f4f7fa;
+}
+
+.app__header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.app__header p {
+  margin: 0.25rem 0 0;
+  opacity: 0.85;
+}
+
+.app__map {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  background: #e8eef3;
+  color: #3b4b58;
+}
