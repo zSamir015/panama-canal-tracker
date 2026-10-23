@@ -233,6 +233,8 @@ Principio general: **denegar por defecto** — todo cerrado salvo lo que se abre
   contra la lista de orígenes permitidos (CORS no protege WebSockets), límites de mensajes.
   La librería `websockets` escribe cada frame en DEBUG (`websockets.server` / `.client`): con
   tokens o API keys en los mensajes, su logger se fija en INFO como mínimo (ver el worker AIS).
+  Los WebSocket no salen en OpenAPI: `test_every_websocket_route_is_a_known_authenticated_one`
+  obliga a declarar cada uno y a darle sus propios tests de auth.
 
 ### 8.10 CORS
 - Lista explícita de orígenes desde `CORS_ORIGINS`; nunca `*` (y nunca `*` con credenciales).
