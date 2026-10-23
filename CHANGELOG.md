@@ -6,6 +6,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- Ficha del buque y estela (#70, tarea 4.4): `GET /api/v1/vessels/{mmsi}/history` devuelve la
+  trayectoria como Feature GeoJSON `LineString` (`from`/`to`, por defecto los últimos 30 min,
+  ventana máx. 7 días, como mucho 2000 puntos con `truncated`; `geometry: null` con menos de dos
+  posiciones). En `web/`, clic en un buque: ficha en un panel de React (todo como texto, test con
+  un nombre `<img onerror>`), aro sobre el buque seleccionado y estela como capa `line`, cortada
+  donde faltan más de 5 min de señal. Primeras consultas con TanStack Query (sin reintentar los
+  401); un 401 de la API vuelve al login como el cierre `4401` del WebSocket.
 - Mapa en vivo (#67, tarea 4.3, ADR-0010): MapLibre GL con tiles de OpenFreeMap (sin key), los
   buques de `/ws/live` como una capa GeoJSON (flecha SDF girada por `cog`, punto si no hay rumbo,
   color por categoría de `ship_type`) y leyenda. Login mínimo con el access token solo en memoria;

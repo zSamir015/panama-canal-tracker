@@ -123,3 +123,67 @@
 .login__error {
   color: #b71c1c;
 }
+
+.vessel-panel {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  width: min(20rem, calc(100% - 4.5rem));
+  max-height: calc(100% - 1.5rem);
+  padding: 0.75rem 1rem;
+  overflow-y: auto;
+  font-size: 0.9rem;
+  background: rgb(255 255 255 / 95%);
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 20%);
+}
+
+.vessel-panel__header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.vessel-panel__header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  overflow-wrap: anywhere;
+}
+
+.vessel-panel__header button {
+  padding: 0 0.4rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: #3b4b58;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.vessel-panel dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.2rem 0.75rem;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.vessel-panel dt {
+  font-weight: 600;
+  color: #3b4b58;
+}
+
+.vessel-panel dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.vessel-panel__note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #607d8b;
+}
+
+.vessel-panel__error {
+  color: #b71c1c;
+}

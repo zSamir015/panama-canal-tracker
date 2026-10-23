@@ -36,6 +36,13 @@ class PositionRecord:
 
 
 @dataclass(frozen=True, slots=True)
+class TrackPoint:
+    received_at: datetime
+    lon: float
+    lat: float
+
+
+@dataclass(frozen=True, slots=True)
 class LivePositionRecord:
     mmsi: int
     lon: float
@@ -114,6 +121,29 @@ class VesselRepository(BaseRepository):
             )
         ).one_or_none()
         return PositionRecord(*row) if row else None
+
+    async def track(
+        self, mmsi: int, *, start: datetime, end: datetime, limit: int
+    ) -> tuple[Sequence[TrackPoint], bool]:
+        """Posiciones entre `start` y `end` (ambos incluidos), en orden cronológico.
+
+        Si hay más de `limit`, se quedan las más recientes (lo que importa en la estela) y el
+        segundo valor es True. Usa el índice (vessel_mmsi, received_at).
+        """
+        point = cast(Position.geom, Geometry)
+        rows = (
+            await self._session.execute(
+                select(Position.received_at, func.ST_X(point), func.ST_Y(point))
+                .where(
+                    Position.vessel_mmsi == mmsi,
+                    Position.received_at.between(start, end),
+                )
+                .order_by(Position.received_at.desc())
+                .limit(limit + 1)
+            )
+        ).all()
+        truncated = len(rows) > limit
+        return [TrackPoint(*row) for row in reversed(rows[:limit])], truncated
 
     async def latest_positions_in(
         self,

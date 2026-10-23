@@ -1,4 +1,5 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
+import type { Feature, MultiLineString } from 'geojson';
 import {
   type ExpressionSpecification,
   type GeoJSONSource,
@@ -21,6 +22,13 @@ setWorkerUrl(workerUrl);
 
 const SOURCE_ID = 'vessels';
 const LAYER_ID = 'vessels';
+const TRAIL_SOURCE_ID = 'trail';
+const SELECTED_LAYER_ID = 'vessel-selected';
+const EMPTY_TRAIL: Feature<MultiLineString> = {
+  type: 'Feature',
+  geometry: { type: 'MultiLineString', coordinates: [] },
+  properties: {},
+};
 /** Espera tras mover el mapa antes de suscribirse: el servidor admite 20 mensajes cada 10 s. */
 const VIEWPORT_DEBOUNCE_MS = 300;
 
@@ -34,18 +42,33 @@ const COLOR_BY_CATEGORY = [
 interface VesselMapProps {
   vessels: VesselState;
   onViewportChange: (bbox: Bbox) => void;
+  selectedMmsi: number | null;
+  /** Clic en un buque (su MMSI) o en el mar (`null`). */
+  onSelect: (mmsi: number | null) => void;
+  trail: Feature<MultiLineString> | null;
 }
 
 /** Mapa MapLibre con los buques como una sola capa GeoJSON (WebGL), sin markers DOM (ADR-0006). */
-export function VesselMap({ vessels, onViewportChange }: VesselMapProps) {
+export function VesselMap({
+  vessels,
+  onViewportChange,
+  selectedMmsi,
+  onSelect,
+  trail,
+}: VesselMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
+  // Lo último que se quiere pintar: si el mapa aún no ha cargado, se aplica en el `load`.
   const vesselsRef = useRef(vessels);
+  const trailRef = useRef(trail);
+  const selectedRef = useRef(selectedMmsi);
   const onViewportChangeRef = useRef(onViewportChange);
+  const onSelectRef = useRef(onSelect);
 
   useEffect(() => {
     onViewportChangeRef.current = onViewportChange;
-  }, [onViewportChange]);
+    onSelectRef.current = onSelect;
+  }, [onViewportChange, onSelect]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -78,9 +101,31 @@ export function VesselMap({ vessels, onViewportChange }: VesselMapProps) {
     map.on('load', () => {
       map.addImage('vessel-arrow', arrowIcon(), { sdf: true });
       map.addImage('vessel-dot', dotIcon(), { sdf: true });
+      map.addSource(TRAIL_SOURCE_ID, { type: 'geojson', data: trailRef.current ?? EMPTY_TRAIL });
+      map.addLayer({
+        id: TRAIL_SOURCE_ID,
+        type: 'line',
+        source: TRAIL_SOURCE_ID,
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': '#0b3d5c', 'line-width': 3, 'line-opacity': 0.75 },
+      });
       map.addSource(SOURCE_ID, {
         type: 'geojson',
         data: toFeatureCollection(vesselsRef.current),
+      });
+      // Aro bajo el buque seleccionado.
+      map.addLayer({
+        id: SELECTED_LAYER_ID,
+        type: 'circle',
+        source: SOURCE_ID,
+        filter: selectedFilter(selectedRef.current),
+        paint: {
+          'circle-radius': 16,
+          'circle-color': '#ffd54f',
+          'circle-opacity': 0.5,
+          'circle-stroke-color': '#0b3d5c',
+          'circle-stroke-width': 2,
+        },
       });
       map.addLayer({
         id: LAYER_ID,
@@ -104,6 +149,18 @@ export function VesselMap({ vessels, onViewportChange }: VesselMapProps) {
       reportViewport();
     });
 
+    map.on('click', (event) => {
+      const [feature] = map.queryRenderedFeatures(event.point, { layers: [LAYER_ID] });
+      const mmsi: unknown = feature?.properties.mmsi;
+      onSelectRef.current(typeof mmsi === 'number' ? mmsi : null);
+    });
+    map.on('mouseenter', LAYER_ID, () => {
+      map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', LAYER_ID, () => {
+      map.getCanvas().style.cursor = '';
+    });
+
     return () => {
       clearTimeout(timer);
       mapRef.current = null;
@@ -116,5 +173,23 @@ export function VesselMap({ vessels, onViewportChange }: VesselMapProps) {
     void mapRef.current?.getSource<GeoJSONSource>(SOURCE_ID)?.setData(toFeatureCollection(vessels));
   }, [vessels]);
 
+  useEffect(() => {
+    trailRef.current = trail;
+    void mapRef.current?.getSource<GeoJSONSource>(TRAIL_SOURCE_ID)?.setData(trail ?? EMPTY_TRAIL);
+  }, [trail]);
+
+  useEffect(() => {
+    selectedRef.current = selectedMmsi;
+    const map = mapRef.current;
+    if (map?.getLayer(SELECTED_LAYER_ID)) {
+      map.setFilter(SELECTED_LAYER_ID, selectedFilter(selectedMmsi));
+    }
+  }, [selectedMmsi]);
+
   return <div ref={containerRef} className="vessel-map" />;
+}
+
+function selectedFilter(mmsi: number | null): ExpressionSpecification {
+  // -1 no es un MMSI: sin selección, el filtro no deja pasar ninguno.
+  return ['==', ['get', 'mmsi'], mmsi ?? -1];
 }

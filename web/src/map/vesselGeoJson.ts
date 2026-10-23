@@ -32,6 +32,17 @@ export function shipCategory(shipType: number | null): ShipCategory {
   return 'other';
 }
 
+export const CATEGORY_LABELS: Readonly<Record<ShipCategory, string>> = {
+  cargo: 'Carga',
+  tanker: 'Tanquero',
+  passenger: 'Pasajeros',
+  tug: 'Remolcador / práctico',
+  fishing: 'Pesca',
+  pleasure: 'Recreo',
+  other: 'Otro',
+  unknown: 'Sin tipo',
+};
+
 /** Colores de cada categoría; el mapa los usa en la capa y la leyenda. */
 export const CATEGORY_COLORS: Readonly<Record<ShipCategory, string>> = {
   cargo: '#2e7d32',

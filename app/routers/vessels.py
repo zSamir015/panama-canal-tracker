@@ -4,6 +4,7 @@ Cuelga del router protegido de `app/main.py`: exige access token y aplica el lí
 peticiones. Los datos de buques son de lectura para cualquier usuario autenticado (§8.5).
 """
 
+from datetime import UTC, datetime
 from http import HTTPStatus
 from typing import Annotated, Any
 
@@ -12,15 +13,22 @@ from fastapi import APIRouter, Depends, Path, Query
 from app.core.db import DbSession
 from app.schemas.vessels import (
     DEFAULT_REPORTED_DAYS,
+    DEFAULT_TRACK_MINUTES,
+    MAX_TRACK_DAYS,
+    MAX_TRACK_POINTS,
     CanalBoundFilters,
     CanalBoundPageResponse,
     CanalBoundVesselResponse,
     Mmsi,
     PositionResponse,
+    TrackFilters,
+    TrackGeometry,
+    TrackProperties,
     VesselDetailResponse,
     VesselFilters,
     VesselPageResponse,
     VesselResponse,
+    VesselTrackResponse,
 )
 from app.services.vessels import VesselService
 
@@ -113,5 +121,44 @@ async def get_vessel(
         **VesselResponse.model_validate(detail.vessel).model_dump(),
         last_position=(
             PositionResponse.model_validate(detail.last_position) if detail.last_position else None
+        ),
+    )
+
+
+@router.get(
+    "/{mmsi}/history",
+    summary="Trayectoria de un buque",
+    description=(
+        "Posiciones del buque entre `from` y `to` como Feature GeoJSON con un `LineString` "
+        "(`[longitud, latitud]`, en orden cronológico) y la hora de cada punto en "
+        f"`properties.timestamps`. Por defecto, los últimos {DEFAULT_TRACK_MINUTES} minutos; la "
+        f"ventana no puede pasar de {MAX_TRACK_DAYS} días. Con menos de dos posiciones, "
+        f"`geometry` es `null`. Como mucho {MAX_TRACK_POINTS} puntos: si hay más, se devuelven "
+        "los más recientes y `truncated` es `true`."
+    ),
+    responses={
+        HTTPStatus.NOT_FOUND: {"description": "Buque no encontrado", **PROBLEM},
+        HTTPStatus.UNPROCESSABLE_ENTITY: {"description": "MMSI o ventana inválidos", **PROBLEM},
+    },
+)
+async def get_vessel_history(
+    mmsi: Annotated[Mmsi, Path(description="MMSI de 9 dígitos")],
+    filters: Annotated[TrackFilters, Query()],
+    service: Service,
+) -> VesselTrackResponse:
+    start, end = filters.window(datetime.now(UTC))
+    track = await service.track(mmsi, start=start, end=end, max_points=MAX_TRACK_POINTS)
+    return VesselTrackResponse(
+        geometry=(
+            TrackGeometry(coordinates=[(point.lon, point.lat) for point in track.points])
+            if len(track.points) >= 2
+            else None
+        ),
+        properties=TrackProperties(
+            mmsi=mmsi,
+            start=start,
+            end=end,
+            timestamps=[point.received_at for point in track.points],
+            truncated=track.truncated,
         ),
     )
