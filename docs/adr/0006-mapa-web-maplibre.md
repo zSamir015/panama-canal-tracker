@@ -1,7 +1,7 @@
 # ADR-0006: Mapa en tiempo real con React + MapLibre GL en el mismo repositorio
 
 - **Fecha**: 2026-10-15
-- **Estado**: Aceptada (proveedor de tiles: propuesta, decidir en Fase 4)
+- **Estado**: Aceptada (proveedor de tiles: OpenFreeMap, ver ADR-0010)
 
 ## Contexto
 El mapa en vivo es la parte más visible del proyecto. El plan inicial lo dejaba para otro

@@ -2,14 +2,17 @@
 export interface AppConfig {
   /** Origen de la API (sin barra final). Vacío: la misma del frontend, detrás del proxy. */
   apiUrl: string;
-  /** Estilo de tiles de MapLibre (ADR-0006); null hasta elegir proveedor en la Fase 4. */
-  mapStyleUrl: string | null;
+  /** Estilo de tiles de MapLibre (ADR-0010). */
+  mapStyleUrl: string;
 }
+
+/** OpenFreeMap: sin key ni cuenta, así que no hay nada que proteger en el frontend (ADR-0010). */
+export const DEFAULT_MAP_STYLE_URL = 'https://tiles.openfreemap.org/styles/liberty';
 
 export function readConfig(env: ImportMetaEnv): AppConfig {
   return {
     apiUrl: normalizeUrl(env.VITE_API_URL) ?? '',
-    mapStyleUrl: normalizeUrl(env.VITE_MAP_STYLE_URL),
+    mapStyleUrl: normalizeUrl(env.VITE_MAP_STYLE_URL) ?? DEFAULT_MAP_STYLE_URL,
   };
 }
 
