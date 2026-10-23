@@ -1,7 +1,9 @@
-"""Worker de ingesta AIS: una única conexión WebSocket con AISStream (tarea 3.3).
+"""Worker de ingesta AIS: conexiones WebSocket con AISStream (tarea 3.3, #59).
 
-ADR-0002 y ADR-0004: AISStream admite **una conexión por API key**, así que solo este proceso se
-conecta, nunca la API ni el navegador. El worker:
+ADR-0002, ADR-0004 y ADR-0009: solo este proceso se conecta, nunca la API ni el navegador, y como
+mucho con **dos conexiones** (AISStream admite 3 por cuenta): la del área del Canal y, si
+`AIS_CANAL_BOUND_ENABLED`, la de datos estáticos de todo el mundo para los buques con destino al
+Canal. Cada `AisConsumer` es una conexión. El worker:
 
 1. abre el WebSocket y envía la suscripción (bbox del Canal y tipos de mensaje) al instante:
    AISStream cierra la conexión si no llega en 3 segundos;
@@ -41,13 +43,14 @@ from websockets.asyncio.client import ClientConnection, connect
 from websockets.exceptions import ConnectionClosed, WebSocketException
 
 from app.core.config import Settings, get_settings
-from app.core.db import create_engine, create_session_factory
+from app.core.db import SessionFactory, create_engine, create_session_factory
 from app.core.logging import configure_logging
 from app.core.redis import create_redis
 from app.schemas.ingestion import WorkerStatus
 from app.services.ais_parser import AisMessageRejected, parse_message
 from app.workers.ais_publisher import STATUS_INTERVAL_SECONDS, AisPublisher, worker_status
 from app.workers.ais_writer import AisWriter, WriterStats
+from app.workers.canal_bound_writer import CanalBoundStats, CanalBoundWriter
 from app.workers.common import BACKOFF_BASE_SECONDS, AisRecord, backoff_delay
 
 # Área del Canal en el orden de AISStream, [lat, lon] (docs/DATA_SOURCES.md §1).
@@ -55,6 +58,12 @@ CANAL_BOUNDING_BOXES: tuple[tuple[tuple[float, float], tuple[float, float]], ...
     ((8.4, -80.2), (9.7, -79.2)),
 )
 MESSAGE_TYPES = ("PositionReport", "ShipStaticData")
+# Segunda conexión (#59, ADR-0009): datos estáticos de todo el mundo para encontrar los buques que
+# declaran como destino el Canal. Sin posiciones: serían cientos de mensajes por segundo.
+GLOBAL_BOUNDING_BOXES: tuple[tuple[tuple[float, float], tuple[float, float]], ...] = (
+    ((-90.0, -180.0), (90.0, 180.0)),
+)
+CANAL_BOUND_MESSAGE_TYPES = ("ShipStaticData",)
 
 CONFIRMATION_TIMEOUT_SECONDS = 10.0
 OPEN_TIMEOUT_SECONDS = 10.0
@@ -104,6 +113,8 @@ class AisConsumer:
         backoff_base_seconds: float = BACKOFF_BASE_SECONDS,
         confirmation_timeout: float = CONFIRMATION_TIMEOUT_SECONDS,
         bounding_boxes: Sequence[Any] = CANAL_BOUNDING_BOXES,
+        message_types: Sequence[str] = MESSAGE_TYPES,
+        label: str = "canal_area",
         rng: random.Random | None = None,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
@@ -114,6 +125,9 @@ class AisConsumer:
         self._backoff_base_seconds = backoff_base_seconds
         self._confirmation_timeout = confirmation_timeout
         self._bounding_boxes = bounding_boxes
+        self._message_types = message_types
+        # Distingue en los logs las dos conexiones (área del Canal y destinos, ADR-0009).
+        self._log = logger.bind(connection=label)
         self._rng = rng or random.Random()  # noqa: S311 (jitter, no criptografía)
         self._clock = clock
         self._running = False
@@ -128,15 +142,15 @@ class AisConsumer:
             {
                 "APIKey": self._api_key.get_secret_value(),
                 "BoundingBoxes": [[list(corner) for corner in box] for box in self._bounding_boxes],
-                "FilterMessageTypes": list(MESSAGE_TYPES),
+                "FilterMessageTypes": list(self._message_types),
             }
         )
 
     async def run(self, stop: asyncio.Event) -> None:
         """Mantiene la conexión hasta que `stop` se active."""
         if self._running:
-            # Dos bucles con la misma key serían dos conexiones: AISStream lo prohíbe.
-            raise RuntimeError("AisConsumer ya está en marcha: una sola conexión por API key")
+            # Dos bucles del mismo consumer serían dos conexiones con la misma suscripción.
+            raise RuntimeError("AisConsumer ya está en marcha: una conexión por consumer")
         self._running = True
         attempt = 0
         host = urlsplit(self._url).hostname
@@ -153,13 +167,13 @@ class AisConsumer:
                         if isinstance(error, ConnectionClosed) and error.rcvd
                         else None
                     )
-                    logger.warning(
+                    self._log.warning(
                         "ais_disconnected", host=host, error=type(error).__name__, code=code
                     )
                 else:
                     if not stop.is_set():
                         # El servidor cerró de forma ordenada: también hay que reconectar.
-                        logger.warning("ais_disconnected", host=host, error=None, code=None)
+                        self._log.warning("ais_disconnected", host=host, error=None, code=None)
                 finally:
                     # Una conexión que llegó a confirmar la suscripción reinicia el backoff.
                     if self.stats.subscribed:
@@ -175,7 +189,7 @@ class AisConsumer:
                     base=self._backoff_base_seconds,
                 )
                 attempt += 1
-                logger.info(
+                self._log.info(
                     "ais_reconnect_scheduled", attempt=attempt, delay_seconds=round(delay, 3)
                 )
                 with contextlib.suppress(TimeoutError):
@@ -194,7 +208,7 @@ class AisConsumer:
         ) as connection:
             self.stats.connections += 1
             self.stats.connected = True
-            logger.info("ais_connected", host=urlsplit(self._url).hostname)
+            self._log.info("ais_connected", host=urlsplit(self._url).hostname)
             # Al instante: AISStream cierra si la suscripción no llega en 3 segundos.
             await connection.send(self._subscription())
             closer = asyncio.create_task(self._close_on_stop(connection, stop))
@@ -238,13 +252,13 @@ class AisConsumer:
             message = data.get("Message")
             compression = isinstance(message, dict) and message.get("CompressionEnabled") is True
             self.stats.subscribed = True
-            logger.info("ais_subscription_confirmed", compression=compression)
+            self._log.info("ais_subscription_confirmed", compression=compression)
             if not compression:
-                logger.warning("ais_compression_disabled")
+                self._log.warning("ais_compression_disabled")
             return
         if "error" in data:
             # El texto viene del servidor: se recorta y se trata como dato, no como formato.
-            logger.error("ais_server_error", error=str(data["error"])[:200])
+            self._log.error("ais_server_error", error=str(data["error"])[:200])
             raise AisServerError
         self.stats.ignored += 1
 
@@ -256,7 +270,7 @@ class AisConsumer:
                 self._queue.task_done()
             self.stats.dropped += 1
             if self.stats.dropped == 1 or self.stats.dropped % DROP_LOG_EVERY == 0:
-                logger.warning("ais_queue_full", dropped=self.stats.dropped)
+                self._log.warning("ais_queue_full", dropped=self.stats.dropped)
         self._queue.put_nowait(record)
         self.stats.queued += 1
 
@@ -288,10 +302,41 @@ async def _publish_status(
         await asyncio.sleep(interval)
 
 
-async def _log_stats(consumer: ConsumerStats, writer: WriterStats, interval: float) -> None:
+def _canal_bound_event(consumer: ConsumerStats, writer: CanalBoundStats) -> dict[str, Any]:
+    return {
+        "connected": consumer.connected,
+        "received": consumer.received,
+        "dropped": consumer.dropped,
+        "rejected": dict(consumer.rejected),
+        "upserted": writer.upserted,
+        "removed": writer.removed,
+        "ports": dict(writer.ports),
+        "batches_dropped": writer.batches_dropped,
+    }
+
+
+@dataclass
+class _CanalBound:
+    """Segunda conexión (#59, ADR-0009): consumer de datos estáticos globales y su writer."""
+
+    consumer: AisConsumer
+    writer: CanalBoundWriter
+
+
+async def _log_stats(
+    consumer: ConsumerStats,
+    writer: WriterStats,
+    interval: float,
+    canal_bound: _CanalBound | None = None,
+) -> None:
     while True:
         await asyncio.sleep(interval)
         logger.info("ais_stats", **_stats_event(consumer, writer))
+        if canal_bound is not None:
+            logger.info(
+                "ais_canal_bound_stats",
+                **_canal_bound_event(canal_bound.consumer.stats, canal_bound.writer.stats),
+            )
 
 
 def _require_api_key(settings: Settings) -> SecretStr:
@@ -334,26 +379,39 @@ async def run_worker(
         flush_seconds=settings.ais_batch_flush_seconds,
         on_committed=publisher.publish_batch,
     )
+    canal_bound = _canal_bound(settings, api_key, create_session_factory(engine))
     if stop is None:
         stop = asyncio.Event()
         loop = asyncio.get_running_loop()
         for sig in (signal.SIGINT, signal.SIGTERM):
             loop.add_signal_handler(sig, stop.set)
     writer_stop = asyncio.Event()
-    writer_task = asyncio.create_task(writer.run(writer_stop))
-    stats_task = asyncio.create_task(_log_stats(consumer.stats, writer.stats, stats_interval))
+    writers = [asyncio.create_task(writer.run(writer_stop))]
+    if canal_bound is not None:
+        writers.append(asyncio.create_task(canal_bound.writer.run(writer_stop)))
+    stats_task = asyncio.create_task(
+        _log_stats(consumer.stats, writer.stats, stats_interval, canal_bound)
+    )
 
     def current_status() -> WorkerStatus:
         return worker_status(consumer=consumer.stats, writer=writer.stats, queue_size=queue.qsize())
 
     status_task = asyncio.create_task(_publish_status(publisher, current_status, status_interval))
-    logger.info("ais_worker_started", host=urlsplit(settings.aisstream_url).hostname)
+    logger.info(
+        "ais_worker_started",
+        host=urlsplit(settings.aisstream_url).hostname,
+        canal_bound=canal_bound is not None,
+    )
     try:
-        await consumer.run(stop)
+        # Si una conexión falla de forma inesperada, el grupo cancela la otra y el worker para.
+        async with asyncio.TaskGroup() as group:
+            group.create_task(consumer.run(stop))
+            if canal_bound is not None:
+                group.create_task(canal_bound.consumer.run(stop))
     finally:
-        # El writer vacía la cola después de que el consumer haya dejado de añadir.
+        # Los writers vacían sus colas después de que los consumers hayan dejado de añadir.
         writer_stop.set()
-        await writer_task
+        await asyncio.gather(*writers)
         for task in (stats_task, status_task):
             task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
@@ -363,7 +421,34 @@ async def run_worker(
         await publisher.close()
         await engine.dispose()
         logger.info("ais_worker_stopped", **_stats_event(consumer.stats, writer.stats))
+        if canal_bound is not None:
+            logger.info(
+                "ais_canal_bound_stopped",
+                **_canal_bound_event(canal_bound.consumer.stats, canal_bound.writer.stats),
+            )
     return consumer.stats
+
+
+def _canal_bound(
+    settings: Settings, api_key: SecretStr, sessions: SessionFactory
+) -> _CanalBound | None:
+    """La segunda conexión, si está activada (`AIS_CANAL_BOUND_ENABLED`)."""
+    if not settings.ais_canal_bound_enabled:
+        return None
+    # Cola propia: si esta conexión se atasca, la del área del Canal no lo nota.
+    queue: asyncio.Queue[AisRecord] = asyncio.Queue(maxsize=settings.ais_queue_max_size)
+    consumer = AisConsumer(
+        url=settings.aisstream_url,
+        api_key=api_key,
+        queue=queue,
+        reconnect_max_seconds=settings.ais_reconnect_max_seconds,
+        bounding_boxes=GLOBAL_BOUNDING_BOXES,
+        message_types=CANAL_BOUND_MESSAGE_TYPES,
+        label="canal_bound",
+    )
+    return _CanalBound(
+        consumer=consumer, writer=CanalBoundWriter(queue=queue, session_factory=sessions)
+    )
 
 
 def main() -> None:

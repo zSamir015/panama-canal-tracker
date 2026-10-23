@@ -91,6 +91,8 @@ services:
       # pueda funcionar con cualquier valor).
       AISSTREAM_API_KEY: ${AISSTREAM_API_KEY:-}
       AISSTREAM_URL: ${AISSTREAM_URL:-wss://stream.aisstream.io/v0/stream}
+      # Segunda conexión para los buques con destino al Canal (ADR-0009).
+      AIS_CANAL_BOUND_ENABLED: ${AIS_CANAL_BOUND_ENABLED:-true}
     depends_on:
       migrate:
         condition: service_completed_successfully

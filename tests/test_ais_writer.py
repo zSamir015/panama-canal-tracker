@@ -15,7 +15,7 @@ from app.core.logging import configure_logging
 from app.services.ais_parser import PositionUpdate, VesselStatic
 from app.workers import ais_writer as ais_writer_module
 from app.workers.ais_writer import AisWriter, build_batch
-from app.workers.common import AisRecord
+from app.workers.common import AisRecord, next_record
 
 T0 = datetime(2026, 10, 21, 12, 0, tzinfo=UTC)
 
@@ -203,9 +203,7 @@ async def test_a_record_arriving_together_with_stop_is_not_lost() -> None:
     queue.put_nowait(position(seconds=1))
     stop = asyncio.Event()
     stop.set()
-    writer = RecordingWriter(queue, batch_size=10, flush_seconds=1)
-
-    record = await writer._next(stop, 1)
+    record = await next_record(queue, stop, 1)
 
     assert record == position(seconds=1)
     assert queue.empty()

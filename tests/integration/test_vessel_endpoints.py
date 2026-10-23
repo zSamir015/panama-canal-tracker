@@ -13,6 +13,7 @@ from app.core.db import SessionFactory
 from app.core.security import create_access_token, hash_password
 from app.models.user import UserRole
 from app.repositories.ais import AisRepository, PositionRow, VesselRow
+from app.repositories.canal_bound import CanalBoundRepository, CanalBoundRow
 from app.repositories.user import UserRepository
 
 VESSELS = "/api/v1/vessels"
@@ -275,3 +276,178 @@ async def test_hostile_vessel_names_are_returned_as_json_text(
         assert response.headers["x-content-type-options"] == "nosniff"
     assert listing.json()["items"][0]["name"] == name
     assert detail.json()["name"] == name
+
+
+# --- GET /vessels/canal-bound (#59) ---------------------------------------------------------
+
+CANAL_BOUND = f"{VESSELS}/canal-bound"
+CANAL_BOUND_FIELDS = {
+    "mmsi",
+    "name",
+    "imo",
+    "ship_type",
+    "length_m",
+    "destination",
+    "port_locode",
+    "eta",
+    "lat",
+    "lon",
+    "reported_at",
+}
+
+
+def canal_bound(
+    mmsi: int, *, days_ago: float = 0, eta_in_days: float | None = 3, **overrides: Any
+) -> CanalBoundRow:
+    values: dict[str, Any] = {
+        "mmsi": mmsi,
+        "destination": "USHOU>PABLB",
+        "port_locode": "PABLB",
+        "reported_at": NOW - timedelta(days=days_ago),
+        "name": f"VESSEL {mmsi}",
+        "ship_type": 80,
+        "eta": None if eta_in_days is None else NOW + timedelta(days=eta_in_days),
+        "lat": 28.91,
+        "lon": -94.62,
+    }
+    return CanalBoundRow(**(values | overrides))
+
+
+async def store_canal_bound(sessions: SessionFactory, rows: list[CanalBoundRow]) -> None:
+    async with sessions() as session:
+        await CanalBoundRepository(session).upsert(rows)
+        await session.commit()
+
+
+async def test_canal_bound_lists_the_closest_eta_first(
+    client: AsyncClient, sessions: SessionFactory
+) -> None:
+    await store_canal_bound(
+        sessions,
+        [
+            canal_bound(636000001, eta_in_days=5),
+            canal_bound(636000002, eta_in_days=None),
+            canal_bound(636000003, eta_in_days=1),
+        ],
+    )
+
+    response = await client.get(CANAL_BOUND)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert [item["mmsi"] for item in body["items"]] == [636000003, 636000001, 636000002]
+    assert (body["total"], body["page"], body["size"]) == (3, 1, 50)
+    assert set(body["items"][0]) == CANAL_BOUND_FIELDS
+    assert body["items"][0]["lat"] == pytest.approx(28.91)
+    assert body["items"][0]["lon"] == pytest.approx(-94.62)
+
+
+async def test_canal_bound_puts_past_etas_after_upcoming_ones(
+    client: AsyncClient, sessions: SessionFactory
+) -> None:
+    # Muestra real del 2026-10-22: un buque frente a Noruega declaraba PANAMA con ETA de junio.
+    # Una ETA vencida suele ser un dato sin actualizar: no debe encabezar la lista.
+    await store_canal_bound(
+        sessions,
+        [
+            canal_bound(636000001, eta_in_days=-120),
+            canal_bound(636000002, eta_in_days=None),
+            canal_bound(636000003, eta_in_days=6),
+            canal_bound(636000004, eta_in_days=-0.5),  # llegando: aún cuenta como próxima
+        ],
+    )
+
+    body = (await client.get(CANAL_BOUND)).json()
+
+    assert [item["mmsi"] for item in body["items"]] == [636000004, 636000003, 636000001, 636000002]
+
+
+async def test_canal_bound_filters_by_port_and_report_age(
+    client: AsyncClient, sessions: SessionFactory
+) -> None:
+    await store_canal_bound(
+        sessions,
+        [
+            canal_bound(636000001),
+            canal_bound(636000002, destination="PA CTB", port_locode="PACTB"),
+            canal_bound(636000003, days_ago=40),  # fuera de los 30 días por defecto
+        ],
+    )
+    since = (NOW - timedelta(days=60)).isoformat()
+
+    default = (await client.get(CANAL_BOUND)).json()
+    by_port = (await client.get(CANAL_BOUND, params={"port": "PACTB"})).json()
+    older = (await client.get(CANAL_BOUND, params={"reported_since": since})).json()
+
+    assert {item["mmsi"] for item in default["items"]} == {636000001, 636000002}
+    assert [item["mmsi"] for item in by_port["items"]] == [636000002]
+    assert older["total"] == 3
+
+
+async def test_canal_bound_pages_do_not_overlap(
+    client: AsyncClient, sessions: SessionFactory
+) -> None:
+    await store_canal_bound(sessions, [canal_bound(636000000 + i, eta_in_days=1) for i in range(5)])
+
+    first = (await client.get(CANAL_BOUND, params={"size": 2})).json()
+    second = (await client.get(CANAL_BOUND, params={"size": 2, "page": 2})).json()
+    third = (await client.get(CANAL_BOUND, params={"size": 2, "page": 3})).json()
+
+    pages = [[item["mmsi"] for item in page["items"]] for page in (first, second, third)]
+    assert [len(page) for page in pages] == [2, 2, 1]
+    assert len({mmsi for page in pages for mmsi in page}) == 5
+
+
+async def test_canal_bound_returns_ais_text_as_is(
+    client: AsyncClient, sessions: SessionFactory
+) -> None:
+    await store_canal_bound(
+        sessions,
+        [canal_bound(636000001, name="<img src=x onerror=alert(1)>", destination="<b>PABLB</b>")],
+    )
+
+    response = await client.get(CANAL_BOUND)
+
+    assert response.headers["content-type"] == "application/json"
+    [item] = response.json()["items"]
+    assert item["name"] == "<img src=x onerror=alert(1)>"
+    assert item["destination"] == "<b>PABLB</b>"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"size": 201},
+        {"page": 0},
+        {"port": "CNSHA"},
+        {"port": "PABOC"},  # de Panamá, pero no del Canal
+        {"port": "pablb"},
+        {"reported_since": "2026-10-21T12:00:00"},
+        {"reported_since": (NOW - timedelta(days=91)).isoformat()},
+        {"order_by": "eta"},
+    ],
+    ids=[
+        "size_201",
+        "page_0",
+        "puerto_extranjero",
+        "puerto_fuera_del_canal",
+        "puerto_minusculas",
+        "fecha_sin_zona",
+        "fecha_91_dias",
+        "parametro_desconocido",
+    ],
+)
+async def test_canal_bound_rejects_invalid_parameters(
+    client: AsyncClient, params: dict[str, Any]
+) -> None:
+    response = await client.get(CANAL_BOUND, params=params)
+
+    assert response.status_code == 422
+    assert response.headers["content-type"] == "application/problem+json"
+
+
+async def test_canal_bound_requires_a_token(app: FastAPI) -> None:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="https://test") as c:
+        response = await c.get(CANAL_BOUND)
+
+    assert response.status_code == 401

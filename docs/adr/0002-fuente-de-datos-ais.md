@@ -1,7 +1,7 @@
 # ADR-0002: AISStream.io como fuente de datos AIS
 
 - **Fecha**: 2026-10-15
-- **Estado**: Aceptada
+- **Estado**: Aceptada (el límite de conexiones lo modifica el ADR-0009: como máximo dos)
 
 ## Contexto
 Se necesita un stream de posiciones de buques sobre el área del Canal de Panamá, gratuito y

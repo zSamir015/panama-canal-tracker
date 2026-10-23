@@ -58,6 +58,7 @@ def test_ship_static_data_calculates_dimensions_and_removes_padding() -> None:
         ship_type=70,
         length_m=150,
         beam_m=20,
+        received_at=RECEIVED_AT,
     )
 
 
@@ -109,7 +110,9 @@ def test_static_unavailable_values_become_none() -> None:
         received_at=RECEIVED_AT,
     )
 
-    assert result == VesselStatic(352001234, "PACIFIC STAR", None, None, None, None)
+    assert result == VesselStatic(
+        352001234, "PACIFIC STAR", None, None, None, None, received_at=RECEIVED_AT
+    )
 
 
 @pytest.mark.parametrize(
@@ -293,3 +296,139 @@ def test_parser_uses_supplied_timestamp() -> None:
 
     assert isinstance(result, PositionUpdate)
     assert result.received_at is RECEIVED_AT
+
+
+# --- Destino, ETA y posición de `MetaData` (#59) --------------------------------------------
+
+
+def message_with_canal_bound(metadata: dict[str, Any] | None = None, **overrides: Any) -> str:
+    message = json.loads(fixture("ship_static_data_canal_bound.json"))
+    message["Message"]["ShipStaticData"].update(overrides)
+    message["MetaData"].update(metadata or {})
+    return json.dumps(message)
+
+
+def test_static_destination_eta_and_metadata_position_are_parsed() -> None:
+    result = parse_message(fixture("ship_static_data_canal_bound.json"), received_at=RECEIVED_AT)
+
+    assert result == VesselStatic(
+        mmsi=636012345,
+        name="GULF TRADER",
+        imo=9123456,
+        ship_type=80,
+        length_m=183,
+        beam_m=32,
+        destination="USHOU>PABLB",
+        eta=datetime(2026, 10, 27, 6, 30, tzinfo=UTC),
+        lat=28.91,
+        lon=-94.62,
+        received_at=RECEIVED_AT,
+    )
+
+
+@pytest.mark.parametrize("destination", [None, "", "                    ", "@@@@@@@@@@@@@@@@@@@@"])
+def test_static_empty_destination_becomes_none(destination: str | None) -> None:
+    result = parse_message(
+        message_with_canal_bound(Destination=destination), received_at=RECEIVED_AT
+    )
+
+    assert isinstance(result, VesselStatic)
+    assert result.destination is None
+
+
+def test_static_destination_is_preserved_as_text() -> None:
+    result = parse_message(
+        message_with_canal_bound(Destination="<b>PA BLB</b>"), received_at=RECEIVED_AT
+    )
+
+    assert isinstance(result, VesselStatic)
+    assert result.destination == "<b>PA BLB</b>"
+
+
+@pytest.mark.parametrize(
+    ("destination", "reason"),
+    [
+        ("PA\nBLB", "invalid_destination"),
+        ("PA‮BLB", "invalid_destination"),
+        ("A" * 65, "destination_too_long"),
+    ],
+)
+def test_static_invalid_destination_is_rejected(
+    destination: str, reason: AisRejectionReason
+) -> None:
+    with pytest.raises(AisMessageRejected) as error:
+        parse_message(message_with_canal_bound(Destination=destination), received_at=RECEIVED_AT)
+
+    assert error.value.reason == reason
+
+
+@pytest.mark.parametrize(
+    "eta",
+    [
+        {"Month": 0, "Day": 0, "Hour": 24, "Minute": 60},  # "no disponible" según AIS
+        {"Month": 10, "Day": 0, "Hour": 6, "Minute": 30},
+        {"Month": 10, "Day": 27, "Hour": 24, "Minute": 0},
+        {"Month": 10, "Day": 27, "Hour": 6, "Minute": 60},
+        {"Month": 13, "Day": 1, "Hour": 0, "Minute": 0},
+        {"Month": 2, "Day": 30, "Hour": 0, "Minute": 0},
+        {"Month": 4, "Day": 31, "Hour": 0, "Minute": 0},
+    ],
+)
+def test_static_unavailable_or_impossible_eta_becomes_none(eta: dict[str, int]) -> None:
+    result = parse_message(message_with_canal_bound(Eta=eta), received_at=RECEIVED_AT)
+
+    assert isinstance(result, VesselStatic)
+    assert result.eta is None
+    assert result.destination == "USHOU>PABLB"
+
+
+@pytest.mark.parametrize(
+    ("received_at", "eta", "expected"),
+    [
+        # ETA a principios de enero recibida a final de diciembre: año siguiente.
+        (
+            datetime(2026, 12, 30, 12, 0, tzinfo=UTC),
+            {"Month": 1, "Day": 2, "Hour": 8, "Minute": 0},
+            datetime(2027, 1, 2, 8, 0, tzinfo=UTC),
+        ),
+        # ETA ya pasada de final de diciembre recibida en enero: año anterior.
+        (
+            datetime(2027, 1, 2, 12, 0, tzinfo=UTC),
+            {"Month": 12, "Day": 30, "Hour": 8, "Minute": 0},
+            datetime(2026, 12, 30, 8, 0, tzinfo=UTC),
+        ),
+        # 29 de febrero: solo existe en el año bisiesto cercano.
+        (
+            datetime(2028, 2, 20, 0, 0, tzinfo=UTC),
+            {"Month": 2, "Day": 29, "Hour": 0, "Minute": 0},
+            datetime(2028, 2, 29, 0, 0, tzinfo=UTC),
+        ),
+    ],
+)
+def test_static_eta_year_is_closest_to_reception(
+    received_at: datetime, eta: dict[str, int], expected: datetime
+) -> None:
+    result = parse_message(message_with_canal_bound(Eta=eta), received_at=received_at)
+
+    assert isinstance(result, VesselStatic)
+    assert result.eta == expected
+
+
+@pytest.mark.parametrize(
+    "position",
+    [
+        {"latitude": None, "longitude": None},
+        {"latitude": 28.91, "longitude": None},
+        {"latitude": 91.0, "longitude": -94.62},
+        {"latitude": 28.91, "longitude": 181.0},
+        {"latitude": 0.0, "longitude": 0.0},
+    ],
+)
+def test_static_missing_or_invalid_metadata_position_becomes_none(
+    position: dict[str, float | None],
+) -> None:
+    result = parse_message(message_with_canal_bound(metadata=position), received_at=RECEIVED_AT)
+
+    assert isinstance(result, VesselStatic)
+    assert (result.lat, result.lon) == (None, None)
+    assert result.destination == "USHOU>PABLB"

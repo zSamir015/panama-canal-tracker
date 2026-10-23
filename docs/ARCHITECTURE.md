@@ -3,12 +3,13 @@
 ## 1. Vista general
 
 ```
-   AISStream.io (WebSocket, 1 conexión por API key)
+   AISStream.io (WebSocket, 2 conexiones: área del Canal + destinos, ADR-0009)
               │
               ▼
 ┌─────────────────────────┐        ┌──────────────────────────────────────┐
 │  worker (proceso propio) │        │  PostgreSQL 16 + PostGIS + TimescaleDB│
 │  app/workers/            │──────▶│  vessels · positions (hypertable)     │
+│                          │        │  canal_bound_vessels                  │
 │  · parseo + validación   │ batch  │  transits · anchorage_visits · users  │
 │  · batch insert          │ insert └──────────────────────────────────────┘
 │  · detección de tránsitos│                     ▲
@@ -36,8 +37,15 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
 
 ### 2.1 Worker de ingesta (`app/workers/ais_consumer.py`)
 - Proceso independiente: `python -m app.workers.ais_consumer`. **Una sola réplica.**
-- Única conexión a `wss://stream.aisstream.io/v0/stream`, suscrita por bounding box.
+- Conexión principal a `wss://stream.aisstream.io/v0/stream`, suscrita a la bbox del Canal.
 - Mensajes: `PositionReport` y `ShipStaticData`.
+- Segunda conexión (ADR-0009, `AIS_CANAL_BOUND_ENABLED`): bbox mundial, solo `ShipStaticData`,
+  con su propia cola y su propio writer (`app/workers/canal_bound_writer.py`). Solo guarda en
+  `canal_bound_vessels` los buques cuyo destino declarado es el Canal
+  (`app/services/canal_destination.py`, puro) y borra los que cambian de destino; el resto se
+  descarta sin tocar la base. Las dos conexiones corren en un `TaskGroup`: si una falla de forma
+  inesperada, el worker para (y Docker lo reinicia). Los logs llevan `connection=canal_area` o
+  `connection=canal_bound`.
 - Suscripción enviada al abrir la conexión (AISStream cierra si no llega en 3 s); se espera la
   `SubscriptionConfirmation`. La API key solo viaja en ese mensaje y nunca se registra (el logger
   de la librería `websockets` está fijado en INFO porque en DEBUG escribe los frames).
@@ -236,4 +244,5 @@ flowchart LR
 ## 9. Decisiones
 
 Ver `docs/adr/`: 0001 stack · 0002 AISStream · 0003 auth · 0004 worker + Redis ·
-0005 TimescaleDB · 0006 mapa web · 0007 rate limiting · 0008 datos solo con sesión.
+0005 TimescaleDB · 0006 mapa web · 0007 rate limiting · 0008 datos solo con sesión ·
+0009 segunda conexión para destinos al Canal.

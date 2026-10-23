@@ -27,6 +27,7 @@ from app.services.ais_parser import PositionUpdate, VesselStatic
 from app.workers import ais_consumer
 from app.workers.ais_consumer import AisConsumer, AisRecord, backoff_delay, run_worker
 from app.workers.ais_writer import WriterStats
+from app.workers.canal_bound_writer import CanalBoundStats
 from tests.scripts_loader import load_script
 
 sim = load_script("ais_simulator")
@@ -291,7 +292,7 @@ async def test_only_one_connection_at_a_time() -> None:
         task = asyncio.create_task(consumer.run(stop))
         await asyncio.sleep(0.01)
         # Un segundo bucle con la misma key abriría otra conexión: se rechaza.
-        with pytest.raises(RuntimeError, match="una sola conexión"):
+        with pytest.raises(RuntimeError, match="una conexión por consumer"):
             await asyncio.wait_for(consumer.run(stop), timeout=1)
         await eventually(lambda: consumer.stats.connections >= 5)
         stop.set()
@@ -397,7 +398,22 @@ class DrainingWriter:
             except TimeoutError:
                 continue
             self._queue.task_done()
-            self.stats.positions_written += 1
+            self._count()
+
+    def _count(self) -> None:
+        self.stats.positions_written += 1
+
+
+class DrainingCanalBoundWriter(DrainingWriter):
+    """Igual para el writer de destinos al Canal (#59): sus estadísticas son otras."""
+
+    def __init__(self, *, queue: asyncio.Queue[AisRecord], **_: Any) -> None:
+        super().__init__(queue=queue)
+        self.canal_stats = CanalBoundStats()
+        self.stats = self.canal_stats  # type: ignore[assignment]
+
+    def _count(self) -> None:
+        self.canal_stats.upserted += 1
 
 
 class SilentRedis:
@@ -420,6 +436,7 @@ class SilentRedis:
 @pytest.fixture(autouse=True)
 def no_database_writer(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(ais_consumer, "AisWriter", DrainingWriter)
+    monkeypatch.setattr(ais_consumer, "CanalBoundWriter", DrainingCanalBoundWriter)
     monkeypatch.setattr(ais_consumer, "create_redis", lambda _settings: silent_redis)
 
 
@@ -578,3 +595,63 @@ async def test_worker_leaves_a_final_disconnected_status_when_it_stops() -> None
     final = silent_redis.statuses[-1]
     assert final["connected"] is False
     assert final["received"] == stats.received
+
+
+# --- Segunda conexión: destinos al Canal (#59, ADR-0009) ------------------------------------
+
+
+async def subscriptions_opened_by_the_worker(settings: Settings) -> list[dict[str, Any]]:
+    received: list[dict[str, Any]] = []
+
+    async def handler(connection: ServerConnection) -> None:
+        received.append(json.loads(await connection.recv()))
+        await connection.send(CONFIRMATION)
+        await connection.wait_closed()
+
+    stop = asyncio.Event()
+    async with ws_server(handler) as url:
+        task = asyncio.create_task(
+            run_worker(settings.model_copy(update={"aisstream_url": url}), stop)
+        )
+        expected = 2 if settings.ais_canal_bound_enabled else 1
+        await eventually(lambda: len(received) >= expected)
+        await asyncio.sleep(0.1)  # por si llegara una conexión de más
+        stop.set()
+        await asyncio.wait_for(task, timeout=5)
+    return received
+
+
+async def test_worker_opens_a_second_connection_for_global_static_data() -> None:
+    subscriptions = await subscriptions_opened_by_the_worker(worker_settings())
+
+    assert len(subscriptions) == 2  # nunca más de dos: AISStream admite 3 por cuenta
+    by_types = {tuple(s["FilterMessageTypes"]): s["BoundingBoxes"] for s in subscriptions}
+    assert by_types == {
+        ("PositionReport", "ShipStaticData"): [[[8.4, -80.2], [9.7, -79.2]]],
+        ("ShipStaticData",): [[[-90.0, -180.0], [90.0, 180.0]]],
+    }
+
+
+async def test_second_connection_can_be_disabled() -> None:
+    subscriptions = await subscriptions_opened_by_the_worker(
+        worker_settings(ais_canal_bound_enabled=False)
+    )
+
+    assert [s["FilterMessageTypes"] for s in subscriptions] == [
+        ["PositionReport", "ShipStaticData"]
+    ]
+
+
+async def test_connection_logs_say_which_connection_they_belong_to() -> None:
+    stream = io.StringIO()
+    configure_logging("INFO", stream=stream)
+
+    await subscriptions_opened_by_the_worker(worker_settings())
+
+    confirmed = [
+        event["connection"]
+        for event in log_events(stream)
+        if event["event"] == "ais_subscription_confirmed"
+    ]
+    assert sorted(confirmed) == ["canal_area", "canal_bound"]
+    assert API_KEY not in stream.getvalue()

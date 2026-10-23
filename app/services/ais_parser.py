@@ -12,6 +12,8 @@ from pydantic import BaseModel, ConfigDict, Field, FiniteFloat, StrictBool, Stri
 
 MAX_MESSAGE_BYTES = 8 * 1024
 MAX_NAME_LENGTH = 128
+# El protocolo AIS admite 20 caracteres de destino; el margen cubre el relleno de AISStream.
+MAX_DESTINATION_LENGTH = 64
 _POSITION_REPORT = "PositionReport"
 _STATIC_REPORT = "ShipStaticData"
 _INTERESTING_MESSAGE_TYPES = {_POSITION_REPORT, _STATIC_REPORT}
@@ -37,6 +39,8 @@ AisRejectionReason = Literal[
     "invalid_name",
     "name_too_long",
     "invalid_dimension",
+    "invalid_destination",
+    "destination_too_long",
 ]
 
 
@@ -72,6 +76,16 @@ class VesselStatic:
     ship_type: int | None
     length_m: float | None
     beam_m: float | None
+    # Texto libre que escribe la tripulación (puerto o ruta, p. ej. "PA BLB" o "USHOU>PABLB").
+    destination: str | None = None
+    # ETA declarada. AIS no envía el año: se elige el que deja la fecha más cerca de la recepción.
+    eta: datetime | None = None
+    # Última posición conocida según AISStream (`MetaData`), no la del mensaje estático, que no
+    # lleva posición. Sirve para situar a los buques que están lejos del Canal (#59).
+    lat: float | None = None
+    lon: float | None = None
+    # Hora de recepción del mensaje (la del informe del destino).
+    received_at: datetime | None = None
 
 
 class _MetaData(BaseModel):
@@ -79,6 +93,8 @@ class _MetaData(BaseModel):
 
     mmsi: StrictInt = Field(alias="MMSI")
     ship_name: StrictStr | None = Field(default=None, alias="ShipName")
+    latitude: FiniteFloat | None = Field(default=None, alias="latitude")
+    longitude: FiniteFloat | None = Field(default=None, alias="longitude")
 
 
 class _PositionReport(BaseModel):
@@ -103,6 +119,15 @@ class _Dimension(BaseModel):
     d: FiniteFloat | None = Field(default=None, alias="D")
 
 
+class _Eta(BaseModel):
+    model_config = ConfigDict(extra="ignore", strict=True)
+
+    month: StrictInt = Field(alias="Month")
+    day: StrictInt = Field(alias="Day")
+    hour: StrictInt = Field(alias="Hour")
+    minute: StrictInt = Field(alias="Minute")
+
+
 class _ShipStaticData(BaseModel):
     model_config = ConfigDict(extra="ignore", strict=True)
 
@@ -112,6 +137,8 @@ class _ShipStaticData(BaseModel):
     imo_number: StrictInt | None = Field(default=None, alias="ImoNumber")
     type: StrictInt | None = Field(default=None, alias="Type")
     dimension: _Dimension | None = Field(default=None, alias="Dimension")
+    destination: StrictStr | None = Field(default=None, alias="Destination")
+    eta: _Eta | None = Field(default=None, alias="Eta")
 
 
 class _Message(BaseModel):
@@ -182,6 +209,7 @@ def parse_message(
     name = _normalize_name(static.name)
     length_m = _dimension_sum(static.dimension, "a", "b")
     beam_m = _dimension_sum(static.dimension, "c", "d")
+    lat, lon = _metadata_position(envelope.metadata)
     return VesselStatic(
         mmsi=static.user_id,
         name=name,
@@ -189,6 +217,11 @@ def parse_message(
         ship_type=_normalize_ship_type(static.type),
         length_m=length_m,
         beam_m=beam_m,
+        destination=_normalize_destination(static.destination),
+        eta=_resolve_eta(static.eta, received_at),
+        lat=lat,
+        lon=lon,
+        received_at=received_at,
     )
 
 
@@ -271,6 +304,54 @@ def _normalize_name(value: str | None) -> str | None:
         raise AisMessageRejected("name_too_long")
     normalized = value.rstrip("@ ")
     return normalized or None
+
+
+def _normalize_destination(value: str | None) -> str | None:
+    if value is None:
+        return None
+    if any(unicodedata.category(character).startswith("C") for character in value):
+        raise AisMessageRejected("invalid_destination")
+    if len(value) > MAX_DESTINATION_LENGTH:
+        raise AisMessageRejected("destination_too_long")
+    normalized = value.rstrip("@ ")
+    return normalized or None
+
+
+def _resolve_eta(eta: _Eta | None, received_at: datetime) -> datetime | None:
+    """ETA AIS (mes, día, hora, minuto en UTC) como fecha completa; None si no está disponible.
+
+    Los valores "no disponible" de AIS (mes 0, día 0, hora 24, minuto 60) y las fechas imposibles
+    (30 de febrero) dan None: una ETA rota no invalida el resto del mensaje. Sin año, se prueba el
+    anterior, el actual y el siguiente al de la recepción y gana la fecha más cercana: así una ETA
+    del 2 de enero recibida el 30 de diciembre cae en el año siguiente.
+    """
+    if eta is None:
+        return None
+    if not (1 <= eta.month <= 12 and 1 <= eta.day <= 31 and 0 <= eta.hour <= 23):
+        return None
+    if not 0 <= eta.minute <= 59:
+        return None
+    candidates = []
+    for year in (received_at.year - 1, received_at.year, received_at.year + 1):
+        try:
+            candidates.append(
+                datetime(year, eta.month, eta.day, eta.hour, eta.minute, tzinfo=received_at.tzinfo)
+            )
+        except ValueError:  # 29 de febrero en un año no bisiesto, 31 de abril...
+            continue
+    if not candidates:
+        return None
+    return min(candidates, key=lambda candidate: abs(candidate - received_at))
+
+
+def _metadata_position(metadata: _MetaData) -> tuple[float | None, float | None]:
+    """Posición de `MetaData`, o (None, None) si falta o no es válida (no invalida el mensaje)."""
+    lat, lon = metadata.latitude, metadata.longitude
+    if lat is None or lon is None:
+        return None, None
+    if not -90 <= lat <= 90 or not -180 <= lon <= 180 or (lat == 0 and lon == 0):
+        return None, None
+    return lat, lon
 
 
 def _dimension_sum(

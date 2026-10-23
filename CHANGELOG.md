@@ -5,6 +5,21 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Added
+- Buques de todo el mundo con destino declarado al Canal (#59, ADR-0009): segunda conexión del
+  worker a AISStream (bbox mundial, solo `ShipStaticData`, `AIS_CANAL_BOUND_ENABLED`) con cola y
+  writer propios; detección de destinos (`app/services/canal_destination.py`) con códigos
+  UN/LOCODE verificados, nombres de puerto y rutas, probada contra falsos positivos reales; tabla
+  `canal_bound_vessels` (migración `20261022_0003`) y `GET /api/v1/vessels/canal-bound`.
+- El parser lee el destino (validado: sin caracteres de control, máx. 64), la ETA (sin año en
+  AIS: se elige el más cercano a la recepción; valores "no disponible" → `null`) y la posición de
+  `MetaData` de los `ShipStaticData`.
+
+### Changed
+- AGENTS.md (regla 6) y DATA_SOURCES: como máximo dos conexiones por API key (antes, una).
+- La recogida de lotes de la cola pasa a `app/workers/common.py` (`collect_batch`), compartida por
+  los dos writers.
+
 ## [0.3.0] - 2026-10-21
 
 Fase 3: ingesta AIS. Worker con una única conexión a AISStream → parser → PostgreSQL por lotes
