@@ -43,14 +43,20 @@ cuenta (`POST /api/v1/auth/register` o `/docs`).
 
 ## Cómo está organizado
 
-| Carpeta     | Qué hay                                                                      |
-| ----------- | ---------------------------------------------------------------------------- |
-| `src/auth/` | Login; el access token vive solo en memoria (AGENTS.md §8.4)                 |
-| `src/live/` | Protocolo de `/ws/live`, estado de los buques y el hook `useLiveVessels`     |
-| `src/map/`  | `VesselMap` (MapLibre), GeoJSON, categorías y colores, iconos SDF y viewport |
+| Carpeta        | Qué hay                                                                               |
+| -------------- | ------------------------------------------------------------------------------------- |
+| `src/auth/`    | Login; el access token vive solo en memoria (AGENTS.md §8.4)                          |
+| `src/live/`    | Protocolo de `/ws/live`, estado de los buques y el hook `useLiveVessels`              |
+| `src/api/`     | Cliente REST de `/api/v1` con el token en la cabecera (`ApiError` con el código HTTP) |
+| `src/vessels/` | Ficha del buque (`VesselPanel`), estela de 30 min, consultas con TanStack Query       |
+| `src/map/`     | `VesselMap` (MapLibre), GeoJSON, categorías y colores, iconos SDF y viewport          |
 
-Sin reconexión ni renovación del token todavía (tarea 4.5): si la sesión caduca, vuelve a pedir
-el login.
+Al hacer clic en un buque se abre su ficha y se dibuja su estela (`GET /vessels/{mmsi}/history`,
+recargada cada 15 s). La estela se corta donde faltan más de 5 minutos de señal, para no inventar
+un trayecto. Escape o un clic en el mar cierran la ficha.
+
+Sin reconexión ni renovación del token todavía (tarea 4.5): si la sesión caduca (cierre `4401`
+del WebSocket o 401 de la API), vuelve a pedir el login.
 
 ## Seguridad
 

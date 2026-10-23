@@ -1,12 +1,13 @@
 """Consulta de buques para la API (tarea 3.9). Solo lectura."""
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.canal_bound import CanalBoundRepository, CanalBoundRow
-from app.repositories.vessels import PositionRecord, VesselRecord, VesselRepository
+from app.repositories.vessels import PositionRecord, TrackPoint, VesselRecord, VesselRepository
 from app.services.exceptions import VesselNotFoundError
 
 
@@ -22,6 +23,12 @@ class VesselPage:
 class VesselDetail:
     vessel: VesselRecord
     last_position: PositionRecord | None
+
+
+@dataclass(frozen=True, slots=True)
+class VesselTrack:
+    points: Sequence[TrackPoint]
+    truncated: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -55,6 +62,15 @@ class VesselService:
         if vessel is None:
             raise VesselNotFoundError
         return VesselDetail(vessel=vessel, last_position=await self._vessels.last_position(mmsi))
+
+    async def track(
+        self, mmsi: int, *, start: datetime, end: datetime, max_points: int
+    ) -> VesselTrack:
+        """Trayectoria del buque entre `start` y `end`; 404 si el buque no existe."""
+        if await self._vessels.get(mmsi) is None:
+            raise VesselNotFoundError
+        points, truncated = await self._vessels.track(mmsi, start=start, end=end, limit=max_points)
+        return VesselTrack(points=points, truncated=truncated)
 
     async def canal_bound(
         self,

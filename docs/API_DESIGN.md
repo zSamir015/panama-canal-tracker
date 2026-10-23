@@ -67,7 +67,22 @@
 - `GET /vessels/{mmsi}`: lo mismo más `last_position` (`{received_at, lat, lon, sog, cog,
   heading, nav_status}` o `null`). MMSI que no tiene 9 dígitos → 422; inexistente → 404.
 - `name` es texto AIS tal cual (puede contener `<`, `>`...): el cliente lo muestra como texto.
-- `/vessels/{mmsi}/history` queda para una tarea posterior (no está en la 3.9).
+- `GET /vessels/{mmsi}/history` (#70, tarea 4.4): `?from=...&to=...` (con zona horaria; por
+  defecto `to` = ahora y `from` = `to` − 30 min; `from < to` y como mucho 7 días entre ambos;
+  cualquier otro parámetro → 422). Respuesta: Feature GeoJSON (RFC 7946)
+
+  ```json
+  {"type": "Feature",
+   "geometry": {"type": "LineString", "coordinates": [[-79.70, 9.10], [-79.80, 9.20]]},
+   "properties": {"mmsi": 352001234, "from": "...", "to": "...",
+                  "timestamps": ["2026-10-23T17:10:00Z", "2026-10-23T17:20:00Z"],
+                  "truncated": false}}
+  ```
+
+  `coordinates` va en orden cronológico y `timestamps[i]` es la hora de `coordinates[i]`. Con
+  menos de dos posiciones, `geometry` es `null` (un `LineString` necesita dos). Como mucho 2000
+  puntos: si hay más, se devuelven los más recientes y `truncated` es `true`. Buque inexistente →
+  404; MMSI inválido → 422.
 - `GET /vessels/canal-bound` (#59, ADR-0009): `?page=1&size=50` (máx. 200), `port` (`PA` o el
   UN/LOCODE de un puerto del Canal, p. ej. `PABLB`) y `reported_since` (con zona horaria; por
   defecto 30 días, máx. 90). Orden: ETA próximas primero (incluidas las de las últimas 24 h);
