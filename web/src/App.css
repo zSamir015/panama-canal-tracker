@@ -1,10 +1,15 @@
 .app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
 }
 
 .app__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  align-items: center;
+  justify-content: space-between;
   padding: 1rem 1.5rem;
   background: #0b3d5c;
   color: #f4f7fa;
@@ -20,10 +25,101 @@
   opacity: 0.85;
 }
 
+.app__header .app__status {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  opacity: 1;
+}
+
 .app__map {
+  position: relative;
   display: grid;
   flex: 1;
+  min-height: 0;
   place-items: center;
   background: #e8eef3;
   color: #3b4b58;
+}
+
+/* Más específico que `.maplibregl-map { position: relative }`, que se carga después. */
+.app__map .vessel-map {
+  position: absolute;
+  inset: 0;
+}
+
+.map-legend {
+  position: absolute;
+  bottom: 2rem;
+  left: 0.75rem;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  list-style: none;
+  font-size: 0.8rem;
+  background: rgb(255 255 255 / 90%);
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 20%);
+}
+
+.map-legend li {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.map-legend__swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+}
+
+.login {
+  display: grid;
+  gap: 0.75rem;
+  width: min(22rem, calc(100% - 2rem));
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 15%);
+}
+
+.login h2,
+.login p {
+  margin: 0;
+}
+
+.login label {
+  display: grid;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+.login input {
+  padding: 0.5rem;
+  font: inherit;
+  border: 1px solid #b0bec5;
+  border-radius: 4px;
+}
+
+.login button {
+  padding: 0.6rem;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  background: #0b3d5c;
+  border: 0;
+  border-radius: 4px;
+}
+
+.login button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.login__notice {
+  color: #8a5a00;
+}
+
+.login__error {
+  color: #b71c1c;
 }

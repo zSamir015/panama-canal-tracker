@@ -6,6 +6,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- Mapa en vivo (#67, tarea 4.3, ADR-0010): MapLibre GL con tiles de OpenFreeMap (sin key), los
+  buques de `/ws/live` como una capa GeoJSON (flecha SDF girada por `cog`, punto si no hay rumbo,
+  color por categoría de `ship_type`) y leyenda. Login mínimo con el access token solo en memoria;
+  hook `useLiveVessels` (auth en el primer mensaje, suscripción al viewport con debounce, mensajes
+  del servidor validados antes de aplicarlos). MapLibre va en un chunk aparte que se carga tras el
+  login. Proxy de Vite para `/api` y `/ws` en desarrollo.
 - `WS /ws/live` (#65, tarea 4.2): handshake solo desde `CORS_ORIGINS`, auth con el primer
   mensaje (5 s, cierre `4401`), snapshot del viewport desde PostgreSQL y lotes `update`/`remove`
   como mucho 1 por segundo a partir de Redis (`canal:vessels.live`), con una suscripción por

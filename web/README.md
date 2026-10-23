@@ -1,8 +1,8 @@
 # web/ — Mapa en tiempo real
 
 Frontend del proyecto (Fase 4 del roadmap, ADR-0006): React + TypeScript (`strict`) + Vite.
-Se conectará a la API por REST y a `/ws/live` para las posiciones en vivo; el mapa (MapLibre GL)
-llega en la tarea 4.3.
+Pide iniciar sesión (ADR-0008), abre `/ws/live` y pinta los buques del viewport en un mapa
+MapLibre GL como una capa GeoJSON: flecha girada según el rumbo, color según el tipo de buque.
 
 ## Requisitos
 
@@ -14,7 +14,7 @@ Node `^22.22.2`, `^24.15.0` o `>=26` (lo que admiten Vite, Vitest y jsdom; ver `
 ```bash
 cd web
 npm ci                 # instala exactamente lo de package-lock.json
-npm run dev            # servidor de desarrollo en http://localhost:5173
+npm run dev            # servidor de desarrollo en http://localhost:5173 (proxy de /api y /ws a :8000)
 npm run lint           # ESLint con reglas que usan los tipos; 0 avisos permitidos
 npm run format:check   # Prettier (npm run format para corregir)
 npm run typecheck      # tsc en modo estricto
@@ -29,10 +29,28 @@ Variables `VITE_*` en `web/.env` (ver la sección "Frontend" de `.env.example` e
 lo que lleva `VITE_` termina en el JavaScript público**: nunca secretos. `src/config.ts` las lee y
 rechaza URLs que no sean `http(s)` o que lleven credenciales.
 
-| Variable             | Para qué                                                                    |
-| -------------------- | --------------------------------------------------------------------------- |
-| `VITE_API_URL`       | Origen de la API; vacío = el mismo del frontend (detrás del proxy)          |
-| `VITE_MAP_STYLE_URL` | Estilo de tiles de MapLibre (ADR-0006; el proveedor se decide en la Fase 4) |
+| Variable             | Para qué                                                             |
+| -------------------- | -------------------------------------------------------------------- |
+| `VITE_API_URL`       | Origen de la API; vacío = el mismo del frontend (detrás del proxy)   |
+| `VITE_MAP_STYLE_URL` | Estilo de tiles de MapLibre; vacío = OpenFreeMap, sin key (ADR-0010) |
+
+## Ver el mapa en local
+
+Con la base, Redis, la API (`uvicorn app.main:app`), el simulador y el worker en marcha (ver
+`AGENTS.md` §10), `npm run dev` y abrir `http://localhost:5173`. El proxy de Vite deja la API en
+el mismo origen, así que `CORS_ORIGINS` solo necesita `http://localhost:5173`. Hace falta una
+cuenta (`POST /api/v1/auth/register` o `/docs`).
+
+## Cómo está organizado
+
+| Carpeta     | Qué hay                                                                      |
+| ----------- | ---------------------------------------------------------------------------- |
+| `src/auth/` | Login; el access token vive solo en memoria (AGENTS.md §8.4)                 |
+| `src/live/` | Protocolo de `/ws/live`, estado de los buques y el hook `useLiveVessels`     |
+| `src/map/`  | `VesselMap` (MapLibre), GeoJSON, categorías y colores, iconos SDF y viewport |
+
+Sin reconexión ni renovación del token todavía (tarea 4.5): si la sesión caduca, vuelve a pedir
+el login.
 
 ## Seguridad
 

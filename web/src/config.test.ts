@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { readConfig } from './config';
+import { DEFAULT_MAP_STYLE_URL, readConfig } from './config';
 
 describe('readConfig', () => {
-  it('usa la misma origen y ningún estilo si no hay variables', () => {
-    expect(readConfig({} as ImportMetaEnv)).toEqual({ apiUrl: '', mapStyleUrl: null });
+  it('usa la misma origen y el estilo de OpenFreeMap si no hay variables', () => {
+    expect(readConfig({} as ImportMetaEnv)).toEqual({
+      apiUrl: '',
+      mapStyleUrl: DEFAULT_MAP_STYLE_URL,
+    });
   });
 
   it('quita la barra final y los espacios', () => {
