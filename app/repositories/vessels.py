@@ -1,10 +1,12 @@
 """Lecturas de buques y de su última posición (tarea 3.9)."""
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 
 from geoalchemy2 import Geometry
 from sqlalchemy import cast, func, select
+from sqlalchemy.dialects.postgresql import distinct_on
 
 from app.models.position import Position
 from app.models.vessel import Vessel
@@ -31,6 +33,18 @@ class PositionRecord:
     cog: float | None
     heading: float | None
     nav_status: int | None
+
+
+@dataclass(frozen=True, slots=True)
+class LivePositionRecord:
+    mmsi: int
+    lon: float
+    lat: float
+    cog: float | None
+    sog: float | None
+    received_at: datetime
+    name: str | None
+    ship_type: int | None
 
 
 _VESSEL_COLUMNS = (
@@ -100,3 +114,54 @@ class VesselRepository(BaseRepository):
             )
         ).one_or_none()
         return PositionRecord(*row) if row else None
+
+    async def latest_positions_in(
+        self,
+        *,
+        min_lon: float,
+        min_lat: float,
+        max_lon: float,
+        max_lat: float,
+        since: datetime,
+        limit: int,
+    ) -> Sequence[LivePositionRecord]:
+        """Última posición de cada buque con señal desde `since`, si cae dentro de la caja.
+
+        Primero la última de cada buque y después el filtro: un buque que ya salió de la caja no
+        aparece por una posición antigua de dentro. Los más recientes primero, hasta `limit`.
+        """
+        point = cast(Position.geom, Geometry)
+        latest = (
+            select(
+                Position.vessel_mmsi.label("mmsi"),
+                func.ST_X(point).label("lon"),
+                func.ST_Y(point).label("lat"),
+                Position.cog,
+                Position.sog,
+                Position.received_at,
+            )
+            .where(Position.received_at >= since)  # acota los chunks de la hypertable
+            .ext(distinct_on(Position.vessel_mmsi))
+            .order_by(Position.vessel_mmsi, Position.received_at.desc())
+            .subquery()
+        )
+        rows = await self._session.execute(
+            select(
+                latest.c.mmsi,
+                latest.c.lon,
+                latest.c.lat,
+                latest.c.cog,
+                latest.c.sog,
+                latest.c.received_at,
+                Vessel.name,
+                Vessel.ship_type,
+            )
+            .join(Vessel, Vessel.mmsi == latest.c.mmsi)
+            .where(
+                latest.c.lon.between(min_lon, max_lon),
+                latest.c.lat.between(min_lat, max_lat),
+            )
+            .order_by(latest.c.received_at.desc(), latest.c.mmsi)
+            .limit(limit)
+        )
+        return [LivePositionRecord(*row) for row in rows]

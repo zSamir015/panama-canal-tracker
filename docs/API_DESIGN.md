@@ -127,6 +127,29 @@ rol `user` → 403. No hay endpoint para crear admins (se crean con `scripts/cre
 
 Sin modo anónimo: los datos de AISStream solo se muestran a usuarios con sesión (ADR-0008).
 
+Detalles (tarea 4.2, `app/routers/live.py`):
+
+- **Snapshot**: la última posición de cada buque con señal en los últimos 30 min, si cae dentro
+  del viewport (primero la última de cada buque y después el filtro), como mucho 2000 buques.
+  Cada `subscribe` nuevo devuelve un snapshot nuevo, que sustituye todo lo anterior.
+- **`update`**: solo buques dentro del viewport, la última posición de cada uno desde el envío
+  anterior, como mucho 200 por mensaje y un envío por segundo. **`remove`**: buques que el
+  cliente tenía pintados y cuya nueva posición está fuera del viewport. Los buques que dejan de
+  emitir no generan `remove`: el cliente decide cuándo darlos por perdidos (con `ts`).
+- `bbox` en orden GeoJSON con `min < max` (sin cruzar el antimeridiano); `extra="forbid"` en
+  todos los mensajes; como mucho 20 mensajes del cliente cada 10 s.
+- **Códigos de cierre**:
+
+| Código | Motivo |
+|---|---|
+| handshake 403 | `Origin` ausente o fuera de `CORS_ORIGINS` |
+| `1009` | mensaje del cliente de más de 4 KB (uvicorn corta antes los de más de 8 KB) |
+| `1011` | la base no responde (auth o snapshot) |
+| `1013` | el cliente no lee: un envío tarda más de 10 s |
+| `4400` | mensaje inválido, binario o un segundo `auth` |
+| `4401` | sin `auth` en 5 s, token inválido o caducado, o usuario inexistente |
+| `4429` | más de 5 conexiones del mismo usuario o demasiados mensajes |
+
 ## Convenciones
 
 - Paginación: `?page=1&size=50` (máx. 200) → `{items, total, page, size}`. Para historiales

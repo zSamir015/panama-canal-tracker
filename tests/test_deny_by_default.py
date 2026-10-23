@@ -145,3 +145,25 @@ def test_no_route_hides_from_the_schema() -> None:
     ]
 
     assert offenders == [], "Una ruta fuera del esquema escaparía del test de denegar por defecto"
+
+
+# Los WebSocket no salen en el esquema OpenAPI: se autentican con su primer mensaje (el navegador
+# no puede mandar `Authorization` en un WebSocket) y cada uno tiene sus propios tests de auth
+# (`tests/integration/test_live_websocket.py`). Añadir uno aquí exige esos tests.
+AUTHENTICATED_WEBSOCKETS = {"/ws/live"}
+
+
+def test_every_websocket_route_is_a_known_authenticated_one() -> None:
+    found: set[str] = set()
+    for path in APP_DIR.rglob("*.py"):
+        for node in ast.walk(ast.parse(path.read_text())):
+            if (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr in {"websocket", "websocket_route", "add_websocket_route"}
+                and node.args
+                and isinstance(node.args[0], ast.Constant)
+            ):
+                found.add(str(node.args[0].value))
+
+    assert found == AUTHENTICATED_WEBSOCKETS

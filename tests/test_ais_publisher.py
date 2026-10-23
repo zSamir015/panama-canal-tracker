@@ -11,8 +11,9 @@ from app.core.config import Settings
 from app.core.logging import configure_logging
 from app.core.redis import LIVE_CHANNEL, STATUS_KEY, create_redis
 from app.repositories.ais import PositionRow, VesselRow
+from app.schemas.live import MAX_VESSELS_PER_MESSAGE
 from app.workers.ais_consumer import ConsumerStats
-from app.workers.ais_publisher import MAX_VESSELS_PER_MESSAGE, AisPublisher, worker_status
+from app.workers.ais_publisher import AisPublisher, worker_status
 from app.workers.ais_writer import Batch, WriterStats
 
 T0 = datetime(2026, 10, 21, 12, 0, tzinfo=UTC)
