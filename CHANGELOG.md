@@ -6,6 +6,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- `WS /ws/live` (#65, tarea 4.2): handshake solo desde `CORS_ORIGINS`, auth con el primer
+  mensaje (5 s, cierre `4401`), snapshot del viewport desde PostgreSQL y lotes `update`/`remove`
+  como mucho 1 por segundo a partir de Redis (`canal:vessels.live`), con una suscripción por
+  réplica y backpressure por cliente (solo la última posición de cada buque). Límites: 5
+  conexiones por usuario entre réplicas (Redis, con latido), mensajes de 4 KB, 20 mensajes cada
+  10 s; uvicorn con `--ws-max-size`. El logger de `websockets` nunca baja de INFO. Los modelos
+  del canal en vivo pasan a `app/schemas/live.py`, compartidos por el worker y la API.
 - Buques de todo el mundo con destino declarado al Canal (#59, ADR-0009): segunda conexión del
   worker a AISStream (bbox mundial, solo `ShipStaticData`, `AIS_CANAL_BOUND_ENABLED`) con cola y
   writer propios; detección de destinos (`app/services/canal_destination.py`) con códigos

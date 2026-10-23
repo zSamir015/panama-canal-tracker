@@ -136,3 +136,11 @@ def test_uvicorn_cli_loggers_are_rendered_as_json(name: str) -> None:
     [record] = lines(stream)
     assert record["event"] == "request handled"
     assert record["logger"] == name
+
+
+def test_websockets_library_never_logs_frames_even_in_debug() -> None:
+    # `/ws/live` recibe el access token en un mensaje: en DEBUG, `websockets` lo escribiría.
+    configure_logging("DEBUG")
+
+    assert not logging.getLogger("websockets").isEnabledFor(logging.DEBUG)
+    assert not logging.getLogger("websockets.server").isEnabledFor(logging.DEBUG)

@@ -109,3 +109,7 @@ def configure_logging(level: str, *, stream: TextIO | None = None) -> None:
         uvicorn_logger = logging.getLogger(name)
         uvicorn_logger.handlers.clear()
         uvicorn_logger.propagate = True
+
+    # La librería `websockets` escribe cada frame en DEBUG, y los de `/ws/live` llevan el access
+    # token (AGENTS.md §8.9): nunca baja de INFO, aunque la app esté en DEBUG.
+    logging.getLogger("websockets").setLevel(max(numeric_level, logging.INFO))

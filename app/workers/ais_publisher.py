@@ -18,16 +18,17 @@ from collections import OrderedDict
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any
 
 import structlog
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, ValidationError
+from pydantic import ValidationError
 from redis.asyncio import Redis
 from redis.exceptions import RedisError
 
 from app.core.redis import LIVE_CHANNEL, STATUS_KEY
 from app.repositories.ais import PositionRow
 from app.schemas.ingestion import WorkerStatus
+from app.schemas.live import MAX_VESSELS_PER_MESSAGE, LiveUpdate, LiveVessel
 from app.workers.ais_writer import Batch, WriterStats
 
 if TYPE_CHECKING:
@@ -38,35 +39,10 @@ COOLDOWN_SECONDS = 5.0
 STATUS_INTERVAL_SECONDS = 5.0
 # Si el worker deja de actualizar el estado durante 3 intervalos, la clave caduca.
 STATUS_TTL_SECONDS = 15
-# Buques por mensaje: mantiene cada PUBLISH muy por debajo de los límites razonables de Redis.
-MAX_VESSELS_PER_MESSAGE = 200
 # Nombres y tipos de los buques vistos (de los ShipStaticData) para completar las posiciones.
 MAX_KNOWN_VESSELS = 5_000
 
 logger = structlog.get_logger(__name__)
-
-
-class LiveVessel(BaseModel):
-    """Una posición tal como la recibirá el navegador (docs/API_DESIGN.md, `/ws/live`)."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    mmsi: int = Field(ge=100_000_000, le=999_999_999)
-    lon: float = Field(ge=-180, le=180, allow_inf_nan=False)
-    lat: float = Field(ge=-90, le=90, allow_inf_nan=False)
-    cog: float | None = Field(ge=0, lt=360)
-    sog: float | None = Field(ge=0, lt=102.3)
-    ship_type: int | None = Field(ge=1, le=99)
-    # Texto del buque tal cual (puede traer "<img ...>"): el navegador lo muestra como texto.
-    name: str | None = Field(max_length=128)
-    ts: AwareDatetime
-
-
-class LiveUpdate(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    type: Literal["update"] = "update"
-    vessels: list[LiveVessel] = Field(max_length=MAX_VESSELS_PER_MESSAGE)
 
 
 @dataclass

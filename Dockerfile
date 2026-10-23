@@ -58,7 +58,9 @@ HEALTHCHECK --interval=15s --timeout=3s --start-period=10s --retries=3 \
 # la conexión viene de FORWARDED_ALLOW_IPS (por defecto, 127.0.0.1 y ::1).
 # Sin cabecera `server: uvicorn` (no anunciar el software). Los logs salen en JSON: la app
 # reconfigura los de uvicorn al arrancar (app/core/logging.py).
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--no-server-header"]
+# --ws-max-size: uvicorn corta los frames de más de 8 KB antes de leerlos; `/ws/live` además
+# rechaza los mensajes del cliente de más de 4 KB.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--no-server-header", "--ws-max-size", "8192"]
 
 # --- Worker AIS ------------------------------------------------------------------------------
 FROM runtime AS worker

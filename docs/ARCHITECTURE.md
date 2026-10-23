@@ -85,6 +85,16 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
   - Al conectar, el cliente recibe un **snapshot** (última posición de cada buque) y luego deltas.
   - Backpressure: si un cliente no consume, se descartan sus mensajes viejos, nunca se bloquea
     al resto.
+- Implementación (4.2): `LiveHub` (`app/services/live.py`) abre la suscripción a Redis con el
+  primer cliente de la réplica y reparte cada `update` entre los `ClientView`, sin esperar a
+  ningún envío. Cada `ClientView` guarda solo la última posición de cada buque hasta el
+  siguiente envío (1 s), así que un cliente lento no acumula mensajes; si un envío tarda más de
+  10 s, se le cierra la conexión (`1013`). Si Redis cae, el hub se vuelve a suscribir con
+  backoff y los clientes siguen conectados con su snapshot.
+- El snapshot sale de PostgreSQL (`DISTINCT ON` sobre la hypertable, acotado a 30 min).
+- Límite de 5 conexiones por usuario entre réplicas: sorted set en Redis
+  (`canal:ws:connections:<user_id>`) con latido cada 30 s y caducidad de 90 s (una réplica que
+  muere libera sus huecos sola). Si Redis no responde, el límite se cuenta por réplica.
 
 ### 2.4 Mapa web (`web/`)
 - React + TypeScript + Vite + MapLibre GL JS (ADR-0006).
