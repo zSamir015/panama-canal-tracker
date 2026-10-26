@@ -12,12 +12,18 @@ function jsonResponse(status: number, body: unknown): Response {
 }
 
 describe('login', () => {
-  it('envía las credenciales con la cookie y devuelve el access token', async () => {
+  it('envía las credenciales con la cookie y devuelve la sesión', async () => {
     const fetchImpl = vi.fn<typeof fetch>(() =>
-      Promise.resolve(jsonResponse(200, { access_token: 'abc', token_type: 'bearer' })),
+      Promise.resolve(
+        jsonResponse(200, { access_token: 'abc', token_type: 'bearer', expires_in: 900 }),
+      ),
     );
+    const before = Date.now();
 
-    await expect(login('demo@example.com', 'changeme-changeme', fetchImpl)).resolves.toBe('abc');
+    const session = await login('demo@example.com', 'changeme-changeme', fetchImpl);
+
+    expect(session.accessToken).toBe('abc');
+    expect(session.expiresAt).toBeGreaterThanOrEqual(before + 900_000);
 
     const [url, init] = fetchImpl.mock.calls[0] ?? [];
     expect(url).toBe('/api/v1/auth/login');
@@ -49,9 +55,10 @@ describe('login', () => {
 });
 
 describe('LoginForm', () => {
-  it('entrega el token al iniciar sesión', async () => {
+  it('entrega la sesión al iniciar sesión', async () => {
     const onLogin = vi.fn();
-    const loginImpl = vi.fn(() => Promise.resolve('abc'));
+    const session = { accessToken: 'abc', expiresAt: 0 };
+    const loginImpl = vi.fn(() => Promise.resolve(session));
     render(<LoginForm onLogin={onLogin} loginImpl={loginImpl} />);
 
     await userEvent.type(screen.getByLabelText('Email'), 'demo@example.com');
@@ -59,7 +66,7 @@ describe('LoginForm', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Entrar' }));
 
     expect(loginImpl).toHaveBeenCalledWith('demo@example.com', 'changeme-changeme');
-    expect(onLogin).toHaveBeenCalledWith('abc');
+    expect(onLogin).toHaveBeenCalledWith(session);
   });
 
   it('muestra el error como texto y deja reintentar', async () => {

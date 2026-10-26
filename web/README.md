@@ -45,7 +45,7 @@ cuenta (`POST /api/v1/auth/register` o `/docs`).
 
 | Carpeta        | Qué hay                                                                               |
 | -------------- | ------------------------------------------------------------------------------------- |
-| `src/auth/`    | Login; el access token vive solo en memoria (AGENTS.md §8.4)                          |
+| `src/auth/`    | Login y sesión (`useSession`); el access token vive solo en memoria (AGENTS.md §8.4)  |
 | `src/live/`    | Protocolo de `/ws/live`, estado de los buques y el hook `useLiveVessels`              |
 | `src/api/`     | Cliente REST de `/api/v1` con el token en la cabecera (`ApiError` con el código HTTP) |
 | `src/vessels/` | Ficha del buque (`VesselPanel`), estela de 30 min, consultas con TanStack Query       |
@@ -55,8 +55,34 @@ Al hacer clic en un buque se abre su ficha y se dibuja su estela (`GET /vessels/
 recargada cada 15 s). La estela se corta donde faltan más de 5 minutos de señal, para no inventar
 un trayecto. Escape o un clic en el mar cierran la ficha.
 
-Sin reconexión ni renovación del token todavía (tarea 4.5): si la sesión caduca (cierre `4401`
-del WebSocket o 401 de la API), vuelve a pedir el login.
+### Sesión y reconexión
+
+- **Sesión** (`useSession`): el access token sigue solo en memoria. Al cargar la página se
+  recupera con la cookie del refresh (`POST /auth/refresh`), así que recargar no pide entrar. Se
+  renueva un minuto antes de caducar y también si la API lo rechaza (401 o cierre `4401`). Cada
+  refresh rota la cookie y reutilizar una ya rotada revoca la sesión, así que nunca hay dos
+  renovaciones a la vez: dentro de la pestaña comparten la petición y, entre pestañas, un Web Lock
+  las pone en fila. Si la renovación falla por red, se conserva el token y se reintenta cada 10 s;
+  solo un 401 del refresh devuelve al login ("La sesión caducó").
+- **WebSocket** (`useLiveVessels`): si la conexión se cae, reconecta con backoff exponencial con
+  jitter (1 s → 30 s; al menos 15 s tras `4429`) o en cuanto vuelve la red, y se suscribe otra vez
+  al viewport. Los buques se quedan pintados hasta el snapshot nuevo. Un token renovado no reabre
+  la conexión (el servidor solo lo mira en el `auth`). Con `4401` pide renovar y reconecta con el
+  token nuevo; con `4400` (mensaje inválido, error del cliente) no reintenta.
+- **Indicador** en la cabecera: "Conectando…", "En vivo", "Reconectando…" o "Desconectado".
+
+```mermaid
+stateDiagram-v2
+    [*] --> connecting: con sesión
+    connecting --> live: open (auth + subscribe)
+    live --> reconnecting: cierre 1006, 1011, 1013, 4429...
+    connecting --> reconnecting: falla el handshake
+    reconnecting --> connecting: backoff u online
+    live --> reconnecting: 4401 (renovar token)
+    reconnecting --> connecting: llega el token nuevo
+    live --> closed: 4400
+    closed --> [*]
+```
 
 ## Seguridad
 

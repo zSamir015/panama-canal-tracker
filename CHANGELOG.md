@@ -6,6 +6,14 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- Reconexión y renovación de la sesión (#73, tarea 4.5): `useSession` recupera la sesión al
+  cargar la página con la cookie del refresh, renueva el access token un minuto antes de caducar y
+  cuando la API lo rechaza (401 o `4401`), con una sola renovación a la vez (también entre
+  pestañas, con un Web Lock) porque reutilizar un refresh rotado revoca la sesión.
+  `useLiveVessels` reconecta con backoff exponencial con jitter (1 s → 30 s, mínimo 15 s tras
+  `4429`) o al volver la red, se suscribe otra vez y conserva los buques hasta el snapshot; un
+  token renovado no reabre la conexión y `4400` no se reintenta. Indicador "Reconectando…" en la
+  cabecera.
 - Ficha del buque y estela (#70, tarea 4.4): `GET /api/v1/vessels/{mmsi}/history` devuelve la
   trayectoria como Feature GeoJSON `LineString` (`from`/`to`, por defecto los últimos 30 min,
   ventana máx. 7 días, como mucho 2000 puntos con `truncated`; `geometry: null` con menos de dos
