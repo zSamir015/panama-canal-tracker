@@ -6,6 +6,11 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- Demo estática en GitHub Pages (#79, tarea 4.7, ADR-0011): al compilar con `VITE_DEMO=true` la
+  app salta el login y reproduce en bucle un JSON pregrabado con posiciones de buques generadas por
+  `scripts/ais_simulator.py`. Etiqueta «⚠ Datos simulados» siempre visible. Workflow `pages.yml`
+  despliega a Pages en cada push a `main`, con actions fijadas por SHA y permisos mínimos. No se
+  usan datos de AISStream (ADR-0008).
 - CI del frontend (#77, tarea 4.6): job `Frontend (web)` con `npm ci`, Prettier, ESLint (con la
   regla anti-XSS), `tsc -b`, Vitest, `vite build` y `npm audit`, con `setup-node` fijado por SHA y
   permisos de solo lectura. Test XSS de extremo a extremo por `/ws/live`: un nombre

@@ -112,10 +112,11 @@ buques. Con la key real, el worker aguanta una desconexión forzada y se recuper
 - [ ] 4.5 Reconexión del WebSocket en el cliente; indicador "en vivo / reconectando"
 - [ ] 4.6 CI del frontend (lint con regla anti `dangerouslySetInnerHTML`, typecheck, tests,
       build, `npm audit`); test XSS con un nombre de buque malicioso
-- [ ] 4.7 Despliegue: VPS con compose + reverse proxy (TLS, HSTS, rate limit global);
-      CSP estricta en el frontend; firewall solo 80/443/SSH con llave
+- [ ] 4.7 Demo estática en GitHub Pages (ADR-0011): build con `VITE_DEMO=true`, datos simulados
+      pregrabados, sin backend ni login; workflow `pages.yml` despliega en cada push a `main`
 - [ ] 4.8 Prueba de carga del WebSocket (p. ej. 500 clientes simulados); documentar resultados
 - [ ] 4.9 GIF del mapa en vivo en el README y enlace a la demo
+      (https://zsamir015.github.io/panama-canal-tracker/)
 
 **Aceptación**: la demo muestra buques moviéndose en tiempo real (datos reales si la cobertura lo
 permite; si no, el simulador, rotulado como datos simulados); el WS soporta la carga
