@@ -23,6 +23,9 @@ npm run build          # comprobación de tipos + build de producción en dist/ 
 npm audit              # vulnerabilidades conocidas en las dependencias
 ```
 
+El job `Frontend (web)` del CI (`.github/workflows/ci.yml`) corre estos mismos pasos en cada PR,
+en este orden: `npm ci`, `format:check`, `lint`, `typecheck`, `test`, `build` y `npm audit`.
+
 ## Configuración
 
 Variables `VITE_*` en `web/.env` (ver la sección "Frontend" de `.env.example` en la raíz). **Todo
@@ -90,4 +93,6 @@ stateDiagram-v2
   texto**. ESLint prohíbe `dangerouslySetInnerHTML`, asignar `innerHTML`/`outerHTML`,
   `insertAdjacentHTML` y `Popup.setHTML()` de MapLibre (AGENTS.md §8.7);
   `src/test/lint-rules.test.ts` comprueba que la regla sigue activa.
+- Tests con un buque llamado `<img src=x onerror=alert(1)>`, tanto si el nombre llega por la API
+  REST como por `/ws/live` (`src/App.test.tsx`): se ve como texto y no se crea ninguna imagen.
 - Sin source maps en el build de producción (AGENTS.md §8.12).

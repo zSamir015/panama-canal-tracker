@@ -168,6 +168,39 @@ jobs:
       # Audita los lockfiles tal cual (sin resolver nada de nuevo); falla con cualquier vulnerabilidad.
       - run: pip-audit --strict --disable-pip -r requirements.lock -r requirements-dev.lock
 
+  web:
+    name: Frontend (web)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      # `npm ci` instala exactamente el lockfile (con sus hashes de integridad) y falla si
+      # package.json y package-lock.json no coinciden; nunca resuelve versiones nuevas.
+      - name: Instalar dependencias (lockfile)
+        run: npm ci --no-audit --no-fund
+      - run: npm run format:check
+      # Incluye la regla anti-XSS (AGENTS.md §8.7): prohíbe dangerouslySetInnerHTML, innerHTML y
+      # Popup.setHTML(); src/test/lint-rules.test.ts comprueba que sigue activa.
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      # Falla con cualquier vulnerabilidad conocida, también en dependencias de desarrollo
+      # (AGENTS.md §8.13).
+      - run: npm audit
+
   secrets:
     name: Secretos (gitleaks)
     runs-on: ubuntu-24.04

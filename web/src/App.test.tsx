@@ -42,10 +42,16 @@ interface StubOptions {
   refreshStatuses?: number[];
   /** Códigos que devuelve la estela, uno por petición (el último se repite). */
   trackStatuses?: number[];
+  /** Nombre que devuelve la ficha REST (por defecto, el hostil de `detail`). */
+  detailName?: string;
 }
 
 /** API de mentira: login, refresh, ficha y estela. */
-function stubApi({ refreshStatuses = [401], trackStatuses = [200] }: StubOptions = {}) {
+function stubApi({
+  refreshStatuses = [401],
+  trackStatuses = [200],
+  detailName = detail.name,
+}: StubOptions = {}) {
   const next = (pending: number[]) => (pending.length > 1 ? pending.shift() : pending[0]) ?? 200;
   const pendingRefresh = [...refreshStatuses];
   const pendingTrack = [...trackStatuses];
@@ -71,7 +77,7 @@ function stubApi({ refreshStatuses = [401], trackStatuses = [200] }: StubOptions
         }),
       );
     }
-    return Promise.resolve(json(200, detail));
+    return Promise.resolve(json(200, { ...detail, name: detailName }));
   });
   vi.stubGlobal('fetch', fetchMock);
   // El WebSocket no se abre nunca: aquí solo importa la parte REST.
@@ -162,5 +168,58 @@ describe('App', () => {
 
     expect(await screen.findByText('La sesión caducó. Vuelve a iniciar sesión.')).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
+  });
+
+  it('un nombre hostil que llega por /ws/live se muestra como texto (AGENTS.md §8.7)', async () => {
+    stubApi({ detailName: 'NOMBRE REST' });
+    const hostile = '<img src=x onerror=alert(1)>';
+    // WebSocket de mentira: al recibir la suscripción contesta con un snapshot del buque.
+    vi.stubGlobal(
+      'WebSocket',
+      class extends EventTarget {
+        static readonly OPEN = 1;
+        readyState = 0;
+        constructor() {
+          super();
+          queueMicrotask(() => {
+            this.readyState = 1;
+            this.dispatchEvent(new Event('open'));
+          });
+        }
+        send(data: string) {
+          if ((JSON.parse(data) as { type: string }).type !== 'auth') {
+            return;
+          }
+          const vessel = {
+            mmsi: detail.mmsi,
+            lon: -79.91,
+            lat: 9.35,
+            cog: 145,
+            sog: 7.8,
+            ship_type: 70,
+            name: hostile,
+            ts: '2026-10-25T17:00:00Z',
+          };
+          queueMicrotask(() => {
+            this.dispatchEvent(
+              new MessageEvent('message', {
+                data: JSON.stringify({ type: 'snapshot', vessels: [vessel] }),
+              }),
+            );
+          });
+        }
+        close = vi.fn();
+      },
+    );
+    renderWithQuery(<App />);
+    await signIn();
+    expect(await screen.findByRole('status')).toHaveTextContent('En vivo · 1 buques');
+
+    await userEvent.click(screen.getByRole('button', { name: 'buque de prueba' }));
+
+    // La ficha prefiere el nombre en vivo: llega intacto, pero como texto.
+    expect(await screen.findByRole('heading', { name: hostile })).toBeVisible();
+    expect(screen.queryByText('NOMBRE REST')).not.toBeInTheDocument();
+    expect(document.querySelector('img')).toBeNull();
   });
 });

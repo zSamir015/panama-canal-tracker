@@ -6,6 +6,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- CI del frontend (#77, tarea 4.6): job `Frontend (web)` con `npm ci`, Prettier, ESLint (con la
+  regla anti-XSS), `tsc -b`, Vitest, `vite build` y `npm audit`, con `setup-node` fijado por SHA y
+  permisos de solo lectura. Test XSS de extremo a extremo por `/ws/live`: un nombre
+  `<img onerror>` que llega en el snapshot se muestra como texto en la ficha.
 - Reconexión y renovación de la sesión (#73, tarea 4.5): `useSession` recupera la sesión al
   cargar la página con la cookie del refresh, renueva el access token un minuto antes de caducar y
   cuando la API lo rechaza (401 o `4401`), con una sola renovación a la vez (también entre
