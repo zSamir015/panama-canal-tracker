@@ -1,20 +1,9 @@
-import { CATEGORY_COLORS, type ShipCategory } from './vesselGeoJson';
-
-const LABELS: Record<ShipCategory, string> = {
-  cargo: 'Carga',
-  tanker: 'Tanquero',
-  passenger: 'Pasajeros',
-  tug: 'Remolcador / práctico',
-  fishing: 'Pesca',
-  pleasure: 'Recreo',
-  other: 'Otro',
-  unknown: 'Sin tipo',
-};
+import { CATEGORY_COLORS, CATEGORY_LABELS, type ShipCategory } from './vesselGeoJson';
 
 export function MapLegend() {
   return (
     <ul className="map-legend" aria-label="Tipos de buque">
-      {Object.entries(LABELS).map(([category, label]) => (
+      {Object.entries(CATEGORY_LABELS).map(([category, label]) => (
         <li key={category}>
           <span
             className="map-legend__swatch"

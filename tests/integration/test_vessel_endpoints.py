@@ -259,6 +259,152 @@ async def test_detail_requires_a_token(app: FastAPI, sessions: SessionFactory) -
     assert response.status_code == 401
 
 
+# --- GET /vessels/{mmsi}/history ------------------------------------------------------------
+
+
+async def test_history_defaults_to_the_last_30_minutes_in_order(
+    client: AsyncClient, sessions: SessionFactory
+) -> None:
+    await store(
+        sessions,
+        [vessel(352000001, minutes_ago=1), vessel(352000002, minutes_ago=5)],
+        [
+            position(352000001, 1, lat=9.30, lon=-79.90),
+            position(352000001, 45, lat=9.00, lon=-79.60),  # fuera de la ventana por defecto
+            position(352000001, 20, lat=9.10, lon=-79.70),
+            position(352000001, 10, lat=9.20, lon=-79.80),
+            position(352000002, 5, lat=8.90, lon=-79.50),  # otro buque
+        ],
+    )
+
+    response = await client.get(f"{VESSELS}/352000001/history")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/json"
+    body = response.json()
+    assert body["type"] == "Feature"
+    assert body["geometry"]["type"] == "LineString"
+    # GeoJSON: [longitud, latitud], de la más antigua a la más reciente.
+    assert body["geometry"]["coordinates"] == [
+        pytest.approx([-79.70, 9.10]),
+        pytest.approx([-79.80, 9.20]),
+        pytest.approx([-79.90, 9.30]),
+    ]
+    props = body["properties"]
+    assert set(props) == {"mmsi", "from", "to", "timestamps", "truncated"}
+    assert props["mmsi"] == 352000001
+    assert props["truncated"] is False
+    assert [datetime.fromisoformat(t) for t in props["timestamps"]] == [
+        NOW - timedelta(minutes=20),
+        NOW - timedelta(minutes=10),
+        NOW - timedelta(minutes=1),
+    ]
+    window = datetime.fromisoformat(props["to"]) - datetime.fromisoformat(props["from"])
+    assert window == timedelta(minutes=30)
+
+
+async def test_history_uses_the_requested_window(
+    client: AsyncClient, sessions: SessionFactory
+) -> None:
+    await store(
+        sessions,
+        [vessel(352000001, minutes_ago=1)],
+        [position(352000001, minutes) for minutes in (90, 60, 40, 1)],
+    )
+    start, end = NOW - timedelta(minutes=70), NOW - timedelta(minutes=30)
+
+    response = await client.get(
+        f"{VESSELS}/352000001/history",
+        params={"from": start.isoformat(), "to": end.isoformat()},
+    )
+
+    assert response.status_code == 200
+    props = response.json()["properties"]
+    assert [datetime.fromisoformat(t) for t in props["timestamps"]] == [
+        NOW - timedelta(minutes=60),
+        NOW - timedelta(minutes=40),
+    ]
+    assert datetime.fromisoformat(props["from"]) == start
+    assert datetime.fromisoformat(props["to"]) == end
+
+
+async def test_history_with_fewer_than_two_positions_has_no_geometry(
+    client: AsyncClient, sessions: SessionFactory
+) -> None:
+    await store(sessions, [vessel(352000001, minutes_ago=1)], [position(352000001, 1)])
+
+    response = await client.get(f"{VESSELS}/352000001/history")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["geometry"] is None
+    assert len(body["properties"]["timestamps"]) == 1
+
+
+async def test_history_keeps_the_most_recent_points_when_truncated(
+    client: AsyncClient, sessions: SessionFactory, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("app.routers.vessels.MAX_TRACK_POINTS", 2)
+    await store(
+        sessions,
+        [vessel(352000001, minutes_ago=1)],
+        [position(352000001, minutes) for minutes in (20, 10, 1)],
+    )
+
+    response = await client.get(f"{VESSELS}/352000001/history")
+
+    props = response.json()["properties"]
+    assert props["truncated"] is True
+    assert [datetime.fromisoformat(t) for t in props["timestamps"]] == [
+        NOW - timedelta(minutes=10),
+        NOW - timedelta(minutes=1),
+    ]
+
+
+async def test_history_of_an_unknown_vessel_is_404(client: AsyncClient) -> None:
+    response = await client.get(f"{VESSELS}/352999999/history")
+
+    assert response.status_code == 404
+    assert response.headers["content-type"] == "application/problem+json"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "from": (NOW - timedelta(minutes=5)).isoformat(),
+            "to": (NOW - timedelta(minutes=10)).isoformat(),
+        },
+        {"from": (NOW - timedelta(days=8)).isoformat()},
+        {"from": "2026-10-23T10:00:00"},  # sin zona horaria
+        {"since": NOW.isoformat()},  # parámetro desconocido
+    ],
+)
+async def test_history_rejects_invalid_windows(
+    client: AsyncClient, sessions: SessionFactory, params: dict[str, str]
+) -> None:
+    await store(sessions, [vessel(352000001)])
+
+    response = await client.get(f"{VESSELS}/352000001/history", params=params)
+
+    assert response.status_code == 422
+    assert response.headers["content-type"] == "application/problem+json"
+
+
+async def test_history_with_an_invalid_mmsi_is_422(client: AsyncClient) -> None:
+    response = await client.get(f"{VESSELS}/12345678/history")
+
+    assert response.status_code == 422
+
+
+async def test_history_requires_a_token(app: FastAPI, sessions: SessionFactory) -> None:
+    await store(sessions, [vessel(352000001)])
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="https://test") as c:
+        response = await c.get(f"{VESSELS}/352000001/history")
+
+    assert response.status_code == 401
+
+
 # --- Datos AIS como JSON seguro -------------------------------------------------------------
 
 
