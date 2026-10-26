@@ -37,26 +37,43 @@ function json(status: number, body: unknown): Response {
   });
 }
 
-/** API de mentira: login, ficha y estela; `trackStatus` permite simular un token caducado. */
-function stubApi(trackStatus = 200) {
-  vi.stubGlobal(
-    'fetch',
-    vi.fn((url: string) => {
-      if (url.endsWith('/auth/login')) {
-        return Promise.resolve(json(200, { access_token: 'abc', token_type: 'bearer' }));
-      }
-      if (url.endsWith('/history')) {
-        return Promise.resolve(
-          json(trackStatus, {
-            type: 'Feature',
-            geometry: null,
-            properties: { timestamps: [], truncated: false },
-          }),
-        );
-      }
-      return Promise.resolve(json(200, detail));
-    }),
-  );
+interface StubOptions {
+  /** Códigos de `/auth/refresh`, uno por petición (el último se repite); 401 = sin sesión. */
+  refreshStatuses?: number[];
+  /** Códigos que devuelve la estela, uno por petición (el último se repite). */
+  trackStatuses?: number[];
+}
+
+/** API de mentira: login, refresh, ficha y estela. */
+function stubApi({ refreshStatuses = [401], trackStatuses = [200] }: StubOptions = {}) {
+  const next = (pending: number[]) => (pending.length > 1 ? pending.shift() : pending[0]) ?? 200;
+  const pendingRefresh = [...refreshStatuses];
+  const pendingTrack = [...trackStatuses];
+  const fetchMock = vi.fn<(url: string, init?: RequestInit) => Promise<Response>>((url) => {
+    if (url.endsWith('/auth/login')) {
+      return Promise.resolve(json(200, { access_token: 'abc', token_type: 'bearer' }));
+    }
+    if (url.endsWith('/auth/refresh')) {
+      return Promise.resolve(
+        json(next(pendingRefresh), {
+          access_token: 'renovado',
+          token_type: 'bearer',
+          expires_in: 900,
+        }),
+      );
+    }
+    if (url.endsWith('/history')) {
+      return Promise.resolve(
+        json(next(pendingTrack), {
+          type: 'Feature',
+          geometry: null,
+          properties: { timestamps: [], truncated: false },
+        }),
+      );
+    }
+    return Promise.resolve(json(200, detail));
+  });
+  vi.stubGlobal('fetch', fetchMock);
   // El WebSocket no se abre nunca: aquí solo importa la parte REST.
   vi.stubGlobal(
     'WebSocket',
@@ -65,9 +82,11 @@ function stubApi(trackStatus = 200) {
       close = vi.fn();
     },
   );
+  return fetchMock;
 }
 
 async function signIn() {
+  await screen.findByRole('heading', { name: 'Iniciar sesión' });
   await userEvent.type(screen.getByLabelText('Email'), 'demo@example.com');
   await userEvent.type(screen.getByLabelText('Contraseña'), 'changeme-changeme');
   await userEvent.click(screen.getByRole('button', { name: 'Entrar' }));
@@ -78,13 +97,43 @@ afterEach(() => {
 });
 
 describe('App', () => {
-  it('muestra el título y pide iniciar sesión antes del mapa (ADR-0008)', () => {
+  it('muestra el título y pide iniciar sesión antes del mapa (ADR-0008)', async () => {
+    stubApi();
     renderWithQuery(<App />);
 
     expect(screen.getByRole('heading', { level: 1, name: 'Panama Canal Tracker' })).toBeVisible();
     expect(screen.getByRole('region', { name: 'Mapa en vivo' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
+    expect(screen.getByText('Recuperando la sesión…')).toBeVisible();
+    expect(await screen.findByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    // Sin sesión previa no hay aviso de caducidad.
+    expect(screen.queryByText(/caducó/)).not.toBeInTheDocument();
+  });
+
+  it('al recargar recupera la sesión con la cookie, sin pedir entrar', async () => {
+    stubApi({ refreshStatuses: [200] });
+    renderWithQuery(<App />);
+
+    expect(await screen.findByRole('button', { name: 'buque de prueba' })).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('Conectando…');
+    expect(screen.queryByRole('heading', { name: 'Iniciar sesión' })).not.toBeInTheDocument();
+  });
+
+  it('si la API rechaza el token, lo renueva y sigue con el nuevo', async () => {
+    // Al cargar no hay sesión; después del login, la renovación sí la encuentra.
+    const fetchMock = stubApi({ refreshStatuses: [401, 200], trackStatuses: [401, 200] });
+    renderWithQuery(<App />);
+    await signIn();
+
+    await userEvent.click(await screen.findByRole('button', { name: 'buque de prueba' }));
+
+    await vi.waitFor(() => {
+      const authorizations = fetchMock.mock.calls
+        .filter(([url]) => url.endsWith('/history'))
+        .map(([, init]) => new Headers(init?.headers).get('Authorization'));
+      expect(authorizations).toEqual(['Bearer abc', 'Bearer renovado']);
+    });
+    expect(screen.queryByRole('heading', { name: 'Iniciar sesión' })).not.toBeInTheDocument();
   });
 
   it('abre la ficha al hacer clic en un buque y la cierra con Escape', async () => {
@@ -104,8 +153,8 @@ describe('App', () => {
     expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
   });
 
-  it('vuelve al login si la API rechaza el token', async () => {
-    stubApi(401);
+  it('vuelve al login si la API rechaza el token y ya no hay sesión que renovar', async () => {
+    stubApi({ trackStatuses: [401] });
     renderWithQuery(<App />);
     await signIn();
 

@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Bbox } from './protocol';
-import { liveSocketUrl, useLiveVessels } from './useLiveVessels';
+import { liveSocketUrl, reconnectDelay, useLiveVessels } from './useLiveVessels';
 
 /** WebSocket de mentira: guarda lo enviado y deja disparar eventos desde el test. */
 class FakeWebSocket extends EventTarget {
@@ -67,6 +67,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
@@ -137,29 +138,192 @@ describe('useLiveVessels', () => {
     expect(socket.sent.at(-1)).toEqual({ type: 'subscribe', bbox: [...moved] });
   });
 
-  it('expone el código de cierre (4401: token inválido)', () => {
-    const { result } = renderHook(() => useLiveVessels('token-1', CANAL));
+  it('cierra la conexión al desmontarse', () => {
+    const { unmount } = renderHook(() => useLiveVessels('token-1', CANAL));
     const socket = lastSocket();
 
-    act(() => {
-      socket.serverOpens();
-      socket.serverCloses(4401);
-    });
+    unmount();
 
-    expect(result.current).toMatchObject({ status: 'closed', closeCode: 4401 });
+    expect(socket.closedWith).toBe(1000);
   });
 
-  it('cierra la conexión al desmontarse y con un token nuevo', () => {
-    const { rerender, unmount } = renderHook(({ token }) => useLiveVessels(token, CANAL), {
+  it('un token renovado no reabre la conexión: se usa en la siguiente', () => {
+    vi.useFakeTimers();
+    const { rerender } = renderHook(({ token }) => useLiveVessels(token, CANAL), {
       initialProps: { token: 'token-1' },
     });
     const first = lastSocket();
+    act(() => {
+      first.serverOpens();
+    });
 
     rerender({ token: 'token-2' });
-    expect(first.closedWith).toBe(1000);
+    expect(first.closedWith).toBeNull();
+    expect(FakeWebSocket.instances).toHaveLength(1);
 
+    act(() => {
+      first.serverCloses(1012);
+      vi.runOnlyPendingTimers();
+    });
+    act(() => {
+      lastSocket().serverOpens();
+    });
+    expect(lastSocket().sent[0]).toEqual({ type: 'auth', token: 'token-2' });
+  });
+
+  it('al caerse reconecta, se suscribe otra vez y conserva los buques hasta el snapshot', () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useLiveVessels('token-1', CANAL));
+    const first = lastSocket();
+    act(() => {
+      first.serverOpens();
+      first.serverSends({ type: 'snapshot', vessels: [vessel] });
+      first.serverCloses(1006);
+    });
+
+    expect(result.current).toMatchObject({ status: 'reconnecting', closeCode: 1006 });
+    expect(result.current.vessels.size).toBe(1);
+    expect(FakeWebSocket.instances).toHaveLength(1);
+
+    act(() => {
+      vi.advanceTimersByTime(1_000);
+    });
     const second = lastSocket();
-    unmount();
-    expect(second.closedWith).toBe(1000);
+    expect(second).not.toBe(first);
+    act(() => {
+      second.serverOpens();
+    });
+
+    expect(result.current.status).toBe('live');
+    expect(second.sent).toEqual([
+      { type: 'auth', token: 'token-1' },
+      { type: 'subscribe', bbox: [...CANAL] },
+    ]);
+    act(() => {
+      second.serverSends({ type: 'snapshot', vessels: [] });
+    });
+    expect(result.current.vessels.size).toBe(0);
+  });
+
+  it('las esperas crecen entre fallos seguidos y vuelven a empezar al conectar', () => {
+    vi.useFakeTimers();
+    vi.spyOn(Math, 'random').mockReturnValue(1);
+    renderHook(() => useLiveVessels('token-1', CANAL));
+
+    const failAndWait = (ms: number) => {
+      const before = FakeWebSocket.instances.length;
+      act(() => {
+        lastSocket().serverCloses(1006);
+        vi.advanceTimersByTime(ms - 1);
+      });
+      expect(FakeWebSocket.instances).toHaveLength(before);
+      act(() => {
+        vi.advanceTimersByTime(1);
+      });
+      expect(FakeWebSocket.instances).toHaveLength(before + 1);
+    };
+
+    failAndWait(1_000);
+    failAndWait(2_000);
+    failAndWait(4_000);
+    act(() => {
+      lastSocket().serverOpens();
+    });
+    failAndWait(1_000);
+  });
+
+  it('al volver la red reintenta sin esperar al backoff', () => {
+    vi.useFakeTimers();
+    renderHook(() => useLiveVessels('token-1', CANAL));
+    act(() => {
+      lastSocket().serverCloses(1006);
+    });
+    expect(FakeWebSocket.instances).toHaveLength(1);
+
+    act(() => {
+      window.dispatchEvent(new Event('online'));
+    });
+
+    expect(FakeWebSocket.instances).toHaveLength(2);
+  });
+
+  it('con 4401 pide renovar el token y reconecta en cuanto llega otro', () => {
+    vi.useFakeTimers();
+    const onUnauthorized = vi.fn();
+    const { result, rerender } = renderHook(
+      ({ token }) => useLiveVessels(token, CANAL, onUnauthorized),
+      { initialProps: { token: 'caducado' } },
+    );
+    act(() => {
+      lastSocket().serverOpens();
+      lastSocket().serverCloses(4401);
+    });
+
+    expect(onUnauthorized).toHaveBeenCalledWith('caducado');
+    expect(result.current).toMatchObject({ status: 'reconnecting', closeCode: 4401 });
+    // Con el mismo token no tiene sentido insistir.
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+    expect(FakeWebSocket.instances).toHaveLength(1);
+
+    rerender({ token: 'renovado' });
+    expect(FakeWebSocket.instances).toHaveLength(2);
+    act(() => {
+      lastSocket().serverOpens();
+    });
+    expect(lastSocket().sent[0]).toEqual({ type: 'auth', token: 'renovado' });
+  });
+
+  it('con 4400 (mensaje inválido: error del cliente) no reintenta', () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useLiveVessels('token-1', CANAL));
+    act(() => {
+      lastSocket().serverOpens();
+      lastSocket().serverCloses(4400);
+      vi.advanceTimersByTime(60_000);
+    });
+
+    expect(result.current).toMatchObject({ status: 'closed', closeCode: 4400 });
+    expect(FakeWebSocket.instances).toHaveLength(1);
+  });
+
+  it('al cerrar sesión deja de reintentar y olvida los buques', () => {
+    vi.useFakeTimers();
+    const initialProps: { token: string | null } = { token: 'token-1' };
+    const { result, rerender } = renderHook(({ token }) => useLiveVessels(token, CANAL), {
+      initialProps,
+    });
+    act(() => {
+      lastSocket().serverOpens();
+      lastSocket().serverSends({ type: 'snapshot', vessels: [vessel] });
+      lastSocket().serverCloses(1006);
+    });
+
+    rerender({ token: null });
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+    expect(result.current).toMatchObject({ status: 'idle', closeCode: null });
+    expect(FakeWebSocket.instances).toHaveLength(1);
+
+    rerender({ token: 'token-2' });
+    expect(result.current).toMatchObject({ status: 'connecting' });
+    expect(result.current.vessels.size).toBe(0);
+  });
+});
+
+describe('reconnectDelay', () => {
+  it('duplica el tramo en cada intento hasta 30 s, con jitter entre la mitad y el total', () => {
+    expect(reconnectDelay(0, 1006, () => 1)).toBe(1_000);
+    expect(reconnectDelay(0, 1006, () => 0)).toBe(500);
+    expect(reconnectDelay(3, 1006, () => 1)).toBe(8_000);
+    expect(reconnectDelay(10, 1006, () => 1)).toBe(30_000);
+    expect(reconnectDelay(10, 1006, () => 0)).toBe(15_000);
+  });
+
+  it('con 4429 (demasiadas conexiones) espera al menos 15 s', () => {
+    expect(reconnectDelay(0, 4429, () => 0)).toBe(15_000);
+    expect(reconnectDelay(10, 4429, () => 1)).toBe(30_000);
   });
 });

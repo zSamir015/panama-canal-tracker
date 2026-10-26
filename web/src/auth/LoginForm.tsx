@@ -1,8 +1,9 @@
 import { type SubmitEvent, useState } from 'react';
 import { login, LoginError } from './login';
+import type { Session } from './session';
 
 interface LoginFormProps {
-  onLogin: (accessToken: string) => void;
+  onLogin: (session: Session) => void;
   /** Aviso a mostrar encima del formulario, p. ej. cuando la sesión caducó. */
   notice?: string | undefined;
   loginImpl?: typeof login;

@@ -1,18 +1,20 @@
 import { config } from '../config';
+import { parseTokenResponse, type Session } from './session';
 
 export class LoginError extends Error {
   override name = 'LoginError';
 }
 
 /**
- * `POST /api/v1/auth/login`. Devuelve el access token, que se guarda solo en memoria (AGENTS.md
- * §8.4); el refresh token llega en una cookie `HttpOnly` que JavaScript no puede leer.
+ * `POST /api/v1/auth/login`. Devuelve la sesión (access token y caducidad), que se guarda solo en
+ * memoria (AGENTS.md §8.4); el refresh token llega en una cookie `HttpOnly` que JavaScript no puede
+ * leer.
  */
 export async function login(
   email: string,
   password: string,
   fetchImpl: typeof fetch = fetch,
-): Promise<string> {
+): Promise<Session> {
   let response: Response;
   try {
     response = await fetchImpl(`${config.apiUrl}/api/v1/auth/login`, {
@@ -35,14 +37,9 @@ export async function login(
     throw new LoginError('No se pudo iniciar sesión. Inténtalo de nuevo.');
   }
 
-  const body: unknown = await response.json();
-  if (
-    typeof body !== 'object' ||
-    body === null ||
-    !('access_token' in body) ||
-    typeof body.access_token !== 'string'
-  ) {
+  const session = parseTokenResponse(await response.json());
+  if (!session) {
     throw new LoginError('Respuesta inesperada de la API.');
   }
-  return body.access_token;
+  return session;
 }
