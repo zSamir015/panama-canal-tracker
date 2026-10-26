@@ -1,0 +1,2552 @@
+[
+  {
+    "type": "snapshot",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.9204,
+        "lat": 9.3036,
+        "cog": 181.6,
+        "sog": 8.6,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.596,
+        "lat": 9.001,
+        "cog": 315.0,
+        "sog": 6.1,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.614,
+        "lat": 9.025,
+        "cog": 158.2,
+        "sog": 7.1,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.8812,
+        "lat": 9.2248,
+        "cog": 319.5,
+        "sog": 6.9,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.868233,
+        "lat": 9.422365,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.524131,
+        "lat": 8.923922,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.824,
+        "lat": 9.18,
+        "cog": 119.1,
+        "sog": 7.7,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.62,
+        "lat": 9.04,
+        "cog": 338.2,
+        "sog": 6.1,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:00Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920436,
+        "lat": 9.302304,
+        "cog": 181.6,
+        "sog": 6.9,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59612,
+        "lat": 9.00112,
+        "cog": 315.0,
+        "sog": 8.0,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61388,
+        "lat": 9.0247,
+        "cog": 158.2,
+        "sog": 6.1,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.881836,
+        "lat": 9.225544,
+        "cog": 319.5,
+        "sog": 6.8,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.869551,
+        "lat": 9.421499,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.519107,
+        "lat": 8.917204,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.82184,
+        "lat": 9.1788,
+        "cog": 119.1,
+        "sog": 9.2,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.62072,
+        "lat": 9.04072,
+        "cog": 315.0,
+        "sog": 6.0,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:01Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920472,
+        "lat": 9.301008,
+        "cog": 181.6,
+        "sog": 9.2,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59624,
+        "lat": 9.00124,
+        "cog": 315.0,
+        "sog": 8.8,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61376,
+        "lat": 9.0244,
+        "cog": 158.2,
+        "sog": 7.4,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.882472,
+        "lat": 9.226288,
+        "cog": 319.5,
+        "sog": 6.6,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.871634,
+        "lat": 9.424572,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.524033,
+        "lat": 8.915927,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.81968,
+        "lat": 9.1776,
+        "cog": 119.1,
+        "sog": 9.4,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.62144,
+        "lat": 9.04144,
+        "cog": 315.0,
+        "sog": 8.4,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:02Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920508,
+        "lat": 9.299712,
+        "cog": 181.6,
+        "sog": 9.2,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59636,
+        "lat": 9.00136,
+        "cog": 315.0,
+        "sog": 8.9,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61364,
+        "lat": 9.0241,
+        "cog": 158.2,
+        "sog": 8.1,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.883108,
+        "lat": 9.227032,
+        "cog": 319.5,
+        "sog": 9.9,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.86948,
+        "lat": 9.418785,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.518815,
+        "lat": 8.923294,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.81752,
+        "lat": 9.1764,
+        "cog": 119.1,
+        "sog": 9.4,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.62216,
+        "lat": 9.04216,
+        "cog": 315.0,
+        "sog": 8.3,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:03Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920544,
+        "lat": 9.298416,
+        "cog": 181.6,
+        "sog": 8.8,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59648,
+        "lat": 9.00148,
+        "cog": 315.0,
+        "sog": 6.2,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61352,
+        "lat": 9.0238,
+        "cog": 158.2,
+        "sog": 6.9,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.883744,
+        "lat": 9.227776,
+        "cog": 319.5,
+        "sog": 7.2,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.872672,
+        "lat": 9.415798,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.52222,
+        "lat": 8.91601,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.81536,
+        "lat": 9.1752,
+        "cog": 119.1,
+        "sog": 8.5,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.62288,
+        "lat": 9.04288,
+        "cog": 315.0,
+        "sog": 7.5,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:04Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.92058,
+        "lat": 9.29712,
+        "cog": 181.6,
+        "sog": 7.5,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.5966,
+        "lat": 9.0016,
+        "cog": 315.0,
+        "sog": 6.8,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.6134,
+        "lat": 9.0235,
+        "cog": 158.2,
+        "sog": 7.1,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.88438,
+        "lat": 9.22852,
+        "cog": 319.5,
+        "sog": 9.7,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.868909,
+        "lat": 9.42148,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.517709,
+        "lat": 8.916711,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.8132,
+        "lat": 9.174,
+        "cog": 119.1,
+        "sog": 6.7,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.6236,
+        "lat": 9.0436,
+        "cog": 315.0,
+        "sog": 7.5,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:05Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920616,
+        "lat": 9.295824,
+        "cog": 181.6,
+        "sog": 10.0,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59672,
+        "lat": 9.00172,
+        "cog": 315.0,
+        "sog": 8.6,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61328,
+        "lat": 9.0232,
+        "cog": 158.2,
+        "sog": 8.2,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.885016,
+        "lat": 9.229264,
+        "cog": 319.5,
+        "sog": 8.7,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.86724,
+        "lat": 9.423429,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.524679,
+        "lat": 8.91729,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.81104,
+        "lat": 9.1728,
+        "cog": 119.1,
+        "sog": 7.3,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.62432,
+        "lat": 9.04432,
+        "cog": 315.0,
+        "sog": 7.1,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:06Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920652,
+        "lat": 9.294528,
+        "cog": 181.6,
+        "sog": 6.8,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59684,
+        "lat": 9.00184,
+        "cog": 315.0,
+        "sog": 9.8,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61316,
+        "lat": 9.0229,
+        "cog": 158.2,
+        "sog": 9.5,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.885652,
+        "lat": 9.230008,
+        "cog": 319.5,
+        "sog": 7.3,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.871044,
+        "lat": 9.421554,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.520411,
+        "lat": 8.924145,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.80888,
+        "lat": 9.1716,
+        "cog": 119.1,
+        "sog": 7.1,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.62504,
+        "lat": 9.04504,
+        "cog": 315.0,
+        "sog": 7.0,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:07Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920688,
+        "lat": 9.293232,
+        "cog": 181.6,
+        "sog": 8.2,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59696,
+        "lat": 9.00196,
+        "cog": 315.0,
+        "sog": 7.1,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61304,
+        "lat": 9.0226,
+        "cog": 158.2,
+        "sog": 8.3,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.886288,
+        "lat": 9.230752,
+        "cog": 319.5,
+        "sog": 9.6,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.872807,
+        "lat": 9.418994,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.519905,
+        "lat": 8.924975,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.80672,
+        "lat": 9.1704,
+        "cog": 119.1,
+        "sog": 6.4,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.62576,
+        "lat": 9.04576,
+        "cog": 315.0,
+        "sog": 6.2,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:08Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920724,
+        "lat": 9.291936,
+        "cog": 181.6,
+        "sog": 6.4,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59708,
+        "lat": 9.00208,
+        "cog": 315.0,
+        "sog": 8.5,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61292,
+        "lat": 9.0223,
+        "cog": 158.2,
+        "sog": 9.2,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.886924,
+        "lat": 9.231496,
+        "cog": 319.5,
+        "sog": 7.7,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.871184,
+        "lat": 9.415635,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.519709,
+        "lat": 8.924961,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.80456,
+        "lat": 9.1692,
+        "cog": 119.1,
+        "sog": 9.9,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.62648,
+        "lat": 9.04648,
+        "cog": 315.0,
+        "sog": 9.4,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:09Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.92076,
+        "lat": 9.29064,
+        "cog": 181.6,
+        "sog": 6.0,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.5972,
+        "lat": 9.0022,
+        "cog": 315.0,
+        "sog": 8.9,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.6128,
+        "lat": 9.022,
+        "cog": 158.2,
+        "sog": 8.7,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.88756,
+        "lat": 9.23224,
+        "cog": 319.5,
+        "sog": 8.1,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.86859,
+        "lat": 9.417668,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.520652,
+        "lat": 8.916116,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.8024,
+        "lat": 9.168,
+        "cog": 119.1,
+        "sog": 7.8,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.6272,
+        "lat": 9.0472,
+        "cog": 315.0,
+        "sog": 9.8,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:10Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920796,
+        "lat": 9.289344,
+        "cog": 181.6,
+        "sog": 9.5,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59732,
+        "lat": 9.00232,
+        "cog": 315.0,
+        "sog": 7.1,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61268,
+        "lat": 9.0217,
+        "cog": 158.2,
+        "sog": 8.0,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.888196,
+        "lat": 9.232984,
+        "cog": 319.5,
+        "sog": 6.7,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.866295,
+        "lat": 9.424126,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.518611,
+        "lat": 8.917984,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.80024,
+        "lat": 9.1668,
+        "cog": 119.1,
+        "sog": 8.4,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.62792,
+        "lat": 9.04792,
+        "cog": 315.0,
+        "sog": 6.6,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:11Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920832,
+        "lat": 9.288048,
+        "cog": 181.6,
+        "sog": 9.1,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59744,
+        "lat": 9.00244,
+        "cog": 315.0,
+        "sog": 8.2,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61256,
+        "lat": 9.0214,
+        "cog": 158.2,
+        "sog": 9.1,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.888832,
+        "lat": 9.233728,
+        "cog": 319.5,
+        "sog": 8.1,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.871758,
+        "lat": 9.415006,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.515709,
+        "lat": 8.915195,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.79808,
+        "lat": 9.1656,
+        "cog": 119.1,
+        "sog": 9.5,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.62864,
+        "lat": 9.04864,
+        "cog": 315.0,
+        "sog": 9.3,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:12Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920868,
+        "lat": 9.286752,
+        "cog": 181.6,
+        "sog": 7.2,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59756,
+        "lat": 9.00256,
+        "cog": 315.0,
+        "sog": 6.2,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61244,
+        "lat": 9.0211,
+        "cog": 158.2,
+        "sog": 9.5,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.889468,
+        "lat": 9.234472,
+        "cog": 319.5,
+        "sog": 9.8,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.87014,
+        "lat": 9.415857,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.517394,
+        "lat": 8.915692,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.79592,
+        "lat": 9.1644,
+        "cog": 119.1,
+        "sog": 9.1,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.62936,
+        "lat": 9.04936,
+        "cog": 315.0,
+        "sog": 6.5,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:13Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920904,
+        "lat": 9.285456,
+        "cog": 181.6,
+        "sog": 7.9,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59768,
+        "lat": 9.00268,
+        "cog": 315.0,
+        "sog": 8.2,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61232,
+        "lat": 9.0208,
+        "cog": 158.2,
+        "sog": 7.1,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.890104,
+        "lat": 9.235216,
+        "cog": 319.5,
+        "sog": 9.5,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.872882,
+        "lat": 9.419231,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.517701,
+        "lat": 8.920393,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.79376,
+        "lat": 9.1632,
+        "cog": 119.1,
+        "sog": 6.8,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.63008,
+        "lat": 9.05008,
+        "cog": 315.0,
+        "sog": 7.2,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:14Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.92094,
+        "lat": 9.28416,
+        "cog": 181.6,
+        "sog": 10.0,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.5978,
+        "lat": 9.0028,
+        "cog": 315.0,
+        "sog": 8.6,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.6122,
+        "lat": 9.0205,
+        "cog": 158.2,
+        "sog": 7.8,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.89074,
+        "lat": 9.23596,
+        "cog": 319.5,
+        "sog": 8.1,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.872753,
+        "lat": 9.41621,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.519117,
+        "lat": 8.918381,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.7916,
+        "lat": 9.162,
+        "cog": 119.1,
+        "sog": 6.9,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.6308,
+        "lat": 9.0508,
+        "cog": 315.0,
+        "sog": 6.9,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:15Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920976,
+        "lat": 9.282864,
+        "cog": 181.6,
+        "sog": 6.3,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59792,
+        "lat": 9.00292,
+        "cog": 315.0,
+        "sog": 8.5,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61208,
+        "lat": 9.0202,
+        "cog": 158.2,
+        "sog": 6.9,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.891376,
+        "lat": 9.236704,
+        "cog": 319.5,
+        "sog": 9.6,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.874291,
+        "lat": 9.423596,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.51831,
+        "lat": 8.91738,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.78944,
+        "lat": 9.1608,
+        "cog": 119.1,
+        "sog": 6.9,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.63152,
+        "lat": 9.05152,
+        "cog": 315.0,
+        "sog": 6.5,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:16Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920968,
+        "lat": 9.28192,
+        "cog": 158.2,
+        "sog": 9.7,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59804,
+        "lat": 9.00304,
+        "cog": 315.0,
+        "sog": 8.3,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61196,
+        "lat": 9.0199,
+        "cog": 158.2,
+        "sog": 7.9,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.892012,
+        "lat": 9.237448,
+        "cog": 319.5,
+        "sog": 9.1,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.873096,
+        "lat": 9.423075,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.520689,
+        "lat": 8.915969,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.78728,
+        "lat": 9.1596,
+        "cog": 119.1,
+        "sog": 7.7,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.63224,
+        "lat": 9.05224,
+        "cog": 315.0,
+        "sog": 7.9,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:17Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920872,
+        "lat": 9.28168,
+        "cog": 158.2,
+        "sog": 8.9,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59816,
+        "lat": 9.00316,
+        "cog": 315.0,
+        "sog": 8.7,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61184,
+        "lat": 9.0196,
+        "cog": 158.2,
+        "sog": 9.9,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.892648,
+        "lat": 9.238192,
+        "cog": 319.5,
+        "sog": 6.4,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.871607,
+        "lat": 9.419026,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.522513,
+        "lat": 8.923617,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.78512,
+        "lat": 9.1584,
+        "cog": 119.1,
+        "sog": 6.8,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.63296,
+        "lat": 9.05296,
+        "cog": 315.0,
+        "sog": 7.8,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:18Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920776,
+        "lat": 9.28144,
+        "cog": 158.2,
+        "sog": 7.7,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59828,
+        "lat": 9.00328,
+        "cog": 315.0,
+        "sog": 7.1,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61172,
+        "lat": 9.0193,
+        "cog": 158.2,
+        "sog": 7.0,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.893284,
+        "lat": 9.238936,
+        "cog": 319.5,
+        "sog": 9.7,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.866387,
+        "lat": 9.419431,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.524494,
+        "lat": 8.920503,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.78296,
+        "lat": 9.1572,
+        "cog": 119.1,
+        "sog": 10.0,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.63368,
+        "lat": 9.05368,
+        "cog": 315.0,
+        "sog": 9.3,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:19Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.92068,
+        "lat": 9.2812,
+        "cog": 158.2,
+        "sog": 9.9,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.5984,
+        "lat": 9.0034,
+        "cog": 315.0,
+        "sog": 9.7,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.6116,
+        "lat": 9.019,
+        "cog": 158.2,
+        "sog": 9.4,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.89392,
+        "lat": 9.23968,
+        "cog": 319.5,
+        "sog": 6.7,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.872863,
+        "lat": 9.419856,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.524414,
+        "lat": 8.91901,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.7808,
+        "lat": 9.156,
+        "cog": 119.1,
+        "sog": 7.5,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.6344,
+        "lat": 9.0544,
+        "cog": 315.0,
+        "sog": 9.9,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:20Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920584,
+        "lat": 9.28096,
+        "cog": 158.2,
+        "sog": 7.1,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59852,
+        "lat": 9.00352,
+        "cog": 315.0,
+        "sog": 9.1,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61148,
+        "lat": 9.0187,
+        "cog": 158.2,
+        "sog": 7.8,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.894556,
+        "lat": 9.240424,
+        "cog": 319.5,
+        "sog": 7.7,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.865046,
+        "lat": 9.424573,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.517816,
+        "lat": 8.920558,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.77864,
+        "lat": 9.1548,
+        "cog": 119.1,
+        "sog": 6.6,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.63512,
+        "lat": 9.05512,
+        "cog": 315.0,
+        "sog": 7.2,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:21Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920488,
+        "lat": 9.28072,
+        "cog": 158.2,
+        "sog": 9.9,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59864,
+        "lat": 9.00364,
+        "cog": 315.0,
+        "sog": 8.3,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61136,
+        "lat": 9.0184,
+        "cog": 158.2,
+        "sog": 8.2,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.895192,
+        "lat": 9.241168,
+        "cog": 319.5,
+        "sog": 9.0,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.869158,
+        "lat": 9.415572,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.516473,
+        "lat": 8.920029,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.77648,
+        "lat": 9.1536,
+        "cog": 119.1,
+        "sog": 6.6,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.63584,
+        "lat": 9.05584,
+        "cog": 315.0,
+        "sog": 9.8,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:22Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920392,
+        "lat": 9.28048,
+        "cog": 158.2,
+        "sog": 6.3,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59876,
+        "lat": 9.00376,
+        "cog": 315.0,
+        "sog": 6.7,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61124,
+        "lat": 9.0181,
+        "cog": 158.2,
+        "sog": 8.4,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.895828,
+        "lat": 9.241912,
+        "cog": 319.5,
+        "sog": 8.7,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.873801,
+        "lat": 9.417352,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.522538,
+        "lat": 8.923903,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.77432,
+        "lat": 9.1524,
+        "cog": 119.1,
+        "sog": 8.4,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.63656,
+        "lat": 9.05656,
+        "cog": 315.0,
+        "sog": 8.5,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:23Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920296,
+        "lat": 9.28024,
+        "cog": 158.2,
+        "sog": 7.7,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59888,
+        "lat": 9.00388,
+        "cog": 315.0,
+        "sog": 8.3,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61112,
+        "lat": 9.0178,
+        "cog": 158.2,
+        "sog": 8.1,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.896464,
+        "lat": 9.242656,
+        "cog": 319.5,
+        "sog": 9.7,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.867838,
+        "lat": 9.417043,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.521042,
+        "lat": 8.917387,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.77216,
+        "lat": 9.1512,
+        "cog": 119.1,
+        "sog": 8.7,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.63728,
+        "lat": 9.05728,
+        "cog": 315.0,
+        "sog": 7.2,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:24Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.9202,
+        "lat": 9.28,
+        "cog": 158.2,
+        "sog": 7.3,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.599,
+        "lat": 9.004,
+        "cog": 315.0,
+        "sog": 9.0,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.611,
+        "lat": 9.0175,
+        "cog": 158.2,
+        "sog": 6.3,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.8971,
+        "lat": 9.2434,
+        "cog": 319.5,
+        "sog": 7.8,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.865039,
+        "lat": 9.424985,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.522868,
+        "lat": 8.915733,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.77,
+        "lat": 9.15,
+        "cog": 119.1,
+        "sog": 7.1,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.638,
+        "lat": 9.058,
+        "cog": 315.0,
+        "sog": 9.7,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:25Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920104,
+        "lat": 9.27976,
+        "cog": 158.2,
+        "sog": 9.5,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59912,
+        "lat": 9.00412,
+        "cog": 315.0,
+        "sog": 9.5,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61088,
+        "lat": 9.0172,
+        "cog": 158.2,
+        "sog": 7.5,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.897736,
+        "lat": 9.244144,
+        "cog": 319.5,
+        "sog": 6.6,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.867965,
+        "lat": 9.423337,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.515128,
+        "lat": 8.921117,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.76784,
+        "lat": 9.1488,
+        "cog": 119.1,
+        "sog": 8.6,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.63872,
+        "lat": 9.05872,
+        "cog": 315.0,
+        "sog": 6.0,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:26Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.920008,
+        "lat": 9.27952,
+        "cog": 158.2,
+        "sog": 9.3,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59924,
+        "lat": 9.00424,
+        "cog": 315.0,
+        "sog": 7.2,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61076,
+        "lat": 9.0169,
+        "cog": 158.2,
+        "sog": 8.7,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.898372,
+        "lat": 9.244888,
+        "cog": 319.5,
+        "sog": 9.8,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.873846,
+        "lat": 9.416343,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.519468,
+        "lat": 8.91607,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.76568,
+        "lat": 9.1476,
+        "cog": 119.1,
+        "sog": 7.1,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.63944,
+        "lat": 9.05944,
+        "cog": 315.0,
+        "sog": 8.4,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:27Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.919912,
+        "lat": 9.27928,
+        "cog": 158.2,
+        "sog": 8.9,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59936,
+        "lat": 9.00436,
+        "cog": 315.0,
+        "sog": 6.8,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61064,
+        "lat": 9.0166,
+        "cog": 158.2,
+        "sog": 8.5,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.899008,
+        "lat": 9.245632,
+        "cog": 319.5,
+        "sog": 7.1,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.865947,
+        "lat": 9.419885,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.524077,
+        "lat": 8.923461,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.76352,
+        "lat": 9.1464,
+        "cog": 119.1,
+        "sog": 7.7,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.64016,
+        "lat": 9.06016,
+        "cog": 315.0,
+        "sog": 7.1,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:28Z"
+      }
+    ]
+  },
+  {
+    "type": "update",
+    "vessels": [
+      {
+        "mmsi": 352000001,
+        "lon": -79.919816,
+        "lat": 9.27904,
+        "cog": 158.2,
+        "sog": 6.0,
+        "ship_type": 70,
+        "name": "PACIFIC STAR",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 636000002,
+        "lon": -79.59948,
+        "lat": 9.00448,
+        "cog": 315.0,
+        "sog": 9.1,
+        "ship_type": 80,
+        "name": "ATLANTIC DAWN",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 538000003,
+        "lon": -79.61052,
+        "lat": 9.0163,
+        "cog": 158.2,
+        "sog": 8.5,
+        "ship_type": 70,
+        "name": "GATUN TRADER",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 353000004,
+        "lon": -79.899644,
+        "lat": 9.246376,
+        "cog": 319.5,
+        "sog": 7.0,
+        "ship_type": 84,
+        "name": "CULEBRA SPIRIT",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 371000005,
+        "lon": -79.869483,
+        "lat": 9.422412,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "COLON BREEZE",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 563000006,
+        "lon": -79.524903,
+        "lat": 8.919277,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 80,
+        "name": "BALBOA GRACE",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 477000007,
+        "lon": -79.76136,
+        "lat": 9.1452,
+        "cog": 119.1,
+        "sog": 6.3,
+        "ship_type": 60,
+        "name": "MIRAFLORES SUN",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 256000008,
+        "lon": -79.64088,
+        "lat": 9.06088,
+        "cog": 315.0,
+        "sog": 9.5,
+        "ship_type": 70,
+        "name": "CANAL VOYAGER",
+        "ts": "2026-10-25T12:00:29Z"
+      }
+    ]
+  }
+]

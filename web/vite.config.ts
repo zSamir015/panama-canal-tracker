@@ -4,6 +4,8 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [react()],
+  // En modo demo (GitHub Pages) el sitio vive bajo /panama-canal-tracker/ (ADR-0011).
+  base: process.env.VITE_DEMO === 'true' ? '/panama-canal-tracker/' : '/',
   server: {
     // En desarrollo, la API va detrás del mismo origen que el frontend, como en producción: la
     // cookie del refresh y el `Origin` del WebSocket funcionan igual. El navegador sigue

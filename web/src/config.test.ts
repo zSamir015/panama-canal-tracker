@@ -6,6 +6,7 @@ describe('readConfig', () => {
     expect(readConfig({} as ImportMetaEnv)).toEqual({
       apiUrl: '',
       mapStyleUrl: DEFAULT_MAP_STYLE_URL,
+      demo: false,
     });
   });
 
@@ -18,6 +19,7 @@ describe('readConfig', () => {
     expect(config).toEqual({
       apiUrl: 'https://api.example.com',
       mapStyleUrl: 'https://tiles.example.com/style.json',
+      demo: false,
     });
   });
 

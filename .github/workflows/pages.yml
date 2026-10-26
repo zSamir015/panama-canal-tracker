@@ -1,0 +1,64 @@
+# Deploy de la demo estática en GitHub Pages (ADR-0011, tarea 4.7).
+# Compila el frontend con VITE_DEMO=true (datos simulados, sin backend) y lo publica en Pages.
+# El dueño del repo debe activar Pages en Settings → Pages → Source: GitHub Actions.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Solo los permisos que necesita el deploy a Pages.
+permissions:
+  pages: write
+  id-token: write
+
+# Un solo deploy a la vez; si hay otro en cola, se cancela el anterior.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build demo
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Instalar dependencias (lockfile)
+        run: npm ci --no-audit --no-fund
+      - name: Build con datos simulados
+        run: npm run build
+        env:
+          VITE_DEMO: "true"
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+      - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy to Pages
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

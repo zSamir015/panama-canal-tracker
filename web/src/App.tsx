@@ -3,6 +3,9 @@ import './App.css';
 import { ApiError } from './api/client';
 import { LoginForm } from './auth/LoginForm';
 import { useSession } from './auth/useSession';
+import { config } from './config';
+import { DemoBanner } from './demo/DemoBanner';
+import { useDemoVessels } from './demo/useDemoVessels';
 import type { Bbox } from './live/protocol';
 import { type LiveStatus, useLiveVessels } from './live/useLiveVessels';
 import { MapLegend } from './map/MapLegend';
@@ -33,6 +36,7 @@ export function App() {
   // Un 4401 de `/ws/live` o un 401 de la API piden renovar el token; si la renovación dice que
   // ya no hay sesión, `useSession` pasa a `signedOut` con `expired` y se vuelve al login.
   const live = useLiveVessels(token, bbox, renew);
+  const demo = useDemoVessels();
   const track = useVesselTrack(selectedMmsi, token);
 
   const closePanel = useCallback(() => {
@@ -46,28 +50,35 @@ export function App() {
     }
   }, [trackUnauthorized, token, renew]);
 
-  const signedIn = session.status === 'signedIn' && token !== null;
-  const selectedLive = selectedMmsi === null ? undefined : live.vessels.get(selectedMmsi);
+  // En modo demo se salta el login y se usan los buques pregrabados (ADR-0011).
+  const activeVessels = config.demo ? demo : live;
+  const mapReady = config.demo || (session.status === 'signedIn' && token !== null);
+  const selectedLive = selectedMmsi === null ? undefined : activeVessels.vessels.get(selectedMmsi);
 
   return (
     <main className="app">
       <header className="app__header">
         <div>
           <h1>Panama Canal Tracker</h1>
-          <p>Buques del Canal de Panamá en tiempo real a partir de datos AIS.</p>
+          {config.demo ? (
+            <p>Demo con datos simulados del Canal de Panamá.</p>
+          ) : (
+            <p>Buques del Canal de Panamá en tiempo real a partir de datos AIS.</p>
+          )}
         </div>
-        {signedIn && (
+        {mapReady && (
           <p className="app__status" role="status">
-            {STATUS_TEXT[live.status]} · {live.vessels.size} buques
+            {config.demo ? 'Demo' : STATUS_TEXT[live.status]} · {activeVessels.vessels.size} buques
           </p>
         )}
       </header>
+      {config.demo && <DemoBanner />}
       <section className="app__map" aria-label="Mapa en vivo">
-        {signedIn ? (
+        {mapReady ? (
           <>
             <Suspense fallback={<p>Cargando el mapa…</p>}>
               <VesselMap
-                vessels={live.vessels}
+                vessels={activeVessels.vessels}
                 onViewportChange={setBbox}
                 selectedMmsi={selectedMmsi}
                 onSelect={setSelectedMmsi}
@@ -75,7 +86,7 @@ export function App() {
               />
             </Suspense>
             <MapLegend />
-            {selectedMmsi !== null && (
+            {selectedMmsi !== null && !config.demo && token !== null && (
               <VesselPanel
                 key={selectedMmsi}
                 mmsi={selectedMmsi}

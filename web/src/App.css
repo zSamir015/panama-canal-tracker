@@ -187,3 +187,13 @@
 .vessel-panel__error {
   color: #b71c1c;
 }
+
+.demo-banner {
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #5d4037;
+  text-align: center;
+  background: #fff3cd;
+  border-bottom: 2px solid #ffc107;
+}
