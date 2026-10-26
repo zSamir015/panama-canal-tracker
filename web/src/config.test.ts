@@ -34,3 +34,9 @@ describe('readConfig', () => {
     ).toThrow('credenciales');
   });
 });
+
+describe('comprobación temporal del CI (se revierte)', () => {
+  it('falla a propósito', () => {
+    expect(1).toBe(2);
+  });
+});
