@@ -5,6 +5,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-06
+
+Fase 4: mapa en tiempo real. Frontend React + MapLibre con ficha del buque y estela de 30 min,
+`WS /ws/live` con autenticación en el primer mensaje, reconexión y CI del frontend. La demo
+pública corre en GitHub Pages con datos simulados (ADR-0011) y el WebSocket aguantó 500 clientes
+en la prueba de carga, sin degradar la ingesta.
+
 ### Added
 - Prueba de carga del WebSocket (tarea 4.8): `scripts/ws_load_test.py` abre 500 clientes
   (100 usuarios de prueba × 5 sockets) contra `/ws/live` con el simulador AIS y mide conexiones,
