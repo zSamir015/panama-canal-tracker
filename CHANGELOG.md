@@ -6,6 +6,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- Prueba de carga del WebSocket (tarea 4.8): `scripts/ws_load_test.py` abre 500 clientes
+  (100 usuarios de prueba × 5 sockets) contra `/ws/live` con el simulador AIS y mide conexiones,
+  tiempo al primer snapshot, CPU y memoria de la API y la tasa de ingesta. Resultado en
+  `docs/LOAD_TEST.md`: 500/500 conectados, sin fallos y sin degradación medible de la ingesta.
 - Demo estática en GitHub Pages (#79, tarea 4.7, ADR-0011): al compilar con `VITE_DEMO=true` la
   app salta el login y reproduce en bucle un JSON pregrabado con posiciones de buques generadas por
   `scripts/ais_simulator.py`. Etiqueta «⚠ Datos simulados» siempre visible. Workflow `pages.yml`

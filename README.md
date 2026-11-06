@@ -92,6 +92,7 @@ For development (API on the host with `--reload`), see [AGENTS.md](AGENTS.md#10-
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phases with acceptance criteria |
 | [docs/API_DESIGN.md](docs/API_DESIGN.md) | REST and WebSocket contract |
 | [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md) | AIS source, limits, geographic zones |
+| [docs/LOAD_TEST.md](docs/LOAD_TEST.md) | WebSocket load test: 500 clients, results and method |
 | [docs/adr/](docs/adr/) | Architecture decision records |
 | [AGENTS.md](AGENTS.md) | Engineering and security conventions for this repository |
 | [SECURITY.md](SECURITY.md) | How to report a vulnerability |
