@@ -8,16 +8,19 @@ Si la base no está levantada fallan con un mensaje claro; nunca se saltan en si
 (un test saltado parece verde y oculta que no se probó nada).
 """
 
-from collections.abc import AsyncIterator
+import asyncio
+from collections.abc import AsyncIterator, Callable
 from urllib.parse import urlsplit, urlunsplit
 
 import pytest
 from alembic import command
+from alembic.config import Config
 from fastapi import FastAPI
 from limits.aio.storage import RedisStorage
 from pydantic import SecretStr
 from sqlalchemy import text
 from sqlalchemy.engine import make_url
+from sqlalchemy.exc import InternalError
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, create_async_engine
 
 from app.core.config import Settings
@@ -103,6 +106,7 @@ async def owner_engine(db_settings: Settings) -> AsyncIterator[AsyncEngine]:
 
 
 TEST_MIGRATION_LOCK = "panama_canal_tracker_test_migrations"
+MIGRATION_RETRIES = 5
 
 
 @pytest.fixture
@@ -125,6 +129,30 @@ async def migration_lock(owner_engine: AsyncEngine) -> AsyncIterator[AsyncConnec
         await connection.close()
 
 
+async def migrate(
+    connection: AsyncConnection, action: Callable[[Config, str], None], revision: str
+) -> None:
+    """Ejecuta un comando de Alembic en una transacción, reintentándola si TimescaleDB choca.
+
+    Al crear una política (refresco de un agregado, compresión), el planificador de TimescaleDB
+    escribe de inmediato en su catálogo de trabajos. Si el siguiente DDL borra esa política a los
+    pocos milisegundos (los tests suben y bajan el esquema sin pausa), PostgreSQL responde
+    "tuple concurrently deleted". Es una carrera del test con el planificador, no un fallo de la
+    migración: la transacción se deshace entera y reintentarla la resuelve. Cualquier otro error
+    se propaga sin reintentar.
+    """
+    for attempt in range(MIGRATION_RETRIES):
+        try:
+            async with connection.begin():
+                await connection.run_sync(alembic(action, revision))
+        except InternalError as error:
+            if "tuple concurrently deleted" not in str(error) or attempt + 1 == MIGRATION_RETRIES:
+                raise
+            await asyncio.sleep(0.2 * (attempt + 1))
+        else:
+            return
+
+
 @pytest.fixture
 async def migrated(
     owner_engine: AsyncEngine, migration_lock: AsyncConnection
@@ -135,12 +163,10 @@ async def migrated(
     el esquema en `head` durante toda la prueba y evita que otra ejecución lo baje mientras la
     primera todavía usa sus tablas.
     """
-    async with migration_lock.begin():
-        await migration_lock.run_sync(alembic(command.downgrade, "base"))
-        await migration_lock.run_sync(alembic(command.upgrade, "head"))
+    await migrate(migration_lock, command.downgrade, "base")
+    await migrate(migration_lock, command.upgrade, "head")
     yield owner_engine
-    async with migration_lock.begin():
-        await migration_lock.run_sync(alembic(command.downgrade, "base"))
+    await migrate(migration_lock, command.downgrade, "base")
 
 
 # Redis real: la base 15, nunca la 0 de desarrollo. Se vacía antes y después de cada test.

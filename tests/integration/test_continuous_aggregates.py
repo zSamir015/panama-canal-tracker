@@ -79,7 +79,8 @@ async def test_the_hourly_view_groups_by_vessel_and_hour_before_any_refresh(
 WATERMARK_PASSED_SAMPLE = text(
     "SELECT _timescaledb_functions.to_timestamp(_timescaledb_functions.cagg_watermark("
     "(SELECT (config->>'mat_hypertable_id')::int FROM timescaledb_information.jobs "
-    "WHERE proc_name = 'policy_refresh_continuous_aggregate'))) > :hour"
+    "WHERE proc_name = 'policy_refresh_continuous_aggregate' "
+    "AND hypertable_name = 'positions_hourly'))) > :hour"
 )
 
 
