@@ -62,6 +62,27 @@ Una línea JSON por mensaje:
 
 No se guardan nombres ni destinos de buques.
 
+## Replay con el detector de tránsitos
+
+`scripts/transit_replay.py` pasa las posiciones grabadas por la misma máquina de estados que usa
+el worker (sin base de datos ni red) y resume qué tránsitos habría detectado:
+
+```bash
+python scripts/transit_replay.py data/collected/ais-*.jsonl                       # resumen
+python scripts/transit_replay.py data/collected/ais-*.jsonl --json                # un tránsito por línea
+python scripts/transit_replay.py data/collected/ais-*.jsonl --timeout-minutes 60  # otro timeout
+```
+
+El resumen da el periodo, las posiciones y los buques, los tránsitos por estado, los abortados
+por motivo y los completados por día y sentido: es lo que se compara con las estadísticas de la
+ACP en la tarea 5.7. Las líneas que no son posiciones válidas se omiten y se cuentan por motivo.
+Con varios ficheros los trata como uno solo, ordenado por hora.
+
+Un buque que se ve por primera vez a mitad del Canal y sale por una entrada abre un tránsito
+desde esa entrada (la regla del detector es "aparece en una entrada"), que queda `in_progress`
+hasta que el timeout lo aborta. Con cobertura parcial esto produce tránsitos falsos de corta
+vida; medirlos es parte de la validación de la 5.7.
+
 ## Límites
 
 - Entre ventanas hay unos 15 minutos sin conexión, y GitHub puede retrasar el cron.
