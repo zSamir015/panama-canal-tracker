@@ -4,6 +4,8 @@ export interface AppConfig {
   apiUrl: string;
   /** Estilo de tiles de MapLibre (ADR-0010). */
   mapStyleUrl: string;
+  /** Modo demo: salta el login y reproduce datos simulados pregrabados (ADR-0011). */
+  demo: boolean;
 }
 
 /** OpenFreeMap: sin key ni cuenta, así que no hay nada que proteger en el frontend (ADR-0010). */
@@ -13,6 +15,7 @@ export function readConfig(env: ImportMetaEnv): AppConfig {
   return {
     apiUrl: normalizeUrl(env.VITE_API_URL) ?? '',
     mapStyleUrl: normalizeUrl(env.VITE_MAP_STYLE_URL) ?? DEFAULT_MAP_STYLE_URL,
+    demo: env.VITE_DEMO === 'true',
   };
 }
 
