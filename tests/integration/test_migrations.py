@@ -175,6 +175,17 @@ async def test_downgrade_removes_everything_the_migration_created(
             )
         ).scalar_one()
 
+    async with owner_engine.connect() as connection:
+        leftovers = (
+            await connection.execute(
+                text(
+                    "SELECT count(*) FROM timescaledb_information.continuous_aggregates "
+                    "WHERE view_name = 'positions_hourly'"
+                )
+            )
+        ).scalar_one()
+
     assert await tables() == before
+    assert leftovers == 0  # la bajada borra el agregado continuo y su política
     assert user_role is None
     assert transit_types == 0  # también el enum de los fondeaderos

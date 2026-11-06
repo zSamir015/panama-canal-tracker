@@ -148,7 +148,8 @@ objetivo sin degradar la ingesta.
 
 - [x] 6.1 Polígonos de fondeaderos; `AnchorageService` y tabla `anchorage_visits`
 - [x] 6.2 Enlace visita de fondeo → tránsito siguiente (tiempo de espera real)
-- [ ] 6.3 Agregados continuos de TimescaleDB para estadísticas
+- [x] 6.3 Agregados continuos de TimescaleDB sobre las posiciones (ADR-0013); los tránsitos y
+      las esperas se calculan con SQL
 - [ ] 6.4 `GET /stats/daily`, `/stats/transit-durations`, `/stats/waiting-times`
 - [ ] 6.5 Compresión y downsampling de `positions` (sin borrar histórico)
 - [ ] 6.6 Vista de estadísticas en `web/` (gráficas)

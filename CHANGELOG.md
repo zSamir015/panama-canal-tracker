@@ -11,6 +11,11 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Agregado continuo `positions_hourly` (tarea 6.3, ADR-0013): una fila por buque y hora con el
+  número de posiciones y la velocidad media y máxima, en tiempo real (suma lo posterior a la
+  marca de agua) y con una política que lo refresca cada 30 minutos. Servirá para el tráfico
+  (buques distintos por día) y para medir la cobertura de AISStream. Las estadísticas de
+  tránsitos y esperas (6.4) se calculan con SQL: no son hypertables y tienen pocas filas al día.
 - Tiempo de espera real (tarea 6.2): cada visita a un fondeadero se enlaza con el tránsito que la
   sigue (`anchorage_visits.transit_id`). Reglas puras en `app/services/waiting.py`: fondeadero del
   lado por el que el buque entra, la visita más reciente para cada tránsito y el primer tránsito
