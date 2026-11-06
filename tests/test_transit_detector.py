@@ -346,3 +346,55 @@ def test_after_a_timeout_the_vessel_can_start_a_new_transit() -> None:
     assert events == [
         TransitStarted(mmsi=MMSI, origin="atlantic_entrance", entered_at=T0 + timedelta(hours=2))
     ]
+
+
+def test_pacific_to_atlantic_is_a_completed_northbound_transit() -> None:
+    route = sail([IN_PACIFIC, IN_THE_LAKE, IN_ATLANTIC], start=T0, hours=9)
+
+    final_track, events = feed(VesselTrack(mmsi=MMSI), route)
+
+    started, completed = events
+    assert started == TransitStarted(mmsi=MMSI, origin="pacific_entrance", entered_at=T0)
+    assert isinstance(completed, TransitCompleted)
+    assert completed.direction is TransitDirection.NORTHBOUND
+    # Sale en cuanto la ruta toca la entrada del Atlántico, algo antes de la última muestra.
+    assert timedelta(hours=8) < completed.duration <= timedelta(hours=9)
+    assert final_track.transit is None
+
+
+def test_a_vessel_stopped_inside_the_entrance_for_days_opens_one_transit_and_nothing_else() -> None:
+    # Fondeado dentro de la zona de entrada: una posición cada 10 minutos durante 3 días.
+    stopped = [position(T0 + timedelta(minutes=10 * n), IN_ATLANTIC) for n in range(432)]
+
+    track, events = feed(VesselTrack(mmsi=MMSI), stopped)
+
+    assert [type(event) for event in events] == [TransitStarted]
+    assert track.transit is not None
+    assert track.transit.left_origin is False  # sin salir de la zona no hay reversa posible
+
+
+def test_a_vessel_stopped_in_the_lake_longer_than_the_timeout_stays_open_while_it_reports() -> None:
+    # Espera turno en el lago durante 5 horas, emitiendo cada 10 minutos: no hay hueco de señal.
+    waiting = [position(T0 + timedelta(minutes=10 * n), IN_THE_LAKE) for n in range(31)]
+
+    track, events = feed(VesselTrack(mmsi=MMSI), [position(T0, IN_ATLANTIC), *waiting[1:]])
+
+    assert [type(event) for event in events] == [TransitStarted]
+    assert track.transit is not None
+    assert track.transit.left_origin is True
+
+
+def test_a_vessel_stopped_in_the_lake_that_stops_reporting_is_aborted_by_timeout() -> None:
+    track, events = feed(
+        VesselTrack(mmsi=MMSI),
+        [position(T0, IN_ATLANTIC), position(T0 + timedelta(minutes=20), IN_THE_LAKE)],
+    )
+
+    track, expired = expire(
+        track, T0 + timedelta(minutes=20) + TIMEOUT + timedelta(seconds=1), timeout=TIMEOUT
+    )
+
+    assert [type(event) for event in events] == [TransitStarted]
+    assert [type(event) for event in expired] == [TransitAborted]
+    assert isinstance(expired[0], TransitAborted)
+    assert expired[0].reason is AbortReason.TIMEOUT

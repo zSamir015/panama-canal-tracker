@@ -11,6 +11,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Replay y trayectorias sintéticas (tarea 5.5): `scripts/transit_replay.py` pasa las posiciones
+  del recolector por el detector y resume tránsitos por estado, abortos por motivo y completados
+  por día y sentido (guía en `docs/AIS_COLLECTOR.md`). Tests nuevos: los dos sentidos completos
+  con las rutas del simulador (~5 h 45 min), buques fondeados fuera de las entradas, buque
+  detenido dentro de una entrada o en el lago, huecos de señal por debajo y por encima del
+  timeout, y lectura tolerante del fichero.
 - Endpoints de tránsitos (tarea 5.4): `GET /api/v1/transits` (paginado, filtros `direction`,
   `status` y ventana `from`/`to`, por defecto 7 días y como mucho 90), `GET /transits/current`
   (los `in_progress`) y `GET /transits/{id}`. Exigen token como el resto de la API.
