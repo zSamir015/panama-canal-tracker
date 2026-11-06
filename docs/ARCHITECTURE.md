@@ -265,7 +265,20 @@ flowchart LR
 
   **No exporta** (todavía) latencia ni conteo de peticiones HTTP, reconexiones del worker, latencia
   de inserción ni clientes WebSocket.
-- Alertas en `docker/prometheus/canal-alerts.yml`: worker sin publicar estado 5 min, más de 5 min
+- Reglas de alerta en `docker/prometheus/canal-alerts.yml`, con sus tests en
+  `canal-alerts.test.yml`. Se validan y se prueban con el `promtool` oficial, sin instalar nada:
+
+  ```bash
+  docker run --rm --entrypoint promtool -v "$PWD/docker/prometheus:/rules:ro" \
+    prom/prometheus:latest check rules /rules/canal-alerts.yml
+  docker run --rm --entrypoint promtool -v "$PWD/docker/prometheus:/rules:ro" \
+    prom/prometheus:latest test rules /rules/canal-alerts.test.yml
+  ```
+
+  Los tests dan series de entrada y comprueban cuándo salta cada alerta y cuándo no (incluido
+  el límite exacto de 300 s y el caso del worker que nunca recibió un mensaje). Se comprobó que
+  fallan si se cambia el umbral o el `unless` de la regla. No corren en el CI.
+- Las alertas: worker sin publicar estado 5 min, más de 5 min
   sin mensajes de AISStream (con una regla aparte si nunca llegó ninguno), y dependencia caída.
   Con la cobertura escasa de AISStream (§8) la de "sin mensajes" puede saltar sin que el worker
   esté mal.

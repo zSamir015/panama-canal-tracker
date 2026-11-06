@@ -17,7 +17,8 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   Prometheus escrito a mano, el estado del worker AIS (disponibilidad, conexión, cola, edad del
   último mensaje y contadores), `canal_dependency_up`, los tránsitos en curso y los buques
   esperando en fondeadero. Reglas de alerta en `docker/prometheus/canal-alerts.yml`, entre ellas
-  más de 5 minutos sin mensajes. No exporta métricas de peticiones HTTP.
+  más de 5 minutos sin mensajes, validadas con `promtool check rules` y con tests de reglas
+  (`canal-alerts.test.yml`). No exporta métricas de peticiones HTTP.
 - Vista de estadísticas (tarea 6.6): pestaña "Estadísticas" junto al mapa, con los tránsitos
   completados por día en barras apiladas por sentido (periodo de 7, 30 o 90 días), los totales por
   tipo de buque y las tablas de duración del tránsito y de espera en fondeo (cuenta, media,
