@@ -50,6 +50,7 @@ from app.schemas.ingestion import WorkerStatus
 from app.services.ais_parser import AisMessageRejected, parse_message
 from app.workers.ais_publisher import STATUS_INTERVAL_SECONDS, AisPublisher, worker_status
 from app.workers.ais_writer import AisWriter, Batch, WriterStats
+from app.workers.anchorage_tracker import AnchorageStats, AnchorageTracker
 from app.workers.canal_bound_writer import CanalBoundStats, CanalBoundWriter
 from app.workers.common import BACKOFF_BASE_SECONDS, AisRecord, backoff_delay
 from app.workers.transit_tracker import TransitStats, TransitTracker
@@ -279,6 +280,17 @@ class AisConsumer:
 # --- Proceso del worker ---------------------------------------------------------------------
 
 
+def _anchorage_event(stats: AnchorageStats, open_visits: int) -> dict[str, Any]:
+    return {
+        "restored": stats.restored,
+        "open": open_visits,
+        "started": stats.started,
+        "ended": stats.ended,
+        "events_dropped": stats.events_dropped,
+        "batches_skipped": stats.batches_skipped,
+    }
+
+
 def _transit_event(stats: TransitStats, open_transits: int) -> dict[str, Any]:
     return {
         "restored": stats.restored,
@@ -342,12 +354,17 @@ async def _log_stats(
     interval: float,
     canal_bound: _CanalBound | None = None,
     transits: TransitTracker | None = None,
+    anchorages: AnchorageTracker | None = None,
 ) -> None:
     while True:
         await asyncio.sleep(interval)
         logger.info("ais_stats", **_stats_event(consumer, writer))
         if transits is not None:
             logger.info("transit_stats", **_transit_event(transits.stats, transits.open_transits))
+        if anchorages is not None:
+            logger.info(
+                "anchorage_stats", **_anchorage_event(anchorages.stats, anchorages.open_visits)
+            )
         if canal_bound is not None:
             logger.info(
                 "ais_canal_bound_stats",
@@ -393,10 +410,16 @@ async def run_worker(
         timeout=timedelta(minutes=settings.transit_signal_timeout_minutes),
     )
 
+    anchorages = AnchorageTracker(
+        session_factory=create_session_factory(engine),
+        timeout=timedelta(minutes=settings.transit_signal_timeout_minutes),
+    )
+
     async def after_commit(batch: Batch) -> None:
-        # Primero el mapa en vivo (no espera a la base); después la detección de tránsitos.
+        # Primero el mapa en vivo (no espera a la base); después tránsitos y esperas en fondeo.
         await publisher.publish_batch(batch)
         await transits.on_batch(batch)
+        await anchorages.on_batch(batch)
 
     writer = AisWriter(
         queue=queue,
@@ -415,10 +438,11 @@ async def run_worker(
     writers = [asyncio.create_task(writer.run(writer_stop))]
     # Se para con los writers: tras el último lote ya no hay nada que detectar.
     transit_task = asyncio.create_task(transits.run(writer_stop))
+    anchorage_task = asyncio.create_task(anchorages.run(writer_stop))
     if canal_bound is not None:
         writers.append(asyncio.create_task(canal_bound.writer.run(writer_stop)))
     stats_task = asyncio.create_task(
-        _log_stats(consumer.stats, writer.stats, stats_interval, canal_bound, transits)
+        _log_stats(consumer.stats, writer.stats, stats_interval, canal_bound, transits, anchorages)
     )
 
     def current_status() -> WorkerStatus:
@@ -441,6 +465,7 @@ async def run_worker(
         writer_stop.set()
         await asyncio.gather(*writers)
         await transit_task
+        await anchorage_task
         for task in (stats_task, status_task):
             task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
@@ -451,6 +476,9 @@ async def run_worker(
         await engine.dispose()
         logger.info("ais_worker_stopped", **_stats_event(consumer.stats, writer.stats))
         logger.info("transit_stopped", **_transit_event(transits.stats, transits.open_transits))
+        logger.info(
+            "anchorage_stopped", **_anchorage_event(anchorages.stats, anchorages.open_visits)
+        )
         if canal_bound is not None:
             logger.info(
                 "ais_canal_bound_stopped",

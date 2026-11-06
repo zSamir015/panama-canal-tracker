@@ -70,30 +70,34 @@ PACIFIC_ENTRANCE = Zone(
 ZONES: tuple[Zone, ...] = (ATLANTIC_ENTRANCE, PACIFIC_ENTRANCE)
 
 
-def zone_at(lon: float, lat: float) -> ZoneId | None:
-    """Devuelve la zona que contiene el punto, usando ray casting.
+def point_in_ring(lon: float, lat: float, ring: tuple[Coordinate, ...]) -> bool:
+    """Si el punto está dentro del anillo cerrado, por ray casting.
 
     Los puntos exactamente sobre un borde o un vértice no forman parte del contrato de esta
     función. El criterio usado por el algoritmo puede considerarlos dentro o fuera según la
     arista que se evalúe.
     """
+    inside = False
+    # Los anillos están cerrados; así pairwise incluye también la arista del último vértice al
+    # primero. Usar > en ambos lados cuenta un vértice una sola vez y evita aristas horizontales,
+    # que harían cero el denominador del cruce.
+    for (edge_lon_1, edge_lat_1), (edge_lon_2, edge_lat_2) in pairwise(ring):
+        crosses_latitude = (edge_lat_1 > lat) != (edge_lat_2 > lat)
+        if not crosses_latitude:
+            continue
+
+        crossing_lon = edge_lon_1 + (lat - edge_lat_1) * (edge_lon_2 - edge_lon_1) / (
+            edge_lat_2 - edge_lat_1
+        )
+        if lon < crossing_lon:
+            inside = not inside
+    return inside
+
+
+def zone_at(lon: float, lat: float) -> ZoneId | None:
+    """Devuelve la zona de entrada que contiene el punto, o `None` (ver `point_in_ring`)."""
     for zone in ZONES:
-        inside = False
-        # Los anillos están cerrados; así pairwise incluye también la arista del último vértice
-        # al primero. Usar > en ambos lados cuenta un vértice una sola vez y evita aristas
-        # horizontales, que harían cero el denominador del cruce.
-        for (edge_lon_1, edge_lat_1), (edge_lon_2, edge_lat_2) in pairwise(zone.ring):
-            crosses_latitude = (edge_lat_1 > lat) != (edge_lat_2 > lat)
-            if not crosses_latitude:
-                continue
-
-            crossing_lon = edge_lon_1 + (lat - edge_lat_1) * (edge_lon_2 - edge_lon_1) / (
-                edge_lat_2 - edge_lat_1
-            )
-            if lon < crossing_lon:
-                inside = not inside
-
-        if inside:
+        if point_in_ring(lon, lat, zone.ring):
             return zone.id
 
     return None
