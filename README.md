@@ -8,7 +8,10 @@
 [![CI](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-<!-- Demo GIF (Phase 4): docs/media/live-map.gif -->
+**[Live demo](https://zsamir015.github.io/panama-canal-tracker/)** — runs in the browser on simulated
+data (no backend, no AIS feed).
+
+![Live map of the Panama Canal with simulated vessels](docs/media/live-map.gif)
 
 ## What it does
 
