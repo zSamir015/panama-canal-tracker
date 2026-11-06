@@ -33,7 +33,7 @@ import signal
 from collections import Counter
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from urllib.parse import urlsplit
 
@@ -49,9 +49,10 @@ from app.core.redis import create_redis
 from app.schemas.ingestion import WorkerStatus
 from app.services.ais_parser import AisMessageRejected, parse_message
 from app.workers.ais_publisher import STATUS_INTERVAL_SECONDS, AisPublisher, worker_status
-from app.workers.ais_writer import AisWriter, WriterStats
+from app.workers.ais_writer import AisWriter, Batch, WriterStats
 from app.workers.canal_bound_writer import CanalBoundStats, CanalBoundWriter
 from app.workers.common import BACKOFF_BASE_SECONDS, AisRecord, backoff_delay
+from app.workers.transit_tracker import TransitStats, TransitTracker
 
 # Área del Canal en el orden de AISStream, [lat, lon] (docs/DATA_SOURCES.md §1).
 CANAL_BOUNDING_BOXES: tuple[tuple[tuple[float, float], tuple[float, float]], ...] = (
@@ -278,6 +279,18 @@ class AisConsumer:
 # --- Proceso del worker ---------------------------------------------------------------------
 
 
+def _transit_event(stats: TransitStats, open_transits: int) -> dict[str, Any]:
+    return {
+        "restored": stats.restored,
+        "open": open_transits,
+        "started": stats.started,
+        "completed": stats.completed,
+        "aborted": stats.aborted,
+        "events_dropped": stats.events_dropped,
+        "batches_skipped": stats.batches_skipped,
+    }
+
+
 def _stats_event(stats: ConsumerStats, writer: WriterStats) -> dict[str, Any]:
     return {
         "connected": stats.connected,
@@ -328,10 +341,13 @@ async def _log_stats(
     writer: WriterStats,
     interval: float,
     canal_bound: _CanalBound | None = None,
+    transits: TransitTracker | None = None,
 ) -> None:
     while True:
         await asyncio.sleep(interval)
         logger.info("ais_stats", **_stats_event(consumer, writer))
+        if transits is not None:
+            logger.info("transit_stats", **_transit_event(transits.stats, transits.open_transits))
         if canal_bound is not None:
             logger.info(
                 "ais_canal_bound_stats",
@@ -372,12 +388,22 @@ async def run_worker(
     )
     engine = create_engine(settings)
     publisher = AisPublisher(create_redis(settings))
+    transits = TransitTracker(
+        session_factory=create_session_factory(engine),
+        timeout=timedelta(minutes=settings.transit_signal_timeout_minutes),
+    )
+
+    async def after_commit(batch: Batch) -> None:
+        # Primero el mapa en vivo (no espera a la base); después la detección de tránsitos.
+        await publisher.publish_batch(batch)
+        await transits.on_batch(batch)
+
     writer = AisWriter(
         queue=queue,
         session_factory=create_session_factory(engine),
         batch_size=settings.ais_batch_size,
         flush_seconds=settings.ais_batch_flush_seconds,
-        on_committed=publisher.publish_batch,
+        on_committed=after_commit,
     )
     canal_bound = _canal_bound(settings, api_key, create_session_factory(engine))
     if stop is None:
@@ -387,10 +413,12 @@ async def run_worker(
             loop.add_signal_handler(sig, stop.set)
     writer_stop = asyncio.Event()
     writers = [asyncio.create_task(writer.run(writer_stop))]
+    # Se para con los writers: tras el último lote ya no hay nada que detectar.
+    transit_task = asyncio.create_task(transits.run(writer_stop))
     if canal_bound is not None:
         writers.append(asyncio.create_task(canal_bound.writer.run(writer_stop)))
     stats_task = asyncio.create_task(
-        _log_stats(consumer.stats, writer.stats, stats_interval, canal_bound)
+        _log_stats(consumer.stats, writer.stats, stats_interval, canal_bound, transits)
     )
 
     def current_status() -> WorkerStatus:
@@ -412,6 +440,7 @@ async def run_worker(
         # Los writers vacían sus colas después de que los consumers hayan dejado de añadir.
         writer_stop.set()
         await asyncio.gather(*writers)
+        await transit_task
         for task in (stats_task, status_task):
             task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
@@ -421,6 +450,7 @@ async def run_worker(
         await publisher.close()
         await engine.dispose()
         logger.info("ais_worker_stopped", **_stats_event(consumer.stats, writer.stats))
+        logger.info("transit_stopped", **_transit_event(transits.stats, transits.open_transits))
         if canal_bound is not None:
             logger.info(
                 "ais_canal_bound_stopped",

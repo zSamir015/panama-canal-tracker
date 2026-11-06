@@ -320,3 +320,9 @@ def test_redis_url_is_masked_in_repr() -> None:
     settings = make_settings(redis_url=REDIS_URL)
 
     assert "pw-redis-falsa-de-prueba" not in repr(settings)
+
+
+def test_transit_signal_timeout_defaults_to_30_minutes_and_is_bounded() -> None:
+    assert Settings(_env_file=None).transit_signal_timeout_minutes == 30  # type: ignore[call-arg]
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None, transit_signal_timeout_minutes=1)  # type: ignore[call-arg]

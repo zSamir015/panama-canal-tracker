@@ -62,7 +62,11 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
      NOTHING`. Si la base rechaza un dato, se reintenta fila a fila con savepoints y solo se
      descarta la fila mala; si la base no responde, se reintenta el lote con backoff y, al final,
      se descarta contándolo. Al parar, vacía la cola antes de salir.
-  4. **TransitDetector** (desde Fase 5): máquina de estados por buque.
+  4. **TransitTracker** (`app/workers/transit_tracker.py`, Fase 5): tras el commit de cada lote
+     pasa las posiciones por la máquina de estados pura (`app/services/transit_detector.py`) y
+     guarda en `transits` los eventos (abrir, completar, abortar). Cada minuto aplica el timeout a
+     los buques callados y, al arrancar, reconstruye el estado desde la base. Si la base no
+     responde se reintenta y, al final, se descartan los eventos contándolos.
   5. **Publisher** (`app/workers/ais_publisher.py`): tras el commit de cada lote, un `PUBLISH` en
      `canal:vessels.live` con la última posición de cada buque del lote, con el formato de
      `/ws/live` (`{"type": "update", "vessels": [...]}`, como mucho 200 buques por mensaje) y

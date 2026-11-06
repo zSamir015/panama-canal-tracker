@@ -80,6 +80,9 @@ class Settings(BaseSettings):
     # Segunda conexión con datos estáticos de todo el mundo para los buques con destino al Canal
     # (#59, ADR-0009). Con la cuenta gratuita de AISStream quedan 3 conexiones: usamos 2.
     ais_canal_bound_enabled: bool = True
+    # Detección de tránsitos (5.3): sin señal durante más de estos minutos, un tránsito abierto se
+    # aborta (docs/ARCHITECTURE.md §4.2).
+    transit_signal_timeout_minutes: int = Field(default=30, ge=5, le=24 * 60)
 
     @field_validator("database_url", "migrations_database_url")
     @classmethod
