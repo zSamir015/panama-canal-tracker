@@ -122,9 +122,27 @@
 
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
-| GET | `/stats/daily` | ✅ | Tránsitos por día, sentido y tipo de buque |
+| GET | `/stats/daily` | ✅ | Tránsitos por día, sentido y categoría de buque |
 | GET | `/stats/transit-durations` | ✅ | Duración de tránsito (media, p50, p90) por ventana |
 | GET | `/stats/waiting-times` | ✅ | Espera en fondeo antes de entrar (media, p50, p90) |
+
+- Los tres comparten la ventana `from`/`to` (con zona horaria; por defecto, los últimos 30 días;
+  `from < to` y como mucho 365 días entre ambos); cualquier otro parámetro o valor inválido, 422.
+  La respuesta repite la ventana aplicada (`from`, `to`). Se calculan con SQL en cada consulta
+  (ADR-0013).
+- `GET /stats/daily`: `{from, to, items: [{date, direction, ship_category, transits}]}`. Cuenta los
+  tránsitos **completados** por día UTC de su salida del Canal. `ship_category` es una de `cargo`,
+  `tanker`, `passenger`, `tug`, `fishing`, `pleasure`, `other` o `unknown` (las del mapa). Solo
+  salen las combinaciones con algún tránsito, ordenadas por día, sentido y categoría; el cliente
+  rellena los días vacíos.
+- `GET /stats/transit-durations`: `{from, to, overall, by_direction: {northbound, southbound}}`,
+  con `{count, mean_minutes, p50_minutes, p90_minutes}` en cada uno. Usa los tránsitos
+  completados que salieron en la ventana. Con `count` 0, el resto es `null`; los dos sentidos
+  salen siempre.
+- `GET /stats/waiting-times`: `{from, to, overall, by_anchorage: {atlantic, pacific}}`, mismo
+  formato. Usa los tránsitos que **empezaron** en la ventana y tienen una visita enlazada
+  (6.2), con la espera desde que el buque llegó al fondeadero hasta que entró al Canal. Cuenta
+  también los abortados (un buque que esperó y luego abortó también esperó).
 
 ## Admin
 

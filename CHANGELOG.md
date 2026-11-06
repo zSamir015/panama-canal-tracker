@@ -11,6 +11,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Endpoints de estadísticas (tarea 6.4): `GET /api/v1/stats/daily` (tránsitos completados por día,
+  sentido y categoría de buque), `/stats/transit-durations` y `/stats/waiting-times` (cuenta,
+  media, mediana y percentil 90 en minutos, en total y por sentido o fondeadero), con ventana
+  `from`/`to` (30 días por defecto, 365 como máximo). SQL directo con `percentile_cont`
+  (ADR-0013). Las categorías de buque son las del mapa y salen de una sola lista de rangos
+  (`app/services/ship_categories.py`) que alimenta Python y SQL.
 - Agregado continuo `positions_hourly` (tarea 6.3, ADR-0013): una fila por buque y hora con el
   número de posiciones y la velocidad media y máxima, en tiempo real (suma lo posterior a la
   marca de agua) y con una política que lo refresca cada 30 minutos. Servirá para el tráfico
