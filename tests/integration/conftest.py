@@ -18,7 +18,7 @@ from limits.aio.storage import RedisStorage
 from pydantic import SecretStr
 from sqlalchemy import text
 from sqlalchemy.engine import make_url
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, create_async_engine
 
 from app.core.config import Settings
 from app.core.rate_limit import create_storage
@@ -102,18 +102,45 @@ async def owner_engine(db_settings: Settings) -> AsyncIterator[AsyncEngine]:
     await engine.dispose()
 
 
-@pytest.fixture
-async def migrated(owner_engine: AsyncEngine) -> AsyncIterator[AsyncEngine]:
-    """Esquema migrado a `head` en la base de test; al terminar vuelve a `base`.
+TEST_MIGRATION_LOCK = "panama_canal_tracker_test_migrations"
 
-    Empieza bajando a `base` por si una ejecución anterior se cortó a la mitad.
+
+@pytest.fixture
+async def migration_lock(owner_engine: AsyncEngine) -> AsyncIterator[AsyncConnection]:
+    """Serializa cualquier prueba que pueda cambiar el esquema de la base compartida."""
+    connection = await owner_engine.connect()
+    try:
+        await connection.execute(
+            text("SELECT pg_advisory_lock(hashtextextended(:lock_name, 0))"),
+            {"lock_name": TEST_MIGRATION_LOCK},
+        )
+        await connection.commit()
+        yield connection
+    finally:
+        await connection.execute(
+            text("SELECT pg_advisory_unlock(hashtextextended(:lock_name, 0))"),
+            {"lock_name": TEST_MIGRATION_LOCK},
+        )
+        await connection.commit()
+        await connection.close()
+
+
+@pytest.fixture
+async def migrated(
+    owner_engine: AsyncEngine, migration_lock: AsyncConnection
+) -> AsyncIterator[AsyncEngine]:
+    """Esquema migrado a `head` aislado frente a otras ejecuciones.
+
+    La base de test es compartida por todos los procesos de pytest. El advisory lock mantiene
+    el esquema en `head` durante toda la prueba y evita que otra ejecución lo baje mientras la
+    primera todavía usa sus tablas.
     """
-    async with owner_engine.begin() as connection:
-        await connection.run_sync(alembic(command.downgrade, "base"))
-        await connection.run_sync(alembic(command.upgrade, "head"))
+    async with migration_lock.begin():
+        await migration_lock.run_sync(alembic(command.downgrade, "base"))
+        await migration_lock.run_sync(alembic(command.upgrade, "head"))
     yield owner_engine
-    async with owner_engine.begin() as connection:
-        await connection.run_sync(alembic(command.downgrade, "base"))
+    async with migration_lock.begin():
+        await migration_lock.run_sync(alembic(command.downgrade, "base"))
 
 
 # Redis real: la base 15, nunca la 0 de desarrollo. Se vacía antes y después de cada test.
