@@ -111,7 +111,8 @@ así como una vez cada 5 minutos, muy por debajo de lo que emitirían con cobert
 para detectar tránsitos (duran horas y el detector tolera huecos de
 `TRANSIT_SIGNAL_TIMEOUT_MINUTES`), pero los huecos largos pueden abortar un tránsito real.
 Para validar contra la ACP (tarea 5.7) hacen falta varios días de datos: la cobertura de
-voluntarios varía por hora y por día. Pendiente: acumularlos con el worker real encendido.
+voluntarios varía por hora y por día. Para acumularlos sin un servidor encendido se usa el
+recolector de GitHub Actions (ADR-0012, `docs/AIS_COLLECTOR.md`).
 
 Medir la cobertura (solo recuentos, sin guardar mensajes; `data/` no se sube a git):
 
