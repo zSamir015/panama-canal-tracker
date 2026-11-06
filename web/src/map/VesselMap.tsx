@@ -1,5 +1,5 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
-import type { Feature, MultiLineString } from 'geojson';
+import type { Feature, FeatureCollection, MultiLineString } from 'geojson';
 import {
   type ExpressionSpecification,
   type GeoJSONSource,
@@ -15,10 +15,16 @@ import { config } from '../config';
 import type { Bbox } from '../live/protocol';
 import type { VesselState } from '../live/vesselStore';
 import { CATEGORY_COLORS, toFeatureCollection } from './vesselGeoJson';
+import canalZones from './canalZones.json';
 import { arrowIcon, dotIcon } from './vesselIcons';
 import { boundsToBbox, CANAL_BBOX } from './viewport';
 
 setWorkerUrl(workerUrl);
+
+/** Zonas de entrada del Canal (tarea 5.1). Copia exportada de `app/services/zones.py`. */
+const ZONES_SOURCE_ID = 'canal-zones';
+const ZONE_COLOR = '#c2410c';
+const ZONES = canalZones as unknown as FeatureCollection;
 
 const SOURCE_ID = 'vessels';
 const LAYER_ID = 'vessels';
@@ -101,6 +107,31 @@ export function VesselMap({
     map.on('load', () => {
       map.addImage('vessel-arrow', arrowIcon(), { sdf: true });
       map.addImage('vessel-dot', dotIcon(), { sdf: true });
+      // Zonas de entrada, debajo de la estela y de los buques para no taparlos.
+      map.addSource(ZONES_SOURCE_ID, { type: 'geojson', data: ZONES });
+      map.addLayer({
+        id: `${ZONES_SOURCE_ID}-fill`,
+        type: 'fill',
+        source: ZONES_SOURCE_ID,
+        paint: { 'fill-color': ZONE_COLOR, 'fill-opacity': 0.12 },
+      });
+      map.addLayer({
+        id: `${ZONES_SOURCE_ID}-line`,
+        type: 'line',
+        source: ZONES_SOURCE_ID,
+        paint: { 'line-color': ZONE_COLOR, 'line-width': 1.5, 'line-dasharray': [3, 2] },
+      });
+      map.addLayer({
+        id: `${ZONES_SOURCE_ID}-label`,
+        type: 'symbol',
+        source: ZONES_SOURCE_ID,
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Noto Sans Regular'],
+          'text-size': 12,
+        },
+        paint: { 'text-color': ZONE_COLOR, 'text-halo-color': '#ffffff', 'text-halo-width': 1.5 },
+      });
       map.addSource(TRAIL_SOURCE_ID, { type: 'geojson', data: trailRef.current ?? EMPTY_TRAIL });
       map.addLayer({
         id: TRAIL_SOURCE_ID,

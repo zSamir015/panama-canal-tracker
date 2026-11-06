@@ -117,7 +117,10 @@ python scripts/ais_coverage.py --minutes 2 --output data/coverage.jsonl
 
 
 
-Polígonos GeoJSON versionados en `app/services/zones.py` (se definen en Fases 5 y 6):
+Polígonos GeoJSON versionados en `app/services/zones.py`. Las dos entradas se definieron en la
+tarea 5.1 y son **aproximadas**: se trazaron a mano sobre los tiles de OpenFreeMap, sin una fuente
+oficial de la ACP, y su precisión se mide en la tarea 5.7. Los fondeaderos llegan en la Fase 6.
+El mapa lee una copia exportada (`scripts/export_zones.py`); un test comprueba que no se desfasa.
 
 | Zona | Uso |
 |---|---|
