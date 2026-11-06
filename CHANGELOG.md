@@ -11,6 +11,9 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Endpoints de tránsitos (tarea 5.4): `GET /api/v1/transits` (paginado, filtros `direction`,
+  `status` y ventana `from`/`to`, por defecto 7 días y como mucho 90), `GET /transits/current`
+  (los `in_progress`) y `GET /transits/{id}`. Exigen token como el resto de la API.
 - Detección de tránsitos en el worker (tarea 5.3): tabla `transits` (migración `20261106_0004`,
   con un índice único parcial que permite un solo tránsito `in_progress` por buque y la duración
   como columna generada) y `app/workers/transit_tracker.py`, que pasa por el detector las

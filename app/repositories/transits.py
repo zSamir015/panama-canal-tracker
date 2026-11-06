@@ -6,13 +6,17 @@ detector al arrancar. Solo SQL construido con SQLAlchemy y parámetros enlazados
 
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Any
+from uuid import UUID
 
 from geoalchemy2 import Geometry
 from sqlalchemy import cast, func, select, update
 from sqlalchemy.dialects.postgresql import distinct_on, insert
+from sqlalchemy.sql import Select
 
 from app.models.position import Position
 from app.models.transit import Transit
+from app.models.vessel import Vessel
 from app.repositories.base import BaseRepository
 
 _GEOMETRY = Geometry(geometry_type="POINT", srid=4326)
@@ -42,7 +46,84 @@ class TrackPoint:
     lat: float
 
 
+@dataclass(frozen=True, slots=True)
+class TransitRecord:
+    """Un tránsito tal como lo lee la API, con los datos del buque."""
+
+    id: UUID
+    mmsi: int
+    vessel_name: str | None
+    ship_type: int | None
+    direction: str
+    status: str
+    abort_reason: str | None
+    entered_at: datetime
+    exited_at: datetime | None
+    duration_minutes: int | None
+
+
+_RECORD_COLUMNS: tuple[Any, ...] = (
+    Transit.id,
+    Transit.vessel_mmsi,
+    Vessel.name,
+    Vessel.ship_type,
+    Transit.direction,
+    Transit.status,
+    Transit.abort_reason,
+    Transit.entered_at,
+    Transit.exited_at,
+    Transit.duration_minutes,
+)
+
+
+def _records() -> Select[Any]:
+    return select(*_RECORD_COLUMNS).join(Vessel, Vessel.mmsi == Transit.vessel_mmsi)
+
+
 class TransitRepository(BaseRepository):
+    async def list_transits(
+        self,
+        *,
+        offset: int,
+        limit: int,
+        entered_from: datetime,
+        entered_to: datetime,
+        direction: str | None = None,
+        status: str | None = None,
+    ) -> tuple[list[TransitRecord], int]:
+        """Tránsitos que empezaron en `[entered_from, entered_to)`, los más recientes primero."""
+        conditions = [Transit.entered_at >= entered_from, Transit.entered_at < entered_to]
+        if direction is not None:
+            conditions.append(Transit.direction == direction)
+        if status is not None:
+            conditions.append(Transit.status == status)
+        total = await self._session.scalar(
+            select(func.count()).select_from(Transit).where(*conditions)
+        )
+        rows = await self._session.execute(
+            _records()
+            .where(*conditions)
+            .order_by(Transit.entered_at.desc(), Transit.id)
+            .offset(offset)
+            .limit(limit)
+        )
+        return [TransitRecord(*row) for row in rows], int(total or 0)
+
+    async def current_transits(self, *, limit: int) -> tuple[list[TransitRecord], int]:
+        """Los `in_progress`, el que entró antes primero. Como mucho uno por buque."""
+        condition = Transit.status == "in_progress"
+        total = await self._session.scalar(
+            select(func.count()).select_from(Transit).where(condition)
+        )
+        rows = await self._session.execute(
+            _records().where(condition).order_by(Transit.entered_at, Transit.id).limit(limit)
+        )
+        return [TransitRecord(*row) for row in rows], int(total or 0)
+
+    async def get_transit(self, transit_id: UUID) -> TransitRecord | None:
+        row = (await self._session.execute(_records().where(Transit.id == transit_id))).first()
+        return TransitRecord(*row) if row else None
+
     async def open_transit(self, row: OpenTransitRow) -> bool:
         """Crea un tránsito `in_progress`. Devuelve False si el buque ya tenía uno abierto.
 

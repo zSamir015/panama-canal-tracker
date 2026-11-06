@@ -131,7 +131,7 @@ objetivo sin degradar la ingesta.
 - [x] 5.1 Polígonos GeoJSON de entradas Atlántico y Pacífico (versionados, visibles en el mapa)
 - [x] 5.2 Máquina de estados pura (`in_progress` → `completed` / `aborted`), sin I/O
 - [x] 5.3 Integración en el worker; modelo `transits` + migración
-- [ ] 5.4 `GET /transits`, `/transits/current`, `/transits/{id}`
+- [x] 5.4 `GET /transits`, `/transits/current`, `/transits/{id}`
 - [ ] 5.5 Tests con trayectorias sintéticas: completo en ambos sentidos, abortado por timeout,
       reversa, buque detenido, señal intermitente
 - [ ] 5.6 Panel "en tránsito ahora" en el mapa

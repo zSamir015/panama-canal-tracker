@@ -20,7 +20,7 @@ from app.core.middleware import (
 )
 from app.core.rate_limit import AppRateLimiter, create_storage, limit_api_by_user
 from app.core.redis import create_redis
-from app.routers import admin, auth, live, vessels
+from app.routers import admin, auth, live, transits, vessels
 from app.routers.live import MAX_CLIENT_MESSAGE_BYTES
 from app.services.live import ConnectionLimiter, LiveHub
 
@@ -80,6 +80,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     api_router.include_router(auth.router)
     api_router.include_router(vessels.router)
+    api_router.include_router(transits.router)
     api_router.include_router(admin.router)
     app.include_router(api_router)
 
