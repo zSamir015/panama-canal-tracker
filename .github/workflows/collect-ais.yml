@@ -1,0 +1,88 @@
+# Recolector de posiciones AIS reales del Canal (ADR-0012, guía en docs/AIS_COLLECTOR.md).
+# Se conecta a AISStream unas 5 h 40 min, guarda las posiciones en un JSON Lines, lo cifra y lo
+# sube como artefacto. Cada 6 horas arranca otra ventana, así que cubre casi todo el día sin un
+# servidor encendido. Los datos alimentan el replay (5.5) y la validación con datos reales (5.7).
+#
+# Apagado por defecto: solo corre si la variable de repositorio AIS_COLLECT_ENABLED vale `true`.
+# Necesita los secretos AISSTREAM_API_KEY y AIS_COLLECT_PASSPHRASE.
+#
+# El repositorio es público y los artefactos de un repositorio público los puede descargar
+# cualquiera con cuenta de GitHub: por eso el fichero se cifra antes de subirlo y nunca se sube en
+# claro. No lo ejecutes a la vez que el worker (AISStream limita las conexiones por key).
+name: Collect AIS
+
+on:
+  schedule:
+    # Cada 6 horas. GitHub puede retrasarlo unos minutos; la concurrencia evita que se solapen.
+    - cron: "23 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "Minutos de recolección (0 a 350)"
+        default: "340"
+        required: false
+
+permissions: {}
+
+# Una sola ventana a la vez (una sola conexión a AISStream). Si otra está en cola, espera.
+concurrency:
+  group: collect-ais
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    name: Collect
+    if: ${{ vars.AIS_COLLECT_ENABLED == 'true' }}
+    runs-on: ubuntu-24.04
+    # Máximo de un job de Actions: 360 min. Recolecta 340 y deja margen para instalar y subir.
+    timeout-minutes: 355
+    permissions:
+      contents: read
+    # Los secretos van solo en los pasos que los usan, no en el job: así no los ven el checkout,
+    # setup-python ni la instalación de dependencias.
+    steps:
+      # Antes de gastar casi 6 horas: sin los dos secretos no tiene sentido empezar.
+      - name: Comprobar los secretos
+        env:
+          AISSTREAM_API_KEY: ${{ secrets.AISSTREAM_API_KEY }}
+          AIS_COLLECT_PASSPHRASE: ${{ secrets.AIS_COLLECT_PASSPHRASE }}
+        run: |
+          test -n "$AISSTREAM_API_KEY" || { echo "::error::Falta el secreto AISSTREAM_API_KEY"; exit 1; }
+          test -n "$AIS_COLLECT_PASSPHRASE" || { echo "::error::Falta el secreto AIS_COLLECT_PASSPHRASE"; exit 1; }
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.lock
+      - name: Instalar dependencias (lockfile con hashes)
+        run: |
+          pip install --require-hashes -r requirements.lock
+          pip install --no-deps -e .
+      - name: Recolectar
+        env:
+          AISSTREAM_API_KEY: ${{ secrets.AISSTREAM_API_KEY }}
+          # Por una variable de entorno y no dentro del script de la shell: evita inyección.
+          MINUTES: ${{ inputs.minutes || '340' }}
+        run: python scripts/ais_collect.py --minutes "$MINUTES" --output ais.jsonl
+      # Se cifra aunque la recolección falle a medias: lo recogido hasta ahí también vale.
+      - name: Cifrar
+        if: ${{ !cancelled() && hashFiles('ais.jsonl') != '' }}
+        env:
+          AIS_COLLECT_PASSPHRASE: ${{ secrets.AIS_COLLECT_PASSPHRASE }}
+        run: |
+          printf '%s' "$AIS_COLLECT_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback \
+            --passphrase-fd 0 --symmetric --cipher-algo AES256 --output ais.jsonl.gpg ais.jsonl
+          rm ais.jsonl
+      - name: Subir el fichero cifrado
+        if: ${{ !cancelled() && hashFiles('ais.jsonl.gpg') != '' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ais-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ais.jsonl.gpg
+          if-no-files-found: error
+          retention-days: 90
+          # Ya está cifrado: comprimirlo no ahorra nada.
+          compression-level: 0
