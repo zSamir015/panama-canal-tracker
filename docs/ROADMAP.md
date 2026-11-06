@@ -146,7 +146,7 @@ objetivo sin degradar la ingesta.
 
 ## Fase 6 — Fondeo, tiempos de espera y estadísticas `[ ]`
 
-- [ ] 6.1 Polígonos de fondeaderos; `AnchorageService` y tabla `anchorage_visits`
+- [x] 6.1 Polígonos de fondeaderos; `AnchorageService` y tabla `anchorage_visits`
 - [ ] 6.2 Enlace visita de fondeo → tránsito siguiente (tiempo de espera real)
 - [ ] 6.3 Agregados continuos de TimescaleDB para estadísticas
 - [ ] 6.4 `GET /stats/daily`, `/stats/transit-durations`, `/stats/waiting-times`

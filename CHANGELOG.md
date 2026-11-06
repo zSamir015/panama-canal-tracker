@@ -11,6 +11,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Esperas en fondeo (tarea 6.1): polígonos aproximados de los fondeaderos del Atlántico y del
+  Pacífico (`app/services/anchorages.py`, sin solape con las entradas), detector puro de visitas
+  (`app/services/anchorage_detector.py`: parado 15 min dentro de un fondeadero, con la hora de
+  llegada retrocedida al inicio de la parada; cierra al salir, navegar a 1 nudo o más, o perder la
+  señal), tabla `anchorage_visits` (migración `20261106_0005`, una visita abierta por buque) y
+  `AnchorageTracker` en el worker, con la misma restauración al arrancar que el de tránsitos.
 - Panel "En tránsito ahora" (tarea 5.6): lista de los buques con tránsito `in_progress` (nombre,
   sentido Atlántico → Pacífico o al revés y cuánto llevan en el Canal) sobre el mapa. Se recarga
   cada 30 s con `GET /transits/current` y, al pulsar un buque, lo selecciona en el mapa y abre su
