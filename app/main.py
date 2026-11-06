@@ -20,7 +20,7 @@ from app.core.middleware import (
 )
 from app.core.rate_limit import AppRateLimiter, create_storage, limit_api_by_user
 from app.core.redis import create_redis
-from app.routers import admin, auth, live, stats, transits, vessels
+from app.routers import admin, auth, infrastructure, live, stats, transits, vessels
 from app.routers.live import MAX_CLIENT_MESSAGE_BYTES
 from app.services.live import ConnectionLimiter, LiveHub
 
@@ -92,6 +92,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     public_api_router = APIRouter(prefix="/api/v1")
     public_api_router.include_router(auth.public_router)
     app.include_router(public_api_router)
+
+    app.include_router(infrastructure.router)
 
     @app.get("/health", tags=["infrastructure"])
     async def health() -> dict[str, str]:

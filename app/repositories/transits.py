@@ -120,6 +120,14 @@ class TransitRepository(BaseRepository):
         )
         return [TransitRecord(*row) for row in rows], int(total or 0)
 
+    async def count_in_progress(self) -> int:
+        return int(
+            await self._session.scalar(
+                select(func.count()).select_from(Transit).where(Transit.status == "in_progress")
+            )
+            or 0
+        )
+
     async def get_transit(self, transit_id: UUID) -> TransitRecord | None:
         row = (await self._session.execute(_records().where(Transit.id == transit_id))).first()
         return TransitRecord(*row) if row else None

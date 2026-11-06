@@ -22,8 +22,15 @@
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
 | GET | `/health` | — | El proceso está vivo |
-| GET | `/ready` | — | DB y Redis alcanzables |
-| GET | `/metrics` | red interna | Métricas Prometheus |
+| GET | `/ready` | — | DB y Redis alcanzables (200, o 503 con cuál falla) |
+| GET | `/metrics` | token de métricas | Métricas Prometheus (red interna) |
+
+- `GET /ready`: `{status: "ready" | "unavailable", checks: {database, redis}}` con `ok` o `failed`
+  en cada uno (máx. 2 s por comprobación). Es público y no lleva datos ni mensajes de error.
+- `GET /metrics`: texto de Prometheus. Exige `Authorization: Bearer <METRICS_TOKEN>` (un token
+  estático de la configuración, no un JWT de usuario); sin token configurado o con otro, 401
+  como cualquier ruta protegida. Detalle de las métricas en `docs/ARCHITECTURE.md` §7 y reglas
+  de alerta en `docker/prometheus/canal-alerts.yml`.
 
 ## Auth
 

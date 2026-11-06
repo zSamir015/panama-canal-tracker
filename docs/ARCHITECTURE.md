@@ -252,8 +252,23 @@ flowchart LR
 ## 7. Observabilidad
 
 - Logs JSON con `structlog` (id de request, MMSI cuando aplique).
-- `GET /metrics` (Prometheus): mensajes AIS/s, reconexiones, latencia de inserción, clientes WS.
-- `/health` (proceso vivo) y `/ready` (DB y Redis alcanzables).
+- `/health` (proceso vivo) y `/ready` (DB y Redis alcanzables; 503 si alguna falla).
+- `GET /metrics` (Prometheus, ADR-0014), con el token de `METRICS_TOKEN`. Exporta:
+  - `canal_up` y `canal_dependency_up{name="database"|"redis"}`: la API responde y si cada
+    dependencia respondió en este scrape. Si una cae, sus métricas se omiten y el scrape sigue.
+  - Del worker AIS (lo que publica en Redis cada 5 s): `canal_ais_worker_available`,
+    `canal_ais_worker_connected`, `canal_ais_queue_size`, `canal_ais_last_message_age_seconds` y
+    los contadores `canal_ais_messages_received_total`, `canal_ais_messages_dropped_total`,
+    `canal_ais_positions_written_total` y `canal_ais_batches_dropped_total` (se reinician al
+    arrancar el worker; Prometheus lo compensa).
+  - De la base: `canal_transits_in_progress` y `canal_anchorage_visits_open`.
+
+  **No exporta** (todavía) latencia ni conteo de peticiones HTTP, reconexiones del worker, latencia
+  de inserción ni clientes WebSocket.
+- Alertas en `docker/prometheus/canal-alerts.yml`: worker sin publicar estado 5 min, más de 5 min
+  sin mensajes de AISStream (con una regla aparte si nunca llegó ninguno), y dependencia caída.
+  Con la cobertura escasa de AISStream (§8) la de "sin mensajes" puede saltar sin que el worker
+  esté mal.
 
 ## 8. Riesgos conocidos
 

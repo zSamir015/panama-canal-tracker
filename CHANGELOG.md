@@ -11,6 +11,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- `/ready` y `/metrics` (tarea 7.1, ADR-0014). `/ready` (público) comprueba la base y Redis y
+  responde 503 con cuál falla, sin mensajes de error. `/metrics` exige el token de
+  `METRICS_TOKEN` (401 siempre si no está configurado) y exporta, en el formato de texto de
+  Prometheus escrito a mano, el estado del worker AIS (disponibilidad, conexión, cola, edad del
+  último mensaje y contadores), `canal_dependency_up`, los tránsitos en curso y los buques
+  esperando en fondeadero. Reglas de alerta en `docker/prometheus/canal-alerts.yml`, entre ellas
+  más de 5 minutos sin mensajes. No exporta métricas de peticiones HTTP.
 - Vista de estadísticas (tarea 6.6): pestaña "Estadísticas" junto al mapa, con los tránsitos
   completados por día en barras apiladas por sentido (periodo de 7, 30 o 90 días), los totales por
   tipo de buque y las tablas de duración del tránsito y de espera en fondeo (cuenta, media,

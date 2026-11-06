@@ -27,6 +27,8 @@ APP_DIR = Path(__file__).resolve().parent.parent / "app"
 # Añadir aquí una ruta es abrirla a Internet: tiene que justificarse en el PR.
 PUBLIC_ROUTES = {
     ("GET", "/health"),
+    # `/ready` (7.1): lo usa el orquestador y no lleva datos, solo "ok" o "failed" por dependencia.
+    ("GET", "/ready"),
     ("GET", "/openapi.json"),
     ("GET", "/docs"),
     ("GET", "/docs/oauth2-redirect"),
@@ -105,7 +107,12 @@ async def test_whitelisted_routes_never_ask_for_a_token(
     response = await client.request(method, path, json={})
 
     # Pueden responder 4xx (datos inválidos, sin cookie de refresh), pero nunca "No autenticado".
-    assert response.status_code < 500
+    # `/ready` responde 503 cuando la base o Redis no están, que es justo su trabajo; lo único
+    # que no puede hacer es pedir un token.
+    if (method, path) == ("GET", "/ready"):
+        assert response.status_code in (200, 503)
+    else:
+        assert response.status_code < 500
     if response.headers["content-type"] == "application/problem+json":
         assert response.json()["detail"] != UNAUTHORIZED_DETAIL
 

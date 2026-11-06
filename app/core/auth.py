@@ -7,6 +7,7 @@ Todos los fallos de autenticación responden igual (401, mismo `detail`): el cli
 distinguir un token caducado de uno falsificado o de un usuario borrado.
 """
 
+import hmac
 from http import HTTPStatus
 from typing import Annotated
 
@@ -36,7 +37,7 @@ def get_app_settings(request: Request) -> Settings:
     return settings
 
 
-def _unauthorized() -> HTTPException:
+def unauthorized() -> HTTPException:
     return HTTPException(
         status_code=HTTPStatus.UNAUTHORIZED,
         detail=UNAUTHORIZED_DETAIL,
@@ -50,18 +51,18 @@ async def get_current_user(
     session: DbSession,
 ) -> User:
     if credentials is None:
-        raise _unauthorized()
+        raise unauthorized()
     try:
         claims = decode_access_token(credentials.credentials, settings)
     except InvalidTokenError as error:
         # Solo el tipo de error, nunca el token.
         logger.info("access_token_rejected", reason=str(error))
-        raise _unauthorized() from None
+        raise unauthorized() from None
 
     user = await UserRepository(session).get_by_id(claims.user_id)
     if user is None:
         logger.info("access_token_rejected", reason="UnknownUser", user_id=str(claims.user_id))
-        raise _unauthorized()
+        raise unauthorized()
     return user
 
 
@@ -76,3 +77,23 @@ async def require_admin(user: CurrentUser) -> User:
 
 
 AdminUser = Annotated[User, Depends(require_admin)]
+
+
+async def require_metrics_token(
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
+    settings: Annotated[Settings, Depends(get_app_settings)],
+) -> None:
+    """`/metrics` (7.1): exige el token estático de `METRICS_TOKEN`, no un JWT de usuario.
+
+    Prometheus no inicia sesión: manda un token fijo. Sin token configurado, o con uno
+    distinto, la respuesta es el mismo 401 de cualquier ruta protegida (sin decir cuál de los dos
+    casos es). La comparación es de tiempo constante.
+    """
+    expected = settings.metrics_token
+    if expected is None or credentials is None:
+        raise unauthorized()
+    if not hmac.compare_digest(
+        credentials.credentials.encode(), expected.get_secret_value().encode()
+    ):
+        logger.warning("metrics_token_rejected")
+        raise unauthorized()

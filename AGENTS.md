@@ -230,7 +230,9 @@ Principio general: **denegar por defecto** — todo cerrado salvo lo que se abre
 - Paginación con tamaño máximo; rangos de fechas acotados; sin endpoints que devuelvan tablas
   completas.
 - Errores sin stack traces ni detalles internos; los detalles van al log con un id de request.
-- `/metrics` no se expone a Internet (solo red interna).
+- `/metrics` no se expone a Internet (solo red interna) y además exige el token estático de
+  `METRICS_TOKEN` (ADR-0014); sin token configurado responde 401 siempre. `/ready` es público (sin
+  datos). Una ruta pública nueva se añade a la lista blanca de `tests/test_deny_by_default.py`.
 - WebSocket `/ws/live`: autenticación en el primer mensaje, validación del header `Origin`
   contra la lista de orígenes permitidos (CORS no protege WebSockets), límites de mensajes.
   La librería `websockets` escribe cada frame en DEBUG (`websockets.server` / `.client`): con

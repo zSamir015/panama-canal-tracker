@@ -90,6 +90,16 @@ class AnchorageRepository(BaseRepository):
         )
         return [OpenVisitRow(mmsi=m, anchorage=a, arrived_at=t) for m, a, t in rows]
 
+    async def count_open(self) -> int:
+        return int(
+            await self._session.scalar(
+                select(func.count())
+                .select_from(AnchorageVisit)
+                .where(AnchorageVisit.departed_at.is_(None))
+            )
+            or 0
+        )
+
     async def last_signal(self, mmsi: int) -> datetime | None:
         """Hora de la última posición guardada del buque."""
         return await self._session.scalar(
