@@ -11,6 +11,14 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Copias de seguridad cifradas y restauración probada (tarea 7.2, ADR-0015): `scripts/db_backup.sh`
+  (`pg_dump` cifrado al vuelo con `gpg`, con suma SHA-256), `scripts/db_restore.sh` (restaura en
+  una base nueva con `timescaledb_pre_restore`/`post_restore`, se niega a sobrescribir y borra lo
+  que quede a medias) y `scripts/db_backup_check.sh`, la prueba de punta a punta: migra una base
+  temporal, la rellena (con un chunk comprimido y los agregados), copia, restaura y compara filas,
+  contenido, chunks comprimidos, políticas y permisos, y comprueba que detecta alteraciones.
+  Procedimiento en `docs/BACKUP.md`. **La programación automática queda pendiente**: no hay
+  entorno de despliegue donde programarla.
 - OpenAPI completo (tarea 7.3): las 19 operaciones tienen resumen y descripción, y todos los
   cuerpos de petición y de respuesta llevan un ejemplo (`app/schemas/examples.py`, adjunto a cada
   modelo con `@with_example`; `/metrics` lleva uno en texto de Prometheus). Cada error documentado
