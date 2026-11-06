@@ -11,6 +11,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Compresión y histórico reducido de las posiciones (tarea 6.5, ADR-0005): los chunks de
+  `positions` de más de 7 días se comprimen (agrupados por buque, ordenados por hora), sin borrar
+  nada; se siguen leyendo y el `ON CONFLICT DO NOTHING` del writer sigue funcionando sobre ellos
+  (probado). El agregado continuo `positions_5min` guarda la última posición de cada buque cada
+  5 minutos, para consultar trayectorias de hace meses sin recorrer todas las posiciones; aún no
+  lo lee ningún endpoint. La bajada descomprime y no pierde datos. Las políticas empiezan su
+  primera pasada una hora después de la migración.
 - Endpoints de estadísticas (tarea 6.4): `GET /api/v1/stats/daily` (tránsitos completados por día,
   sentido y categoría de buque), `/stats/transit-durations` y `/stats/waiting-times` (cuenta,
   media, mediana y percentil 90 en minutos, en total y por sentido o fondeadero), con ventana
