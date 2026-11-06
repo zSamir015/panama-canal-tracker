@@ -100,6 +100,20 @@ cientos de mensajes cada 10 minutos. **Decisión del dueño**: medir varios día
 (la cobertura de voluntarios varía) y, mientras, la demo usa el simulador rotulado como datos
 simulados. La bbox no se ha podido ajustar con datos reales: se mantiene.
 
+**Remedición (2026-11-06)**: la cobertura ya no es nula, pero sigue siendo escasa.
+
+| Zona | Tiempo | Recibido |
+|---|---|---|
+| bbox del Canal (`scripts/ais_coverage.py`) | 5 min | 11 posiciones y 8 mensajes estáticos de 10 buques, las 11 posiciones dentro del Canal |
+
+Es una sola muestra. Son unas 2 posiciones por minuto, es decir, cada buque visto reporta algo
+así como una vez cada 5 minutos, muy por debajo de lo que emitirían con cobertura plena. Sirve
+para detectar tránsitos (duran horas y el detector tolera huecos de
+`TRANSIT_SIGNAL_TIMEOUT_MINUTES`), pero los huecos largos pueden abortar un tránsito real.
+Para validar contra la ACP (tarea 5.7) hacen falta varios días de datos: la cobertura de
+voluntarios varía por hora y por día. Para acumularlos sin un servidor encendido se usa el
+recolector de GitHub Actions (ADR-0012, `docs/AIS_COLLECTOR.md`).
+
 Medir la cobertura (solo recuentos, sin guardar mensajes; `data/` no se sube a git):
 
 ```bash

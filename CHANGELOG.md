@@ -5,6 +5,11 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Changed
+- Cobertura de AISStream remedida (2026-11-06): 11 posiciones de 10 buques en 5 min dentro del
+  Canal, frente a 0 mensajes en octubre. Es escasa pero real; `docs/DATA_SOURCES.md` §2b y
+  `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
+
 ### Added
 - Recolector de posiciones AIS reales en GitHub Actions (ADR-0012): `scripts/ais_collect.py`
   guarda en JSON Lines las posiciones y los datos estáticos del Canal (sin nombres ni destinos),
