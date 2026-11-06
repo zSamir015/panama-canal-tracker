@@ -3,7 +3,7 @@
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime, timedelta
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 from fastapi import FastAPI
@@ -14,6 +14,7 @@ from app.core.db import SessionFactory
 from app.core.security import create_access_token, hash_password
 from app.models.user import UserRole
 from app.repositories.ais import AisRepository, VesselRow
+from app.repositories.anchorages import AnchorageRepository, ClosedVisitRow
 from app.repositories.transits import ClosedTransitRow, OpenTransitRow, TransitRepository
 from app.repositories.user import UserRepository
 
@@ -267,7 +268,7 @@ async def test_get_one_transit(client: AsyncClient, sessions: SessionFactory) ->
     response = await get(client, f"{TRANSITS}/{item['id']}")
 
     assert response.status_code == 200
-    assert response.json() == item
+    assert response.json() == {**item, "anchorage_wait": None}
 
 
 async def test_unknown_transit_is_404(client: AsyncClient) -> None:
@@ -300,3 +301,29 @@ async def test_a_vessel_name_with_markup_is_returned_as_plain_text(
 
     assert response.headers["content-type"].startswith("application/json")
     assert response.json()["items"][0]["vessel_name"] == "<img src=x onerror=alert(1)>"
+
+
+# --- Espera en fondeo previa (6.2) ----------------------------------------------------------
+
+
+async def test_the_detail_includes_the_wait_at_the_anchorage(
+    client: AsyncClient, sessions: SessionFactory
+) -> None:
+    await seed(sessions, completed=[(352000001, "southbound", 10, 2)])
+    [item] = (await get(client, TRANSITS)).json()["items"]
+    async with sessions() as session:
+        repository = AnchorageRepository(session)
+        await repository.close_visit(ClosedVisitRow(352000001, "atlantic", ago(34), ago(10.1)))
+        [visit] = await repository.unlinked_visits(ago(100))
+        assert await repository.link(visit.id, UUID(item["id"]))
+        await session.commit()
+
+    detail = (await get(client, f"{TRANSITS}/{item['id']}")).json()
+
+    assert detail["anchorage_wait"] == {
+        "anchorage": "atlantic",
+        "arrived_at": ago(34).isoformat().replace("+00:00", "Z"),
+        "departed_at": ago(10.1).isoformat().replace("+00:00", "Z"),
+        "wait_minutes": 24 * 60,
+    }
+    assert {key: detail[key] for key in FIELDS} == item

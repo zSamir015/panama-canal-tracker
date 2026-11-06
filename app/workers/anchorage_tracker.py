@@ -43,10 +43,14 @@ from app.services.anchorage_detector import (
     on_position,
 )
 from app.services.anchorages import AnchorageId
+from app.services.waiting import match_visits_to_transits
 from app.workers.ais_writer import Batch
 from app.workers.common import backoff_delay
 
 EXPIRE_INTERVAL_SECONDS = 60.0
+# Hasta dónde se miran atrás las visitas y los tránsitos sin enlazar: más que `MAX_WAIT_GAP` más la
+# duración de un tránsito, para no perder el enlace de una espera larga que acaba de terminar.
+LINK_WINDOW = timedelta(hours=72)
 MAX_ATTEMPTS = 3
 RETRY_MAX_SECONDS = 5.0
 
@@ -62,6 +66,7 @@ class AnchorageStats:
     ended: int = 0
     events_dropped: int = 0
     batches_skipped: int = 0
+    linked: int = 0
     last_error: str | None = None
 
 
@@ -133,7 +138,9 @@ class AnchorageTracker:
             with contextlib.suppress(TimeoutError):
                 await asyncio.wait_for(stop.wait(), timeout=self._expire_interval)
             if not stop.is_set():
-                await self.expire(self._clock())
+                now = self._clock()
+                await self.expire(now)
+                await self.link(now)
 
     async def restore(self) -> None:
         """Carga las visitas abiertas desde la base. Ver el docstring del módulo."""
@@ -197,6 +204,35 @@ class AnchorageTracker:
                 else:
                     self.tracks[mmsi] = updated
             await self._save(writes)
+
+    async def link(self, now: datetime) -> None:
+        """Enlaza cada visita con el tránsito que la sigue (6.2). Idempotente.
+
+        Va aparte de los eventos porque los dos detectores trabajan por su cuenta: el tránsito
+        puede abrirse antes o después de que se cierre la visita, y el enlace no depende del orden.
+        Se repite cada minuto sobre lo reciente sin enlazar, así que también cubre los reinicios y
+        los eventos que se guardaron tarde. Un fallo de la base se registra y se reintenta en la
+        siguiente pasada.
+        """
+        since = now - LINK_WINDOW
+        try:
+            async with self._session_factory() as session:
+                repository = AnchorageRepository(session)
+                pairs = match_visits_to_transits(
+                    await repository.unlinked_visits(since),
+                    await repository.unlinked_transits(since),
+                )
+                linked = 0
+                for visit_id, transit_id in pairs:
+                    linked += await repository.link(visit_id, transit_id)
+                await session.commit()
+        except (DBAPIError, OSError, TimeoutError) as error:
+            self.stats.last_error = type(error).__name__
+            logger.warning("anchorage_link_failed", error=type(error).__name__)
+            return
+        self.stats.linked += linked
+        if linked:
+            logger.info("anchorage_visits_linked", linked=linked)
 
     def _record(self, event: AnchorageEvent) -> VisitWrite:
         if isinstance(event, VisitStarted):

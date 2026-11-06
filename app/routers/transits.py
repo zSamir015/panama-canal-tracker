@@ -16,7 +16,9 @@ from app.schemas.transits import (
     DEFAULT_WINDOW_DAYS,
     MAX_CURRENT,
     MAX_WINDOW_DAYS,
+    AnchorageWaitResponse,
     CurrentTransitsResponse,
+    TransitDetailResponse,
     TransitFilters,
     TransitPageResponse,
     TransitResponse,
@@ -89,8 +91,9 @@ async def current_transits(service: Service) -> CurrentTransitsResponse:
     "/{transit_id}",
     summary="Detalle de un tránsito",
     description=(
-        "Un tránsito con los datos del buque. La espera en fondeo previa se añadirá con los "
-        "fondeaderos (Fase 6)."
+        "Un tránsito con los datos del buque y, si se detectó, la espera en fondeo previa "
+        "(`anchorage_wait`): fondeadero, llegada, salida y minutos hasta que el buque entró al "
+        "Canal. Es `null` si no se vio al buque esperando."
     ),
     responses={
         HTTPStatus.NOT_FOUND: {"description": "Tránsito no encontrado", **PROBLEM},
@@ -99,5 +102,21 @@ async def current_transits(service: Service) -> CurrentTransitsResponse:
 )
 async def get_transit(
     transit_id: Annotated[UUID, Path(description="Id del tránsito (UUID)")], service: Service
-) -> TransitResponse:
-    return TransitResponse.model_validate(await service.get(transit_id))
+) -> TransitDetailResponse:
+    detail = await service.get(transit_id)
+    wait = detail.wait
+    return TransitDetailResponse(
+        **TransitResponse.model_validate(detail.transit).model_dump(),
+        anchorage_wait=(
+            AnchorageWaitResponse(
+                anchorage=wait.anchorage,
+                arrived_at=wait.arrived_at,
+                departed_at=wait.departed_at,
+                wait_minutes=round(
+                    (detail.transit.entered_at - wait.arrived_at).total_seconds() / 60
+                ),
+            )
+            if wait
+            else None
+        ),
+    )

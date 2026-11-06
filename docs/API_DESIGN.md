@@ -98,7 +98,7 @@
 |---|---|---|---|
 | GET | `/transits` | ✅ | Histórico (filtros `direction`, `status`, `from`, `to`) |
 | GET | `/transits/current` | ✅ | Tránsitos `in_progress` |
-| GET | `/transits/{id}` | ✅ | Detalle (la espera en fondeo previa llega con la Fase 6) |
+| GET | `/transits/{id}` | ✅ | Detalle, incluida la espera en fondeo previa |
 
 - Cada tránsito: `{id, mmsi, vessel_name, ship_type, direction, status, abort_reason, entered_at,
   exited_at, duration_minutes}`. `direction` es `southbound` (Atlántico a Pacífico) o
@@ -111,7 +111,12 @@
   primero, desempate por id. Respuesta `{items, total, page, size}`.
 - `GET /transits/current`: sin paginación (hay como mucho un tránsito abierto por buque; se
   devuelven como mucho 200). El que entró antes, primero. Respuesta `{items, total}`.
-- `GET /transits/{id}`: `id` es un UUID (si no, 422); inexistente, 404.
+- `GET /transits/{id}`: `id` es un UUID (si no, 422); inexistente, 404. Añade `anchorage_wait`:
+  `{anchorage, arrived_at, departed_at, wait_minutes}`, la visita al fondeadero del lado por el
+  que el buque entró, más reciente que su tránsito anterior y que terminó como mucho 24 h antes
+  de entrar. `wait_minutes` va desde la llegada al fondeadero hasta la entrada al Canal;
+  `departed_at` es `null` si el detector aún no había cerrado la visita. Es `null` si no se vio
+  al buque esperando. El histórico y `/current` no lo llevan.
 
 ## Stats
 

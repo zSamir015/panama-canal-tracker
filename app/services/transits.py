@@ -6,6 +6,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.repositories.anchorages import AnchorageRepository, WaitRecord
 from app.repositories.transits import TransitRecord, TransitRepository
 from app.services.exceptions import TransitNotFoundError
 
@@ -24,9 +25,16 @@ class CurrentTransits:
     total: int
 
 
+@dataclass(frozen=True, slots=True)
+class TransitDetail:
+    transit: TransitRecord
+    wait: WaitRecord | None
+
+
 class TransitService:
     def __init__(self, session: AsyncSession) -> None:
         self._transits = TransitRepository(session)
+        self._anchorages = AnchorageRepository(session)
 
     async def list(
         self,
@@ -52,8 +60,8 @@ class TransitService:
         items, total = await self._transits.current_transits(limit=limit)
         return CurrentTransits(items=items, total=total)
 
-    async def get(self, transit_id: UUID) -> TransitRecord:
+    async def get(self, transit_id: UUID) -> TransitDetail:
         record = await self._transits.get_transit(transit_id)
         if record is None:
             raise TransitNotFoundError
-        return record
+        return TransitDetail(transit=record, wait=await self._anchorages.wait_before(transit_id))
