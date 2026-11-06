@@ -11,6 +11,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Detector de tránsitos (tarea 5.2): `zone_at(lon, lat)` en `app/services/zones.py` (punto dentro
+  de polígono por ray casting) y la máquina de estados pura de `app/services/transit_detector.py`.
+  `on_position` abre, completa (con dirección y duración) o aborta por reversa o por timeout;
+  `expire` cierra por timeout cuando el buque deja de emitir. Sin I/O: se prueba con
+  trayectorias sintéticas (19 tests, verificados con pruebas de mutación). La integración en el
+  worker y el modelo `transits` son la 5.3.
 - Recolector de posiciones AIS reales en GitHub Actions (ADR-0012): `scripts/ais_collect.py`
   guarda en JSON Lines las posiciones y los datos estáticos del Canal (sin nombres ni destinos),
   con reconexión y espera creciente, y el workflow `collect-ais.yml` lo ejecuta en ventanas de
