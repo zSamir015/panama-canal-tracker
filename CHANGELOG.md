@@ -11,6 +11,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Detección de tránsitos en el worker (tarea 5.3): tabla `transits` (migración `20261106_0004`,
+  con un índice único parcial que permite un solo tránsito `in_progress` por buque y la duración
+  como columna generada) y `app/workers/transit_tracker.py`, que pasa por el detector las
+  posiciones de cada lote guardado y escribe los eventos. Cada minuto aborta por timeout los
+  tránsitos sin señal (`TRANSIT_SIGNAL_TIMEOUT_MINUTES`) y, al arrancar, reconstruye su estado
+  desde la base para que un reinicio no pierda tránsitos en curso ni abra falsos con los buques
+  parados en una entrada.
 - Detector de tránsitos (tarea 5.2): `zone_at(lon, lat)` en `app/services/zones.py` (punto dentro
   de polígono por ray casting) y la máquina de estados pura de `app/services/transit_detector.py`.
   `on_position` abre, completa (con dirección y duración) o aborta por reversa o por timeout;

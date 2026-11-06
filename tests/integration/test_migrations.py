@@ -66,6 +66,8 @@ async def test_migration_creates_no_extensions(migrated: AsyncEngine) -> None:
     assert owned == []
 
 
+# Alembic no sabe comparar columnas generadas (PostgreSQL reescribe la expresión) y lo avisa.
+@pytest.mark.filterwarnings("ignore:Computed default on transits.duration_minutes")
 async def test_models_match_the_migrated_schema(migrated: AsyncEngine) -> None:
     def diff(connection: Connection) -> list[Any]:
         context = MigrationContext.configure(
@@ -146,7 +148,7 @@ async def test_refresh_token_defaults_use_the_insert_time(migrated: AsyncEngine)
 
 
 async def test_downgrade_removes_everything_the_migration_created(
-    owner_engine: AsyncEngine,
+    owner_engine: AsyncEngine, migration_lock: None
 ) -> None:
     async def tables() -> set[str]:
         async with owner_engine.connect() as connection:
@@ -163,6 +165,15 @@ async def test_downgrade_removes_everything_the_migration_created(
 
     async with owner_engine.connect() as connection:
         user_role = (await connection.execute(text("SELECT to_regtype('user_role')"))).scalar_one()
+        transit_types = (
+            await connection.execute(
+                text(
+                    "SELECT count(*) FROM pg_type WHERE typname IN "
+                    "('transit_direction', 'transit_status', 'transit_abort_reason')"
+                )
+            )
+        ).scalar_one()
 
     assert await tables() == before
     assert user_role is None
+    assert transit_types == 0

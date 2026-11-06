@@ -28,6 +28,7 @@ from app.workers import ais_consumer
 from app.workers.ais_consumer import AisConsumer, AisRecord, backoff_delay, run_worker
 from app.workers.ais_writer import WriterStats
 from app.workers.canal_bound_writer import CanalBoundStats
+from app.workers.transit_tracker import TransitTracker
 from tests.scripts_loader import load_script
 
 sim = load_script("ais_simulator")
@@ -433,9 +434,21 @@ class SilentRedis:
         return None
 
 
+class OfflineTransitTracker(TransitTracker):
+    """Tracker sin base: no reconstruye estado ni guarda eventos (los tests de 5.3 usan la real)."""
+
+    async def run(self, stop: asyncio.Event) -> None:
+        self.stats.restored = True
+        await stop.wait()
+
+    async def on_batch(self, batch: Any) -> None:
+        return None
+
+
 @pytest.fixture(autouse=True)
 def no_database_writer(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(ais_consumer, "AisWriter", DrainingWriter)
+    monkeypatch.setattr(ais_consumer, "TransitTracker", OfflineTransitTracker)
     monkeypatch.setattr(ais_consumer, "CanalBoundWriter", DrainingCanalBoundWriter)
     monkeypatch.setattr(ais_consumer, "create_redis", lambda _settings: silent_redis)
 

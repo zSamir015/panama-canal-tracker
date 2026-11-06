@@ -19,6 +19,7 @@ def test_alembic_points_to_the_versioned_migration_directory() -> None:
     assert (ROOT / "alembic" / "versions" / "20261018_0001_users_refresh_tokens.py").is_file()
     assert (ROOT / "alembic" / "versions" / "20261020_0002_vessels_positions.py").is_file()
     assert (ROOT / "alembic" / "versions" / "20261022_0003_canal_bound_vessels.py").is_file()
+    assert (ROOT / "alembic" / "versions" / "20261106_0004_transits.py").is_file()
 
 
 def test_models_declare_the_persistent_tables() -> None:
@@ -28,6 +29,7 @@ def test_models_declare_the_persistent_tables() -> None:
         "vessels",
         "positions",
         "canal_bound_vessels",
+        "transits",
     }
 
     users = Base.metadata.tables["users"]
