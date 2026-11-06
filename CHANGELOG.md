@@ -6,6 +6,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- Recolector de posiciones AIS reales en GitHub Actions (ADR-0012): `scripts/ais_collect.py`
+  guarda en JSON Lines las posiciones y los datos estáticos del Canal (sin nombres ni destinos),
+  con reconexión y espera creciente, y el workflow `collect-ais.yml` lo ejecuta en ventanas de
+  340 min cada 6 h, cifra el fichero con `gpg` y lo sube como artefacto. Apagado por defecto
+  (variable `AIS_COLLECT_ENABLED`). Guía en `docs/AIS_COLLECTOR.md`. Alimentará el replay (5.5) y la
+  validación con datos reales (5.7) sin un servidor encendido.
 - Zonas de entrada del Canal (tarea 5.1): polígonos aproximados de la entrada del Atlántico (bahía
   de Limón) y del Pacífico (Balboa) en `app/services/zones.py`, con tests de geometría (anillo
   cerrado, orden lon/lat, sentido antihorario, sin autocruces). `scripts/export_zones.py` genera la
