@@ -169,6 +169,8 @@ objetivo sin degradar la ingesta.
 - [ ] 7.4 README final: GIFs, diagramas, decisiones técnicas, resultados de validación y carga
 - [ ] 7.5 Sección "How it was built" enlazando roadmap, ADRs, issues y releases
 - [ ] 7.6 Revisión de seguridad final (dependencias, headers, CORS, secretos, capturas)
+      (hecha una primera pasada en `docs/SECURITY_REVIEW.md`, con hallazgos abiertos: falta el
+      entorno de producción)
 
 **Release**: `v1.0.0`.
 
