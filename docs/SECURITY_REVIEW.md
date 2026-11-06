@@ -60,17 +60,20 @@ volví a leer el código línea a línea.
    ocultar la versión del servidor, rate limiting global por IP, el bloqueo de `/metrics` desde
    Internet y `frame-ancestors 'none'`. Todo eso lo exige AGENTS.md §8.8 y §8.11 y **está sin
    hacer**.
-2. **CSP del frontend: añadida, verificada solo en parte.** Faltaba por completo. Se genera en la
-   compilación (`web/csp.ts`) desde la configuración (API y tiles) y se pone en un `<meta>`
-   (GitHub Pages no deja mandar cabeceras). La primera versión **bloqueaba el worker de MapLibre**
-   (`worker-src blob:` no bastaba: MapLibre 6 lo sirve como fichero del propio origen); se
-   detectó abriendo la demo construida en Chrome sin cabeza, y se corrigió. Con la versión
-   corregida hubo **0 violaciones de CSP en todas las corridas** y en una el mapa se pintó
-   entero (tiles, controles y leyenda). Pero la captura sin cabeza es **no determinista** (mapa
-   en blanco en la mayoría de las corridas, también sin CSP), así que **no he podido confirmar
-   que los buques ni las zonas se pinten bajo la política**, ni he probado la aplicación completa
-   (login, API, WebSocket con `'self'`). **Antes de fusionar hay que abrir la demo y la app en un
-   navegador de verdad y mirar la consola.** `frame-ancestors` no se puede poner en un `<meta>`.
+2. **CSP del frontend: añadida y verificada en la demo; la app completa, sin probar.** Faltaba
+   por completo. Se genera en la compilación (`web/csp.ts`) desde la configuración (API y tiles) y
+   se pone en un `<meta>` (GitHub Pages no deja mandar cabeceras). La primera versión **bloqueaba
+   el worker de MapLibre** (`worker-src blob:` no bastaba: MapLibre 6 lo sirve como fichero del
+   propio origen); se detectó abriendo la demo construida en Chrome y leyendo la consola, y se
+   corrigió. **Verificación con la versión corregida**: Chrome controlado por el protocolo de
+   depuración (CDP), esperando 18 s **en tiempo real** y leyendo la consola y la red: **0
+   violaciones de CSP y 0 peticiones bloqueadas**, y la demo se pinta entera: mapa con tiles, los 8
+   buques, las dos zonas de entrada con sus etiquetas, leyenda y controles. (Las primeras capturas
+   salían en blanco al azar porque `--virtual-time-budget` no espera a la red; no era la CSP.)
+   **Sin probar**: la aplicación completa con la API (login, llamadas REST y el WebSocket
+   `/ws/live` bajo `'self'`), porque exige levantar la pila y servir el frontend compilado detrás
+   del mismo origen que la API; y `frame-ancestors`, que un `<meta>` ignora y necesita una
+   cabecera.
 3. **Copias de seguridad sin programar** (`docs/BACKUP.md`): no hay dónde. Y nunca se ha
    restaurado una copia con datos reales.
 4. **Validación con datos reales sin hacer (tarea 5.7)**: la precisión de los polígonos, los
