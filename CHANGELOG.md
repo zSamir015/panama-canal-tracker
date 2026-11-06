@@ -5,6 +5,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Added
+- Zonas de entrada del Canal (tarea 5.1): polígonos aproximados de la entrada del Atlántico (bahía
+  de Limón) y del Pacífico (Balboa) en `app/services/zones.py`, con tests de geometría (anillo
+  cerrado, orden lon/lat, sentido antihorario, sin autocruces). `scripts/export_zones.py` genera la
+  copia que lee el mapa, que las dibuja con contorno discontinuo y etiqueta; un test falla si la
+  copia se desfasa. Se usarán en la detección de tránsitos (5.2 y 5.3).
+
 ## [0.4.0] - 2026-11-06
 
 Fase 4: mapa en tiempo real. Frontend React + MapLibre con ficha del buque y estela de 30 min,
