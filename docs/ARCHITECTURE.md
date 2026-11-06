@@ -143,6 +143,8 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
   misma transacción, para evitar posiciones huérfanas.
 - **Compresión** de chunks > 7 días; **política de downsampling** para datos > 90 días
   (agregado continuo con una posición cada 5 min). El histórico no se borra, se compacta.
+- **`positions_hourly`** (agregado continuo, ADR-0013): una fila por buque y hora con `positions`,
+  `avg_sog` y `max_sog`; en tiempo real, refrescado cada 30 min. Tráfico y cobertura salen de ahí.
 
 ### `transits`
 | Campo | Tipo | Notas |
