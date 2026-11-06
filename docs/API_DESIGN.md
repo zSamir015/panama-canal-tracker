@@ -208,6 +208,13 @@ Detalles (tarea 4.2, `app/routers/live.py`):
 | `4401` | sin `auth` en 5 s, token inválido o caducado, o usuario inexistente |
 | `4429` | más de 5 conexiones del mismo usuario o demasiados mensajes |
 
+## Documentación interactiva
+
+`/docs` (Swagger UI) y `/openapi.json` salen del propio código y están completos: cada operación
+lleva resumen, descripción, ejemplo de respuesta y, si tiene cuerpo, de petición, y cada error
+documentado lleva un ejemplo `problem+json`. Los ejemplos viven en `app/schemas/examples.py` con
+valores inventados (nunca datos reales) y un test los valida contra los modelos.
+
 ## Convenciones
 
 - Paginación: `?page=1&size=50` (máx. 200) → `{items, total, page, size}`. Para historiales

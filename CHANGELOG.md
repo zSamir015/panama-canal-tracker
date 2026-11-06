@@ -11,6 +11,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- OpenAPI completo (tarea 7.3): las 19 operaciones tienen resumen y descripción, y todos los
+  cuerpos de petición y de respuesta llevan un ejemplo (`app/schemas/examples.py`, adjunto a cada
+  modelo con `@with_example`; `/metrics` lleva uno en texto de Prometheus). Cada error documentado
+  lleva un ejemplo `problem+json` con su código y su ruta, y el 422 incluye cómo se indica qué
+  campo falla. Se corrige además el 422 que FastAPI documentaba por su cuenta (`HTTPValidationError`
+  en JSON normal): la API real responde `problem+json` en todos los errores. `tests/test_openapi.py`
+  exige todo lo anterior y valida cada ejemplo contra su modelo.
 - `/ready` y `/metrics` (tarea 7.1, ADR-0014). `/ready` (público) comprueba la base y Redis y
   responde 503 con cuál falla, sin mensajes de error. `/metrics` exige el token de
   `METRICS_TOKEN` (401 siempre si no está configurado) y exporta, en el formato de texto de

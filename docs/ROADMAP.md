@@ -163,7 +163,7 @@ objetivo sin degradar la ingesta.
 
 - [x] 7.1 `/metrics` Prometheus y `/ready`; alerta si el worker lleva > 5 min sin mensajes
 - [ ] 7.2 Backups automáticos de la DB y procedimiento de restauración probado
-- [ ] 7.3 OpenAPI completo (descripciones y ejemplos en todos los endpoints)
+- [x] 7.3 OpenAPI completo (descripciones y ejemplos en todos los endpoints)
 - [ ] 7.4 README final: GIFs, diagramas, decisiones técnicas, resultados de validación y carga
 - [ ] 7.5 Sección "How it was built" enlazando roadmap, ADRs, issues y releases
 - [ ] 7.6 Revisión de seguridad final (dependencias, headers, CORS, secretos, capturas)
