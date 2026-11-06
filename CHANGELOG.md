@@ -11,6 +11,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Panel "En tránsito ahora" (tarea 5.6): lista de los buques con tránsito `in_progress` (nombre,
+  sentido Atlántico → Pacífico o al revés y cuánto llevan en el Canal) sobre el mapa. Se recarga
+  cada 30 s con `GET /transits/current` y, al pulsar un buque, lo selecciona en el mapa y abre su
+  ficha. No aparece en la demo estática (no hay API detrás). Nombres como texto, nunca HTML.
 - Replay y trayectorias sintéticas (tarea 5.5): `scripts/transit_replay.py` pasa las posiciones
   del recolector por el detector y resume tránsitos por estado, abortos por motivo y completados
   por día y sentido (guía en `docs/AIS_COLLECTOR.md`). Tests nuevos: los dos sentidos completos

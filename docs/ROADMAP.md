@@ -134,7 +134,7 @@ objetivo sin degradar la ingesta.
 - [x] 5.4 `GET /transits`, `/transits/current`, `/transits/{id}`
 - [x] 5.5 Tests con trayectorias sintéticas: completo en ambos sentidos, abortado por timeout,
       reversa, buque detenido, señal intermitente
-- [ ] 5.6 Panel "en tránsito ahora" en el mapa
+- [x] 5.6 Panel "en tránsito ahora" en el mapa
 - [ ] 5.7 **Validación con datos reales**: comparar tránsitos detectados por día con estadísticas
       públicas de la ACP; documentar precisión, falsos positivos y causas en `docs/VALIDATION.md`
 
