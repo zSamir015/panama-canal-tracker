@@ -15,6 +15,7 @@ from app.core.db import SessionFactory
 from app.models.anchorage_visit import AnchorageVisit
 from app.repositories.ais import AisRepository, VesselRow
 from app.repositories.anchorages import AnchorageRepository, ClosedVisitRow, OpenVisitRow
+from app.repositories.transits import OpenTransitRow, TransitRepository
 from app.services.ais_parser import PositionUpdate
 from app.workers.ais_writer import AisWriter
 from app.workers.anchorage_tracker import AnchorageTracker
@@ -308,3 +309,92 @@ async def test_run_restores_and_stops_on_request(sessions: SessionFactory) -> No
     await asyncio.wait_for(task, timeout=2)
 
     assert tracker.stats.restored is True
+
+
+# --- Enlace con el tránsito siguiente (6.2) -------------------------------------------------
+
+
+async def add_transit(
+    sessions: SessionFactory, minutes: float, direction: str = "southbound", mmsi: int = MMSI
+) -> None:
+    async with sessions() as session:
+        await AisRepository(session).upsert_vessels([VesselRow(mmsi=mmsi, last_seen_at=T0)])
+        await TransitRepository(session).open_transit(
+            OpenTransitRow(mmsi, direction, T0 + timedelta(minutes=minutes))
+        )
+        await session.commit()
+
+
+async def linked(sessions: SessionFactory) -> list[Any]:
+    return [row[4] is not None for row in await visits(sessions)]
+
+
+async def test_a_wait_is_linked_to_the_transit_that_follows_it(sessions: SessionFactory) -> None:
+    tracker = await restored(sessions)
+    await feed(sessions, tracker, *waiting(0, 60), at(60, SEA, sog=8.0))
+    assert await linked(sessions) == [False]
+
+    await add_transit(sessions, 70)
+    await tracker.link(T0 + timedelta(minutes=75))
+
+    assert await linked(sessions) == [True]
+    assert tracker.stats.linked == 1
+
+
+async def test_linking_is_idempotent(sessions: SessionFactory) -> None:
+    tracker = await restored(sessions)
+    await feed(sessions, tracker, *waiting(0, 60), at(60, SEA, sog=8.0))
+    await add_transit(sessions, 70)
+
+    await tracker.link(T0 + timedelta(minutes=75))
+    await tracker.link(T0 + timedelta(minutes=76))
+
+    assert tracker.stats.linked == 1
+
+
+async def test_a_transit_on_the_wrong_side_is_not_linked(sessions: SessionFactory) -> None:
+    tracker = await restored(sessions)
+    await feed(sessions, tracker, *waiting(0, 60), at(60, SEA, sog=8.0))
+    await add_transit(sessions, 70, direction="northbound")
+
+    await tracker.link(T0 + timedelta(minutes=75))
+
+    assert await linked(sessions) == [False]
+
+
+async def test_nothing_happens_without_a_transit(sessions: SessionFactory) -> None:
+    tracker = await restored(sessions)
+    await feed(sessions, tracker, *waiting(0, 60), at(60, SEA, sog=8.0))
+
+    await tracker.link(T0 + timedelta(minutes=75))
+
+    assert await linked(sessions) == [False]
+    assert tracker.stats.linked == 0
+
+
+async def test_old_unlinked_visits_are_left_alone(sessions: SessionFactory) -> None:
+    tracker = await restored(sessions)
+    await feed(sessions, tracker, *waiting(0, 60), at(60, SEA, sog=8.0))
+    await add_transit(sessions, 70)
+
+    await tracker.link(
+        T0 + timedelta(days=10)
+    )  # la visita y el tránsito quedan fuera de la ventana
+
+    assert await linked(sessions) == [False]
+
+
+async def test_a_database_failure_while_linking_is_counted_and_not_raised(
+    sessions: SessionFactory, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    tracker = await restored(sessions)
+
+    async def database_down(*_: Any, **__: Any) -> list[Any]:
+        raise OSError("connection refused")
+
+    monkeypatch.setattr(AnchorageRepository, "unlinked_visits", database_down)
+
+    await tracker.link(T0)
+
+    assert tracker.stats.last_error == "OSError"
+    assert tracker.stats.linked == 0

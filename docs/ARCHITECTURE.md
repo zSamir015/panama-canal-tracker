@@ -205,6 +205,9 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
   estado de navegación, que la tripulación casi nunca actualiza. La visita se cierra al salir del
   fondeadero, al navegar a 1 nudo o más, o si el buque pasa el timeout sin señal.
 - Tiempo de espera = desde `arrived_at` hasta `entered_at` del tránsito siguiente del buque.
+  `app/services/waiting.py` decide el enlace (fondeadero del lado de entrada, la visita más
+  reciente para cada tránsito, como mucho 24 h entre la salida y la entrada) y el
+  `AnchorageTracker` lo guarda en `anchorage_visits.transit_id`, reconciliando cada minuto.
 
 ## 5. Despliegue
 
