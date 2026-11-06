@@ -77,6 +77,23 @@ class TransitResponse(BaseModel):
     duration_minutes: int | None = Field(description="Solo en los `completed`")
 
 
+class AnchorageWaitResponse(BaseModel):
+    """La espera en fondeo previa al tránsito."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    anchorage: Literal["atlantic", "pacific"]
+    arrived_at: datetime
+    departed_at: datetime | None = Field(description="`null` si el buque aún no se había ido")
+    wait_minutes: int = Field(description="Desde que llegó al fondeadero hasta que entró al Canal")
+
+
+class TransitDetailResponse(TransitResponse):
+    anchorage_wait: AnchorageWaitResponse | None = Field(
+        description="`null` si no se detectó una espera en fondeo antes de este tránsito"
+    )
+
+
 class TransitPageResponse(BaseModel):
     items: list[TransitResponse]
     total: int

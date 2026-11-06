@@ -11,6 +11,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Tiempo de espera real (tarea 6.2): cada visita a un fondeadero se enlaza con el tránsito que la
+  sigue (`anchorage_visits.transit_id`). Reglas puras en `app/services/waiting.py`: fondeadero del
+  lado por el que el buque entra, la visita más reciente para cada tránsito y el primer tránsito
+  posterior para cada visita, con un máximo de 24 h entre que se fue y entró. El
+  `AnchorageTracker` lo reconcilia cada minuto sobre lo reciente sin enlazar (idempotente y sin
+  depender del orden en que se guardan los eventos). `GET /transits/{id}` devuelve
+  `anchorage_wait` con la llegada, la salida y los minutos de espera.
 - Esperas en fondeo (tarea 6.1): polígonos aproximados de los fondeaderos del Atlántico y del
   Pacífico (`app/services/anchorages.py`, sin solape con las entradas), detector puro de visitas
   (`app/services/anchorage_detector.py`: parado 15 min dentro de un fondeadero, con la hora de
