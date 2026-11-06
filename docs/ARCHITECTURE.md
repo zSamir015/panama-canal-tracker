@@ -241,9 +241,10 @@ flowchart LR
 ## 8. Riesgos conocidos
 
 1. **Cobertura AIS terrestre**: buques a más de ~40 NM de la costa no aparecen, y la cobertura
-   depende de receptores voluntarios. **Medido el 2026-10-21: casi nula en el Canal**
-   (DATA_SOURCES.md §2b). Mitigación: medir varios días con `scripts/ais_coverage.py`; mientras,
-   la demo usa el simulador, rotulado como datos simulados.
+   depende de receptores voluntarios. **Medido el 2026-10-21: casi nula en el Canal; el
+   2026-11-06: 11 posiciones de 10 buques en 5 min, escasa pero real** (DATA_SOURCES.md §2b).
+   Mitigación: acumular varios días de datos con el worker real; mientras, la demo usa el
+   simulador, rotulado como datos simulados.
 2. **Sin histórico en la fuente**: nuestra DB es el histórico; cada minuto de worker caído son
    datos perdidos. Mitigación: reinicio automático, alertas por silencio prolongado.
 3. **Volumen**: cientos de mensajes por minuto. Mitigación: batch inserts, hypertable,
