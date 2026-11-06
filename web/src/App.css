@@ -188,6 +188,81 @@
   color: #b71c1c;
 }
 
+.transits-panel {
+  position: absolute;
+  top: 0.75rem;
+  right: 3.5rem;
+  width: min(18rem, calc(100% - 5rem));
+  max-height: 40%;
+  padding: 0.6rem 0.75rem;
+  overflow-y: auto;
+  font-size: 0.85rem;
+  background: rgb(255 255 255 / 95%);
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 20%);
+}
+
+.transits-panel h2 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+}
+
+.transits-panel__count {
+  font-weight: 400;
+  color: #607d8b;
+}
+
+.transits-panel ul {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.transits-panel__row {
+  display: grid;
+  width: 100%;
+  padding: 0.3rem 0.4rem;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+}
+
+.transits-panel__row:hover,
+.transits-panel__row[aria-pressed='true'] {
+  background: #e8eef3;
+  border-color: #b0bec5;
+}
+
+.transits-panel__name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.transits-panel__detail {
+  font-size: 0.8rem;
+  color: #607d8b;
+}
+
+.transits-panel p {
+  margin: 0;
+}
+
+.transits-panel__empty,
+.transits-panel__note {
+  font-size: 0.8rem;
+  color: #607d8b;
+}
+
+.transits-panel__error {
+  color: #b71c1c;
+}
+
 .demo-banner {
   padding: 0.4rem 1rem;
   font-size: 0.85rem;

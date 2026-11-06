@@ -68,6 +68,9 @@ function stubApi({
         }),
       );
     }
+    if (url.endsWith('/transits/current')) {
+      return Promise.resolve(json(200, { items: [], total: 0 }));
+    }
     if (url.endsWith('/history')) {
       return Promise.resolve(
         json(next(pendingTrack), {
@@ -156,7 +159,9 @@ describe('App', () => {
     expect(panel).toHaveTextContent('Carga (70)');
 
     await userEvent.keyboard('{Escape}');
-    expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('complementary', { name: 'Ficha del buque' }),
+    ).not.toBeInTheDocument();
   });
 
   it('vuelve al login si la API rechaza el token y ya no hay sesión que renovar', async () => {

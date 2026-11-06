@@ -9,6 +9,8 @@ import { useDemoVessels } from './demo/useDemoVessels';
 import type { Bbox } from './live/protocol';
 import { type LiveStatus, useLiveVessels } from './live/useLiveVessels';
 import { MapLegend } from './map/MapLegend';
+import { TransitsPanel } from './transits/TransitsPanel';
+import { useCurrentTransits } from './transits/queries';
 import { useVesselTrack } from './vessels/queries';
 import { trailFeature } from './vessels/trail';
 import { VesselPanel } from './vessels/VesselPanel';
@@ -43,12 +45,17 @@ export function App() {
     setSelectedMmsi(null);
   }, []);
 
+  // El panel de tránsitos no existe en la demo estática (ADR-0011): no hay API detrás. Esta
+  // consulta comparte clave y caché con la del panel, así que no duplica la petición.
+  const transits = useCurrentTransits(config.demo ? null : token);
+
   const trackUnauthorized = track.error instanceof ApiError && track.error.status === 401;
+  const transitsUnauthorized = transits.error instanceof ApiError && transits.error.status === 401;
   useEffect(() => {
-    if (trackUnauthorized && token !== null) {
+    if ((trackUnauthorized || transitsUnauthorized) && token !== null) {
       renew(token);
     }
-  }, [trackUnauthorized, token, renew]);
+  }, [trackUnauthorized, transitsUnauthorized, token, renew]);
 
   // En modo demo se salta el login y se usan los buques pregrabados (ADR-0011).
   const activeVessels = config.demo ? demo : live;
@@ -86,6 +93,9 @@ export function App() {
               />
             </Suspense>
             <MapLegend />
+            {!config.demo && token !== null && (
+              <TransitsPanel token={token} selectedMmsi={selectedMmsi} onSelect={setSelectedMmsi} />
+            )}
             {selectedMmsi !== null && !config.demo && token !== null && (
               <VesselPanel
                 key={selectedMmsi}
