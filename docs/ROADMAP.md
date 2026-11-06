@@ -102,15 +102,15 @@ buques. Con la key real, el worker aguanta una desconexión forzada y se recuper
 ## Fase 4 — Mapa en tiempo real y demo desplegada `[ ]`
 **Objetivo**: lo visible. Un mapa en vivo del Canal, desplegado y enlazado desde el README.
 
-- [ ] 4.0 Buques de todo el mundo con destino declarado al Canal (#59, ADR-0009: segunda
+- [x] 4.0 Buques de todo el mundo con destino declarado al Canal (#59, ADR-0009: segunda
       conexión a AISStream con `ShipStaticData` global)
-- [ ] 4.1 Inicializar `web/` (Vite + React + TypeScript strict + ESLint/Prettier + Vitest)
-- [ ] 4.2 `WS /ws/live`: suscripción a Redis, snapshot inicial, filtro por viewport, batching 1 Hz,
+- [x] 4.1 Inicializar `web/` (Vite + React + TypeScript strict + ESLint/Prettier + Vitest)
+- [x] 4.2 `WS /ws/live`: suscripción a Redis, snapshot inicial, filtro por viewport, batching 1 Hz,
       validación de `Origin`, auth en el primer mensaje, límites de conexiones y tamaño
-- [ ] 4.3 Mapa MapLibre con capa GeoJSON de buques (icono rotado por rumbo, color por tipo)
-- [ ] 4.4 Ficha del buque al hacer clic; estela de los últimos 30 min (`/vessels/{mmsi}/history`)
-- [ ] 4.5 Reconexión del WebSocket en el cliente; indicador "en vivo / reconectando"
-- [ ] 4.6 CI del frontend (lint con regla anti `dangerouslySetInnerHTML`, typecheck, tests,
+- [x] 4.3 Mapa MapLibre con capa GeoJSON de buques (icono rotado por rumbo, color por tipo)
+- [x] 4.4 Ficha del buque al hacer clic; estela de los últimos 30 min (`/vessels/{mmsi}/history`)
+- [x] 4.5 Reconexión del WebSocket en el cliente; indicador "en vivo / reconectando"
+- [x] 4.6 CI del frontend (lint con regla anti `dangerouslySetInnerHTML`, typecheck, tests,
       build, `npm audit`); test XSS con un nombre de buque malicioso
 - [ ] 4.7 Demo estática en GitHub Pages (ADR-0011): build con `VITE_DEMO=true`, datos simulados
       pregrabados, sin backend ni login; workflow `pages.yml` despliega en cada push a `main`
