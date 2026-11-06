@@ -22,6 +22,7 @@ def test_alembic_points_to_the_versioned_migration_directory() -> None:
     assert (ROOT / "alembic" / "versions" / "20261106_0004_transits.py").is_file()
     assert (ROOT / "alembic" / "versions" / "20261106_0005_anchorage_visits.py").is_file()
     assert (ROOT / "alembic" / "versions" / "20261106_0006_positions_hourly.py").is_file()
+    assert (ROOT / "alembic" / "versions" / "20261106_0007_positions_compression.py").is_file()
 
 
 def test_models_declare_the_persistent_tables() -> None:

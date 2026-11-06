@@ -180,12 +180,12 @@ async def test_downgrade_removes_everything_the_migration_created(
             await connection.execute(
                 text(
                     "SELECT count(*) FROM timescaledb_information.continuous_aggregates "
-                    "WHERE view_name = 'positions_hourly'"
+                    "WHERE view_name IN ('positions_hourly', 'positions_5min')"
                 )
             )
         ).scalar_one()
 
     assert await tables() == before
-    assert leftovers == 0  # la bajada borra el agregado continuo y su política
+    assert leftovers == 0  # la bajada borra los agregados continuos y sus políticas
     assert user_role is None
     assert transit_types == 0  # también el enum de los fondeaderos

@@ -151,7 +151,7 @@ objetivo sin degradar la ingesta.
 - [x] 6.3 Agregados continuos de TimescaleDB sobre las posiciones (ADR-0013); los tránsitos y
       las esperas se calculan con SQL
 - [x] 6.4 `GET /stats/daily`, `/stats/transit-durations`, `/stats/waiting-times`
-- [ ] 6.5 Compresión y downsampling de `positions` (sin borrar histórico)
+- [x] 6.5 Compresión y downsampling de `positions` (sin borrar histórico)
 - [ ] 6.6 Vista de estadísticas en `web/` (gráficas)
 
 **Aceptación**: estadísticas correctas sobre datos sintéticos sembrados y visibles en el frontend.
