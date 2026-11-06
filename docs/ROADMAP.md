@@ -102,9 +102,9 @@ buques. Con la key real, el worker aguanta una desconexión forzada y se recuper
 ## Fase 4 — Mapa en tiempo real y demo desplegada `[ ]`
 **Objetivo**: lo visible. Un mapa en vivo del Canal, desplegado y enlazado desde el README.
 
-- [ ] 4.0 Buques de todo el mundo con destino declarado al Canal (#59, ADR-0009: segunda
+- [x] 4.0 Buques de todo el mundo con destino declarado al Canal (#59, ADR-0009: segunda
       conexión a AISStream con `ShipStaticData` global)
-- [ ] 4.1 Inicializar `web/` (Vite + React + TypeScript strict + ESLint/Prettier + Vitest)
+- [x] 4.1 Inicializar `web/` (Vite + React + TypeScript strict + ESLint/Prettier + Vitest)
 - [ ] 4.2 `WS /ws/live`: suscripción a Redis, snapshot inicial, filtro por viewport, batching 1 Hz,
       validación de `Origin`, auth en el primer mensaje, límites de conexiones y tamaño
 - [ ] 4.3 Mapa MapLibre con capa GeoJSON de buques (icono rotado por rumbo, color por tipo)
