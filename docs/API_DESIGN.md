@@ -98,7 +98,20 @@
 |---|---|---|---|
 | GET | `/transits` | ✅ | Histórico (filtros `direction`, `status`, `from`, `to`) |
 | GET | `/transits/current` | ✅ | Tránsitos `in_progress` |
-| GET | `/transits/{id}` | ✅ | Detalle, incluida la espera en fondeo previa |
+| GET | `/transits/{id}` | ✅ | Detalle (la espera en fondeo previa llega con la Fase 6) |
+
+- Cada tránsito: `{id, mmsi, vessel_name, ship_type, direction, status, abort_reason, entered_at,
+  exited_at, duration_minutes}`. `direction` es `southbound` (Atlántico a Pacífico) o
+  `northbound`; `abort_reason` (`timeout` o `reversal`) solo en los `aborted`; `exited_at` es
+  `null` mientras está `in_progress`; `duration_minutes` solo en los `completed`. `vessel_name`
+  es texto AIS tal cual: el cliente lo muestra como texto.
+- `GET /transits`: `?page=1&size=50` (máx. 200), `direction`, `status` y la ventana de entrada
+  `from`/`to` (con zona horaria; por defecto, los últimos 7 días; `from < to` y como mucho 90 días
+  entre ambos). Cualquier otro parámetro o valor inválido, 422. Orden: entrada más reciente
+  primero, desempate por id. Respuesta `{items, total, page, size}`.
+- `GET /transits/current`: sin paginación (hay como mucho un tránsito abierto por buque; se
+  devuelven como mucho 200). El que entró antes, primero. Respuesta `{items, total}`.
+- `GET /transits/{id}`: `id` es un UUID (si no, 422); inexistente, 404.
 
 ## Stats
 
