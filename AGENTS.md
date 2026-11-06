@@ -321,8 +321,9 @@ Principio general: **denegar por defecto** — todo cerrado salvo lo que se abre
 
 ## 9. Estado actual
 
-> **Fase actual: 4 — Mapa en tiempo real y demo.** Las Fases 1 (`v0.1.0`), 2 (base de datos y
-> autenticación, `v0.2.0`) y 3 (ingesta AIS, `v0.3.0`) están cerradas.
+> **Fase actual: 5 — Detección de tránsitos.** Las Fases 1 (`v0.1.0`), 2 (base de datos y
+> autenticación, `v0.2.0`), 3 (ingesta AIS, `v0.3.0`) y 4 (mapa en tiempo real y demo,
+> `v0.4.0`) están cerradas.
 
 ## 10. Comandos útiles
 

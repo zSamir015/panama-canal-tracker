@@ -99,7 +99,7 @@ buques. Con la key real, el worker aguanta una desconexión forzada y se recuper
 
 ---
 
-## Fase 4 — Mapa en tiempo real y demo desplegada `[ ]`
+## Fase 4 — Mapa en tiempo real y demo desplegada `[x]`
 **Objetivo**: lo visible. Un mapa en vivo del Canal, desplegado y enlazado desde el README.
 
 - [x] 4.0 Buques de todo el mundo con destino declarado al Canal (#59, ADR-0009: segunda
@@ -112,10 +112,10 @@ buques. Con la key real, el worker aguanta una desconexión forzada y se recuper
 - [x] 4.5 Reconexión del WebSocket en el cliente; indicador "en vivo / reconectando"
 - [x] 4.6 CI del frontend (lint con regla anti `dangerouslySetInnerHTML`, typecheck, tests,
       build, `npm audit`); test XSS con un nombre de buque malicioso
-- [ ] 4.7 Demo estática en GitHub Pages (ADR-0011): build con `VITE_DEMO=true`, datos simulados
+- [x] 4.7 Demo estática en GitHub Pages (ADR-0011): build con `VITE_DEMO=true`, datos simulados
       pregrabados, sin backend ni login; workflow `pages.yml` despliega en cada push a `main`
-- [ ] 4.8 Prueba de carga del WebSocket (p. ej. 500 clientes simulados); documentar resultados
-- [ ] 4.9 GIF del mapa en vivo en el README y enlace a la demo
+- [x] 4.8 Prueba de carga del WebSocket (p. ej. 500 clientes simulados); documentar resultados
+- [x] 4.9 GIF del mapa en vivo en el README y enlace a la demo
       (https://zsamir015.github.io/panama-canal-tracker/)
 
 **Aceptación**: la demo muestra buques moviéndose en tiempo real (datos reales si la cobertura lo
