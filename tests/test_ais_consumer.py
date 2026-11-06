@@ -27,6 +27,7 @@ from app.services.ais_parser import PositionUpdate, VesselStatic
 from app.workers import ais_consumer
 from app.workers.ais_consumer import AisConsumer, AisRecord, backoff_delay, run_worker
 from app.workers.ais_writer import WriterStats
+from app.workers.anchorage_tracker import AnchorageTracker
 from app.workers.canal_bound_writer import CanalBoundStats
 from app.workers.transit_tracker import TransitTracker
 from tests.scripts_loader import load_script
@@ -445,10 +446,22 @@ class OfflineTransitTracker(TransitTracker):
         return None
 
 
+class OfflineAnchorageTracker(AnchorageTracker):
+    """Igual que `OfflineTransitTracker`, para las esperas en fondeo (6.1)."""
+
+    async def run(self, stop: asyncio.Event) -> None:
+        self.stats.restored = True
+        await stop.wait()
+
+    async def on_batch(self, batch: Any) -> None:
+        return None
+
+
 @pytest.fixture(autouse=True)
 def no_database_writer(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(ais_consumer, "AisWriter", DrainingWriter)
     monkeypatch.setattr(ais_consumer, "TransitTracker", OfflineTransitTracker)
+    monkeypatch.setattr(ais_consumer, "AnchorageTracker", OfflineAnchorageTracker)
     monkeypatch.setattr(ais_consumer, "CanalBoundWriter", DrainingCanalBoundWriter)
     monkeypatch.setattr(ais_consumer, "create_redis", lambda _settings: silent_redis)
 

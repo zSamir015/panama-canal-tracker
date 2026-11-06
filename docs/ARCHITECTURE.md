@@ -188,7 +188,9 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
 - `ATLANTIC_ENTRANCE`: entrada del Canal por el Atlántico (área de Limón Bay / Cristóbal).
 - `PACIFIC_ENTRANCE`: entrada por el Pacífico (área de Balboa / Puente de las Américas).
 - `ATLANTIC_ANCHORAGE` y `PACIFIC_ANCHORAGE`: fondeaderos donde los buques esperan turno.
-- Los polígonos se dibujan en la Fase 5 con datos reales y se versionan en el repo.
+- Los polígonos de las entradas están en `app/services/zones.py` y los de los fondeaderos en
+  `app/services/anchorages.py`. Todos son aproximados (trazados a mano, sin fuente oficial de la
+  ACP) y se versionan en el repo; su precisión se mide con datos reales (tarea 5.7).
 
 ### 4.2 Detección de tránsitos (máquina de estados por buque)
 - Entra a una zona de entrada → `transit` `in_progress`.
@@ -198,7 +200,10 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
 - La lógica es pura (sin I/O) para testearla con trayectorias sintéticas.
 
 ### 4.3 Tiempo de espera
-- `nav_status = anclado` o SOG < 0,5 nudos durante > 15 min dentro de un fondeadero → visita.
+- Parado (SOG < 0,5 nudos o, sin velocidad, `nav_status` anclado) durante 15 min seguidos dentro
+  de un fondeadero → visita (`app/services/anchorage_detector.py`). La velocidad manda sobre el
+  estado de navegación, que la tripulación casi nunca actualiza. La visita se cierra al salir del
+  fondeadero, al navegar a 1 nudo o más, o si el buque pasa el timeout sin señal.
 - Tiempo de espera = desde `arrived_at` hasta `entered_at` del tránsito siguiente del buque.
 
 ## 5. Despliegue

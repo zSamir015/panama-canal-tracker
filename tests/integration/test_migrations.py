@@ -169,11 +169,12 @@ async def test_downgrade_removes_everything_the_migration_created(
             await connection.execute(
                 text(
                     "SELECT count(*) FROM pg_type WHERE typname IN "
-                    "('transit_direction', 'transit_status', 'transit_abort_reason')"
+                    "('transit_direction', 'transit_status', 'transit_abort_reason', "
+                    "'anchorage_name')"
                 )
             )
         ).scalar_one()
 
     assert await tables() == before
     assert user_role is None
-    assert transit_types == 0
+    assert transit_types == 0  # también el enum de los fondeaderos
