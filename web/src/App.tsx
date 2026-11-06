@@ -9,6 +9,7 @@ import { useDemoVessels } from './demo/useDemoVessels';
 import type { Bbox } from './live/protocol';
 import { type LiveStatus, useLiveVessels } from './live/useLiveVessels';
 import { MapLegend } from './map/MapLegend';
+import { StatsView } from './stats/StatsView';
 import { TransitsPanel } from './transits/TransitsPanel';
 import { useCurrentTransits } from './transits/queries';
 import { useVesselTrack } from './vessels/queries';
@@ -35,6 +36,7 @@ export function App() {
   const { token, renew } = session;
   const [bbox, setBbox] = useState<Bbox | null>(null);
   const [selectedMmsi, setSelectedMmsi] = useState<number | null>(null);
+  const [view, setView] = useState<'map' | 'stats'>('map');
   // Un 4401 de `/ws/live` o un 401 de la API piden renovar el token; si la renovación dice que
   // ya no hay sesión, `useSession` pasa a `signedOut` con `expired` y se vuelve al login.
   const live = useLiveVessels(token, bbox, renew);
@@ -73,6 +75,28 @@ export function App() {
             <p>Buques del Canal de Panamá en tiempo real a partir de datos AIS.</p>
           )}
         </div>
+        {mapReady && !config.demo && (
+          <nav className="app__tabs" aria-label="Vista">
+            <button
+              type="button"
+              aria-pressed={view === 'map'}
+              onClick={() => {
+                setView('map');
+              }}
+            >
+              Mapa
+            </button>
+            <button
+              type="button"
+              aria-pressed={view === 'stats'}
+              onClick={() => {
+                setView('stats');
+              }}
+            >
+              Estadísticas
+            </button>
+          </nav>
+        )}
         {mapReady && (
           <p className="app__status" role="status">
             {config.demo ? 'Demo' : STATUS_TEXT[live.status]} · {activeVessels.vessels.size} buques
@@ -80,41 +104,49 @@ export function App() {
         )}
       </header>
       {config.demo && <DemoBanner />}
-      <section className="app__map" aria-label="Mapa en vivo">
-        {mapReady ? (
-          <>
-            <Suspense fallback={<p>Cargando el mapa…</p>}>
-              <VesselMap
-                vessels={activeVessels.vessels}
-                onViewportChange={setBbox}
-                selectedMmsi={selectedMmsi}
-                onSelect={setSelectedMmsi}
-                trail={selectedMmsi === null ? null : trailFeature(track.data, selectedLive)}
-              />
-            </Suspense>
-            <MapLegend />
-            {!config.demo && token !== null && (
-              <TransitsPanel token={token} selectedMmsi={selectedMmsi} onSelect={setSelectedMmsi} />
-            )}
-            {selectedMmsi !== null && !config.demo && token !== null && (
-              <VesselPanel
-                key={selectedMmsi}
-                mmsi={selectedMmsi}
-                token={token}
-                live={selectedLive}
-                onClose={closePanel}
-              />
-            )}
-          </>
-        ) : session.status === 'restoring' ? (
-          <p>Recuperando la sesión…</p>
-        ) : (
-          <LoginForm
-            onLogin={session.signIn}
-            notice={session.expired ? EXPIRED_NOTICE : undefined}
-          />
-        )}
-      </section>
+      {view === 'stats' && !config.demo && token !== null ? (
+        <StatsView token={token} onUnauthorized={renew} />
+      ) : (
+        <section className="app__map" aria-label="Mapa en vivo">
+          {mapReady ? (
+            <>
+              <Suspense fallback={<p>Cargando el mapa…</p>}>
+                <VesselMap
+                  vessels={activeVessels.vessels}
+                  onViewportChange={setBbox}
+                  selectedMmsi={selectedMmsi}
+                  onSelect={setSelectedMmsi}
+                  trail={selectedMmsi === null ? null : trailFeature(track.data, selectedLive)}
+                />
+              </Suspense>
+              <MapLegend />
+              {!config.demo && token !== null && (
+                <TransitsPanel
+                  token={token}
+                  selectedMmsi={selectedMmsi}
+                  onSelect={setSelectedMmsi}
+                />
+              )}
+              {selectedMmsi !== null && !config.demo && token !== null && (
+                <VesselPanel
+                  key={selectedMmsi}
+                  mmsi={selectedMmsi}
+                  token={token}
+                  live={selectedLive}
+                  onClose={closePanel}
+                />
+              )}
+            </>
+          ) : session.status === 'restoring' ? (
+            <p>Recuperando la sesión…</p>
+          ) : (
+            <LoginForm
+              onLogin={session.signIn}
+              notice={session.expired ? EXPIRED_NOTICE : undefined}
+            />
+          )}
+        </section>
+      )}
     </main>
   );
 }

@@ -11,6 +11,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Vista de estadísticas (tarea 6.6): pestaña "Estadísticas" junto al mapa, con los tránsitos
+  completados por día en barras apiladas por sentido (periodo de 7, 30 o 90 días), los totales por
+  tipo de buque y las tablas de duración del tránsito y de espera en fondeo (cuenta, media,
+  mediana y percentil 90). Gráfico en SVG a mano, sin librería de gráficas nueva. No aparece en
+  la demo estática. Captura con datos de ejemplo en
+  `docs/media/fase6-estadisticas-datos-de-ejemplo.png`.
 - Compresión y histórico reducido de las posiciones (tarea 6.5, ADR-0005): los chunks de
   `positions` de más de 7 días se comprimen (agrupados por buque, ordenados por hora), sin borrar
   nada; se siguen leyendo y el `ON CONFLICT DO NOTHING` del writer sigue funcionando sobre ellos

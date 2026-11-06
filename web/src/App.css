@@ -272,3 +272,145 @@
   background: #fff3cd;
   border-bottom: 2px solid #ffc107;
 }
+
+.app__tabs {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.app__tabs button,
+.stats__window button {
+  padding: 0.3rem 0.75rem;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: rgb(255 255 255 / 12%);
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 6px;
+}
+
+.app__tabs button[aria-pressed='true'] {
+  font-weight: 700;
+  background: rgb(255 255 255 / 30%);
+}
+
+.stats {
+  flex: 1;
+  min-height: 0;
+  padding: 1rem;
+  overflow-y: auto;
+  background: #e8eef3;
+  color: #263238;
+}
+
+.stats__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stats h2,
+.stats h3,
+.stats h4 {
+  margin: 0 0 0.5rem;
+}
+
+.stats__window button {
+  color: #263238;
+  background: #fff;
+  border-color: #b0bec5;
+}
+
+.stats__window button[aria-pressed='true'] {
+  font-weight: 700;
+  color: #fff;
+  background: #1565c0;
+  border-color: #1565c0;
+}
+
+.stats__card {
+  max-width: 44rem;
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 15%);
+}
+
+.bar-chart {
+  width: 100%;
+  height: auto;
+}
+
+.bar-chart__grid {
+  stroke: #cfd8dc;
+  stroke-width: 1;
+}
+
+.bar-chart__tick {
+  font-size: 10px;
+  fill: #607d8b;
+}
+
+.stats__legend,
+.stats__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.5rem 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+}
+
+.stats__legend li {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.stats__legend span {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 2px;
+}
+
+.stats__categories {
+  display: grid;
+  max-width: 18rem;
+}
+
+.stats__categories li {
+  display: flex;
+  justify-content: space-between;
+}
+
+.stats__table {
+  width: 100%;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  border-collapse: collapse;
+}
+
+.stats__table th,
+.stats__table td {
+  padding: 0.3rem 0.5rem;
+  text-align: right;
+  border-bottom: 1px solid #eceff1;
+}
+
+.stats__table th:first-child {
+  text-align: left;
+}
+
+.stats__empty,
+.stats__note {
+  font-size: 0.85rem;
+  color: #607d8b;
+}
+
+.stats__error {
+  color: #b71c1c;
+}
