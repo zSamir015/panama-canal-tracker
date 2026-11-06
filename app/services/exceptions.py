@@ -41,3 +41,8 @@ class VesselNotFoundError(DomainError):
 class IngestionStatusUnavailableError(DomainError):
     status_code = HTTPStatus.SERVICE_UNAVAILABLE
     detail = "El estado de la ingesta no está disponible"
+
+
+class TransitNotFoundError(DomainError):
+    status_code = HTTPStatus.NOT_FOUND
+    detail = "Tránsito no encontrado"
