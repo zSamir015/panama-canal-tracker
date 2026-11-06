@@ -167,7 +167,7 @@ objetivo sin degradar la ingesta.
       programarlas en el entorno de despliegue, que aún no existe)
 - [x] 7.3 OpenAPI completo (descripciones y ejemplos en todos los endpoints)
 - [ ] 7.4 README final: GIFs, diagramas, decisiones técnicas, resultados de validación y carga
-- [ ] 7.5 Sección "How it was built" enlazando roadmap, ADRs, issues y releases
+- [x] 7.5 Sección "How it was built" enlazando roadmap, ADRs, issues y releases
 - [ ] 7.6 Revisión de seguridad final (dependencias, headers, CORS, secretos, capturas)
       (hecha una primera pasada en `docs/SECURITY_REVIEW.md`, con hallazgos abiertos: falta el
       entorno de producción)

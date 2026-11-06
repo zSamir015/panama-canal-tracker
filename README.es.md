@@ -85,6 +85,47 @@ Con una key real, ponla en `AISSTREAM_API_KEY` dentro de `.env` y quita las vari
 perfil del simulador. Para desarrollar (API en el host con `--reload`), ver
 [AGENTS.md](AGENTS.md#10-comandos-útiles).
 
+## Cómo se construyó
+
+El proyecto sigue un plan escrito y deja registrada cada decisión no obvia, de modo que su
+historia se puede leer en orden:
+
+- **El plan**: [docs/ROADMAP.md](docs/ROADMAP.md) recoge cada fase y tarea con sus criterios de
+  aceptación. Las fases se construyeron en orden, una tarea cada vez, y cada fase se cierra con una
+  etiqueta.
+- **Las decisiones**: cada decisión de arquitectura tiene su registro en [docs/adr/](docs/adr/) con
+  el contexto, las alternativas descartadas y las consecuencias:
+
+| ADR | Decisión |
+|---|---|
+| [0001](docs/adr/0001-stack-tecnico.md) | Stack técnico |
+| [0002](docs/adr/0002-fuente-de-datos-ais.md) | AISStream.io como fuente de datos AIS |
+| [0003](docs/adr/0003-librerias-de-autenticacion.md) | PyJWT y pwdlib (Argon2id) para autenticación |
+| [0004](docs/adr/0004-worker-separado-y-redis.md) | Worker de ingesta como proceso separado y Redis pub/sub |
+| [0005](docs/adr/0005-timescaledb-para-posiciones.md) | TimescaleDB para la serie temporal de posiciones |
+| [0006](docs/adr/0006-mapa-web-maplibre.md) | Mapa en tiempo real con React + MapLibre GL en el mismo repositorio |
+| [0007](docs/adr/0007-rate-limiting.md) | Librería de rate limiting |
+| [0008](docs/adr/0008-demo-con-login.md) | Datos de AISStream solo para usuarios con sesión |
+| [0009](docs/adr/0009-segunda-conexion-destinos-al-canal.md) | Segunda conexión a AISStream para buques con destino al Canal |
+| [0010](docs/adr/0010-tiles-openfreemap.md) | Tiles del mapa con OpenFreeMap |
+| [0011](docs/adr/0011-demo-estatica-github-pages.md) | Demo estática en GitHub Pages |
+| [0012](docs/adr/0012-recolector-ais-en-github-actions.md) | Recolector AIS en GitHub Actions |
+| [0013](docs/adr/0013-estadisticas-con-sql-y-agregados-sobre-posiciones.md) | Las estadísticas de tránsitos usan SQL; los agregados continuos, las posiciones |
+| [0014](docs/adr/0014-metricas-con-token-y-exposicion-manual.md) | `/metrics` con token propio y formato de Prometheus escrito a mano |
+| [0015](docs/adr/0015-copias-logicas-cifradas-con-gpg.md) | Copias lógicas cifradas con `pg_dump` y `gpg` |
+
+- **El trabajo**: cada tarea es un pull request con lo que cambia, por qué, cómo se probó y una
+  lista de comprobación de seguridad: [pull requests fusionados](https://github.com/zSamir015/panama-canal-tracker/pulls?q=is%3Apr+is%3Amerged),
+  [issues](https://github.com/zSamir015/panama-canal-tracker/issues).
+- **Las versiones**: una etiqueta anotada por fase cerrada, de `v0.1.0` a `v0.4.0` por ahora
+  ([etiquetas](https://github.com/zSamir015/panama-canal-tracker/tags)). El registro de cambios
+  está en [CHANGELOG.md](CHANGELOG.md).
+- **Lo que sigue abierto**: los resultados de validar el detector con tráfico real (tarea 5.7)
+  todavía no están publicados, porque hacen falta días de datos AIS grabados; hasta entonces, los
+  umbrales y los polígonos son estimaciones. Tampoco existe el despliegue de producción (proxy
+  inverso, copias programadas); [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) lista lo que
+  falta.
+
 ## Licencia
 
 [MIT](LICENSE)

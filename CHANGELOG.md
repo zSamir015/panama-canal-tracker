@@ -11,6 +11,9 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Sección "How it was built" / "Cómo se construyó" en los dos README (tarea 7.5): enlaza el
+  roadmap, los 15 ADR, los pull requests, los issues y las etiquetas de versión, y dice qué sigue
+  abierto (validación con datos reales y despliegue).
 - Revisión de seguridad (tarea 7.6, parcial): `docs/SECURITY_REVIEW.md` contrasta lo construido
   con AGENTS.md §8 (gitleaks sobre el historial, pip-audit, npm audit, búsqueda de patrones
   peligrosos, autores, imágenes y acciones fijadas, Dockerfile) y lista los hallazgos abiertos,
