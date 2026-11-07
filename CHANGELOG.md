@@ -45,43 +45,6 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   esperando en fondeadero. Reglas de alerta en `docker/prometheus/canal-alerts.yml`, entre ellas
   más de 5 minutos sin mensajes, validadas con `promtool check rules` y con tests de reglas
   (`canal-alerts.test.yml`). No exporta métricas de peticiones HTTP.
-- Vista de estadísticas (tarea 6.6): pestaña "Estadísticas" junto al mapa, con los tránsitos
-  completados por día en barras apiladas por sentido (periodo de 7, 30 o 90 días), los totales por
-  tipo de buque y las tablas de duración del tránsito y de espera en fondeo (cuenta, media,
-  mediana y percentil 90). Gráfico en SVG a mano, sin librería de gráficas nueva. No aparece en
-  la demo estática. Captura con datos de ejemplo en
-  `docs/media/fase6-estadisticas-datos-de-ejemplo.png`.
-- Compresión y histórico reducido de las posiciones (tarea 6.5, ADR-0005): los chunks de
-  `positions` de más de 7 días se comprimen (agrupados por buque, ordenados por hora), sin borrar
-  nada; se siguen leyendo y el `ON CONFLICT DO NOTHING` del writer sigue funcionando sobre ellos
-  (probado). El agregado continuo `positions_5min` guarda la última posición de cada buque cada
-  5 minutos, para consultar trayectorias de hace meses sin recorrer todas las posiciones; aún no
-  lo lee ningún endpoint. La bajada descomprime y no pierde datos. Las políticas empiezan su
-  primera pasada una hora después de la migración.
-- Endpoints de estadísticas (tarea 6.4): `GET /api/v1/stats/daily` (tránsitos completados por día,
-  sentido y categoría de buque), `/stats/transit-durations` y `/stats/waiting-times` (cuenta,
-  media, mediana y percentil 90 en minutos, en total y por sentido o fondeadero), con ventana
-  `from`/`to` (30 días por defecto, 365 como máximo). SQL directo con `percentile_cont`
-  (ADR-0013). Las categorías de buque son las del mapa y salen de una sola lista de rangos
-  (`app/services/ship_categories.py`) que alimenta Python y SQL.
-- Agregado continuo `positions_hourly` (tarea 6.3, ADR-0013): una fila por buque y hora con el
-  número de posiciones y la velocidad media y máxima, en tiempo real (suma lo posterior a la
-  marca de agua) y con una política que lo refresca cada 30 minutos. Servirá para el tráfico
-  (buques distintos por día) y para medir la cobertura de AISStream. Las estadísticas de
-  tránsitos y esperas (6.4) se calculan con SQL: no son hypertables y tienen pocas filas al día.
-- Tiempo de espera real (tarea 6.2): cada visita a un fondeadero se enlaza con el tránsito que la
-  sigue (`anchorage_visits.transit_id`). Reglas puras en `app/services/waiting.py`: fondeadero del
-  lado por el que el buque entra, la visita más reciente para cada tránsito y el primer tránsito
-  posterior para cada visita, con un máximo de 24 h entre que se fue y entró. El
-  `AnchorageTracker` lo reconcilia cada minuto sobre lo reciente sin enlazar (idempotente y sin
-  depender del orden en que se guardan los eventos). `GET /transits/{id}` devuelve
-  `anchorage_wait` con la llegada, la salida y los minutos de espera.
-- Esperas en fondeo (tarea 6.1): polígonos aproximados de los fondeaderos del Atlántico y del
-  Pacífico (`app/services/anchorages.py`, sin solape con las entradas), detector puro de visitas
-  (`app/services/anchorage_detector.py`: parado 15 min dentro de un fondeadero, con la hora de
-  llegada retrocedida al inicio de la parada; cierra al salir, navegar a 1 nudo o más, o perder la
-  señal), tabla `anchorage_visits` (migración `20261106_0005`, una visita abierta por buque) y
-  `AnchorageTracker` en el worker, con la misma restauración al arrancar que el de tránsitos.
 - Panel "En tránsito ahora" (tarea 5.6): lista de los buques con tránsito `in_progress` (nombre,
   sentido Atlántico → Pacífico o al revés y cuánto llevan en el Canal) sobre el mapa. Se recarga
   cada 30 s con `GET /transits/current` y, al pulsar un buque, lo selecciona en el mapa y abre su
@@ -119,6 +82,53 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   cerrado, orden lon/lat, sentido antihorario, sin autocruces). `scripts/export_zones.py` genera la
   copia que lee el mapa, que las dibuja con contorno discontinuo y etiqueta; un test falla si la
   copia se desfasa. Se usarán en la detección de tránsitos (5.2 y 5.3).
+
+## [0.6.0] - 2026-11-06
+
+Fase 6: esperas en fondeo y estadísticas. Detección de esperas en los fondeaderos y su enlace con
+el tránsito siguiente, agregados continuos y compresión de las posiciones, endpoints de
+estadísticas y su vista en el frontend. Probado con datos sintéticos: los umbrales y los
+polígonos no están contrastados con datos reales (tarea 5.7, pendiente). La fase 5 sigue abierta
+y no hay `v0.5.0`.
+
+### Added
+- Vista de estadísticas (tarea 6.6): pestaña "Estadísticas" junto al mapa, con los tránsitos
+  completados por día en barras apiladas por sentido (periodo de 7, 30 o 90 días), los totales por
+  tipo de buque y las tablas de duración del tránsito y de espera en fondeo (cuenta, media,
+  mediana y percentil 90). Gráfico en SVG a mano, sin librería de gráficas nueva. No aparece en
+  la demo estática. Captura con datos de ejemplo en
+  `docs/media/fase6-estadisticas-datos-de-ejemplo.png`.
+- Compresión y histórico reducido de las posiciones (tarea 6.5, ADR-0005): los chunks de
+  `positions` de más de 7 días se comprimen (agrupados por buque, ordenados por hora), sin borrar
+  nada; se siguen leyendo y el `ON CONFLICT DO NOTHING` del writer sigue funcionando sobre ellos
+  (probado). El agregado continuo `positions_5min` guarda la última posición de cada buque cada
+  5 minutos, para consultar trayectorias de hace meses sin recorrer todas las posiciones; aún no
+  lo lee ningún endpoint. La bajada descomprime y no pierde datos. Las políticas empiezan su
+  primera pasada una hora después de la migración.
+- Endpoints de estadísticas (tarea 6.4): `GET /api/v1/stats/daily` (tránsitos completados por día,
+  sentido y categoría de buque), `/stats/transit-durations` y `/stats/waiting-times` (cuenta,
+  media, mediana y percentil 90 en minutos, en total y por sentido o fondeadero), con ventana
+  `from`/`to` (30 días por defecto, 365 como máximo). SQL directo con `percentile_cont`
+  (ADR-0013). Las categorías de buque son las del mapa y salen de una sola lista de rangos
+  (`app/services/ship_categories.py`) que alimenta Python y SQL.
+- Agregado continuo `positions_hourly` (tarea 6.3, ADR-0013): una fila por buque y hora con el
+  número de posiciones y la velocidad media y máxima, en tiempo real (suma lo posterior a la
+  marca de agua) y con una política que lo refresca cada 30 minutos. Servirá para el tráfico
+  (buques distintos por día) y para medir la cobertura de AISStream. Las estadísticas de
+  tránsitos y esperas (6.4) se calculan con SQL: no son hypertables y tienen pocas filas al día.
+- Tiempo de espera real (tarea 6.2): cada visita a un fondeadero se enlaza con el tránsito que la
+  sigue (`anchorage_visits.transit_id`). Reglas puras en `app/services/waiting.py`: fondeadero del
+  lado por el que el buque entra, la visita más reciente para cada tránsito y el primer tránsito
+  posterior para cada visita, con un máximo de 24 h entre que se fue y entró. El
+  `AnchorageTracker` lo reconcilia cada minuto sobre lo reciente sin enlazar (idempotente y sin
+  depender del orden en que se guardan los eventos). `GET /transits/{id}` devuelve
+  `anchorage_wait` con la llegada, la salida y los minutos de espera.
+- Esperas en fondeo (tarea 6.1): polígonos aproximados de los fondeaderos del Atlántico y del
+  Pacífico (`app/services/anchorages.py`, sin solape con las entradas), detector puro de visitas
+  (`app/services/anchorage_detector.py`: parado 15 min dentro de un fondeadero, con la hora de
+  llegada retrocedida al inicio de la parada; cierra al salir, navegar a 1 nudo o más, o perder la
+  señal), tabla `anchorage_visits` (migración `20261106_0005`, una visita abierta por buque) y
+  `AnchorageTracker` en el worker, con la misma restauración al arrancar que el de tránsitos.
 
 ## [0.4.0] - 2026-11-06
 

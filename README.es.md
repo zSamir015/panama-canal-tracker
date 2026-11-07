@@ -63,8 +63,11 @@ conexión a AISStream. Detalle en [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 | 3 | Worker de ingesta AIS | ✅ |
 | 4 | Mapa en tiempo real y demo | ✅ |
 | 5 | Detección de tránsitos y validación | ⏳ |
-| 6 | Esperas en fondeo y estadísticas | ⏳ |
+| 6 | Esperas en fondeo y estadísticas | ✅ |
 | 7 | Endurecimiento para producción | ⏳ |
+
+La fase 6 se cierra con datos sintéticos. La fase 5 sigue abierta hasta validar el detector con
+tráfico real (tarea 5.7), así que los umbrales de las estadísticas siguen siendo estimaciones.
 
 Plan completo: [docs/ROADMAP.md](docs/ROADMAP.md).
 
