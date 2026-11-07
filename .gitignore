@@ -44,6 +44,8 @@ service-account*.json
 
 # Volcados de base de datos
 *.dump
+*.dump.gpg
+*.dump.gpg.sha256
 *.sql.gz
 backups/
 
