@@ -68,6 +68,21 @@ function stubApi({
         }),
       );
     }
+    if (url.includes('/stats/daily')) {
+      return Promise.resolve(json(200, { items: [] }));
+    }
+    if (url.includes('/stats/transit-durations')) {
+      const empty = { count: 0, mean_minutes: null, p50_minutes: null, p90_minutes: null };
+      return Promise.resolve(
+        json(200, { overall: empty, by_direction: { northbound: empty, southbound: empty } }),
+      );
+    }
+    if (url.includes('/stats/waiting-times')) {
+      const empty = { count: 0, mean_minutes: null, p50_minutes: null, p90_minutes: null };
+      return Promise.resolve(
+        json(200, { overall: empty, by_anchorage: { atlantic: empty, pacific: empty } }),
+      );
+    }
     if (url.endsWith('/transits/current')) {
       return Promise.resolve(json(200, { items: [], total: 0 }));
     }
@@ -226,5 +241,38 @@ describe('App', () => {
     expect(await screen.findByRole('heading', { name: hostile })).toBeVisible();
     expect(screen.queryByText('NOMBRE REST')).not.toBeInTheDocument();
     expect(document.querySelector('img')).toBeNull();
+  });
+
+  it('cambia entre el mapa y las estadísticas con las pestañas', async () => {
+    stubApi({ refreshStatuses: [200] });
+    renderWithQuery(<App />);
+
+    expect(await screen.findByRole('button', { name: 'buque de prueba' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Mapa' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.queryByRole('region', { name: 'Estadísticas' })).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Estadísticas' }));
+
+    expect(await screen.findByRole('region', { name: 'Estadísticas' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Estadísticas' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.queryByRole('region', { name: 'Mapa en vivo' })).not.toBeInTheDocument();
+    expect(await screen.findByText('No hay tránsitos completados en este periodo.')).toBeVisible();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Mapa' }));
+
+    expect(await screen.findByRole('button', { name: 'buque de prueba' })).toBeVisible();
+    expect(screen.queryByRole('region', { name: 'Estadísticas' })).not.toBeInTheDocument();
+  });
+
+  it('no enseña las pestañas antes de iniciar sesión', async () => {
+    stubApi();
+    renderWithQuery(<App />);
+
+    await screen.findByRole('heading', { name: 'Iniciar sesión' });
+
+    expect(screen.queryByRole('navigation', { name: 'Vista' })).not.toBeInTheDocument();
   });
 });

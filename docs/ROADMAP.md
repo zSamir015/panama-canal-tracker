@@ -152,7 +152,7 @@ objetivo sin degradar la ingesta.
       las esperas se calculan con SQL
 - [x] 6.4 `GET /stats/daily`, `/stats/transit-durations`, `/stats/waiting-times`
 - [x] 6.5 Compresión y downsampling de `positions` (sin borrar histórico)
-- [ ] 6.6 Vista de estadísticas en `web/` (gráficas)
+- [x] 6.6 Vista de estadísticas en `web/` (gráficas)
 
 **Aceptación**: estadísticas correctas sobre datos sintéticos sembrados y visibles en el frontend.
 **Release**: `v0.6.0`.
