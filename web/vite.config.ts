@@ -1,9 +1,23 @@
 /// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
+import { buildCsp } from './csp';
+
+/** Pone la CSP en el `<meta>` de `index.html`, solo al compilar (el servidor de desarrollo necesita scripts en línea para el refresco en caliente). */
+function contentSecurityPolicy(): Plugin {
+  let policy = '';
+  return {
+    name: 'content-security-policy',
+    apply: 'build',
+    configResolved(config) {
+      policy = buildCsp(loadEnv(config.mode, config.envDir, 'VITE_'));
+    },
+    transformIndexHtml: (html) => html.replace('__CSP__', policy),
+  };
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), contentSecurityPolicy()],
   // En modo demo (GitHub Pages) el sitio vive bajo /panama-canal-tracker/ (ADR-0011).
   base: process.env.VITE_DEMO === 'true' ? '/panama-canal-tracker/' : '/',
   server: {

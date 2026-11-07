@@ -8,6 +8,13 @@
       name="description"
       content="Buques del Canal de Panamá en tiempo real a partir de datos AIS."
     />
+    <!--
+      Content-Security-Policy (AGENTS.md §8.11): la construye `csp.ts` con la configuración de la
+      compilación y la pone aquí `vite.config.ts`. GitHub Pages no deja mandar cabeceras, así que
+      va en un <meta>; con un proxy propio se repite como cabecera y se añade
+      `frame-ancestors 'none'`, que un <meta> ignora.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="__CSP__" />
     <title>Panama Canal Tracker</title>
   </head>
   <body>

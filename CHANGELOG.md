@@ -11,6 +11,14 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
 
 ### Added
+- Revisión de seguridad (tarea 7.6, parcial): `docs/SECURITY_REVIEW.md` contrasta lo construido
+  con AGENTS.md §8 (gitleaks sobre el historial, pip-audit, npm audit, búsqueda de patrones
+  peligrosos, autores, imágenes y acciones fijadas, Dockerfile) y lista los hallazgos abiertos,
+  sobre todo que no existe un entorno de producción donde aplicar HSTS, límites y bloqueos.
+- Content-Security-Policy del frontend (AGENTS.md §8.11): se genera al compilar desde la
+  configuración (API y tiles) con `web/csp.ts` y se pone en un `<meta>`. Scripts solo del propio
+  origen, sin `unsafe-inline` ni `unsafe-eval`. Verificada en la demo con Chrome en tiempo real (0
+  violaciones; mapa, buques y zonas); la app completa (login, API y WebSocket) sigue sin probar.
 - Copias de seguridad cifradas y restauración probada (tarea 7.2, ADR-0015): `scripts/db_backup.sh`
   (`pg_dump` cifrado al vuelo con `gpg`, con suma SHA-256), `scripts/db_restore.sh` (restaura en
   una base nueva con `timescaledb_pre_restore`/`post_restore`, se niega a sobrescribir y borra lo
