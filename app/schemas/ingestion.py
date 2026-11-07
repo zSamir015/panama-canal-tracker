@@ -2,6 +2,9 @@
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 
+from app.schemas import examples
+from app.schemas.examples import with_example
+
 
 class WorkerStatus(BaseModel):
     """Contadores del worker AIS en un momento dado (`canal:ais:worker:status`)."""
@@ -28,6 +31,7 @@ class WorkerStatus(BaseModel):
     last_flush_at: AwareDatetime | None
 
 
+@with_example(examples.INGESTION_STATUS)
 class IngestionStatusResponse(BaseModel):
     """`GET /admin/ingestion/status`. Sin estado en Redis (`available=false`): el worker está
     parado o no actualiza desde hace más de la caducidad de la clave."""

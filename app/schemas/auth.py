@@ -12,6 +12,8 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints
 
 from app.core.security import PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH
 from app.models.user import UserRole
+from app.schemas import examples
+from app.schemas.examples import with_example
 
 NewPassword = Annotated[
     str, StringConstraints(min_length=PASSWORD_MIN_LENGTH, max_length=PASSWORD_MAX_LENGTH)
@@ -25,22 +27,26 @@ class _Request(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
 
 
+@with_example(examples.USER_CREATE)
 class UserCreate(_Request):
     email: EmailStr = Field(max_length=320, examples=["demo@example.com"])
     password: NewPassword = Field(examples=["una frase larga y fácil de recordar"])
 
 
+@with_example(examples.LOGIN)
 class LoginRequest(_Request):
     email: EmailStr = Field(max_length=320, examples=["demo@example.com"])
     password: LoginPassword
 
 
+@with_example(examples.TOKEN)
 class TokenResponse(BaseModel):
     access_token: str
     token_type: Literal["bearer"] = "bearer"  # noqa: S105 (tipo de token OAuth2, no un secreto)
     expires_in: int = Field(description="Segundos hasta que caduca el access token")
 
 
+@with_example(examples.USER)
 class UserResponse(BaseModel):
     """Perfil público del usuario. Nunca incluye el hash de la contraseña."""
 

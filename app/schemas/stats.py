@@ -5,6 +5,8 @@ from typing import Literal, Self
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
+from app.schemas import examples
+from app.schemas.examples import with_example
 from app.services.ship_categories import ShipCategory
 
 DEFAULT_WINDOW_DAYS = 30
@@ -58,6 +60,7 @@ class DailyItem(BaseModel):
     transits: int
 
 
+@with_example(examples.DAILY_STATS)
 class DailyStatsResponse(Window):
     items: list[DailyItem] = Field(description="Solo las combinaciones con algún tránsito")
 
@@ -71,11 +74,13 @@ class Distribution(BaseModel):
     p90_minutes: float | None
 
 
+@with_example(examples.TRANSIT_DURATIONS)
 class TransitDurationsResponse(Window):
     overall: Distribution
     by_direction: dict[Direction, Distribution]
 
 
+@with_example(examples.WAITING_TIMES)
 class WaitingTimesResponse(Window):
     overall: Distribution
     by_anchorage: dict[AnchorageName, Distribution]

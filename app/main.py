@@ -2,6 +2,7 @@
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from typing import Any
 
 import uvicorn
 from fastapi import APIRouter, Depends, FastAPI
@@ -18,10 +19,12 @@ from app.core.middleware import (
     RequestIdMiddleware,
     SecurityHeadersMiddleware,
 )
+from app.core.openapi import add_problem_examples
 from app.core.rate_limit import AppRateLimiter, create_storage, limit_api_by_user
 from app.core.redis import create_redis
 from app.routers import admin, auth, infrastructure, live, stats, transits, vessels
 from app.routers.live import MAX_CLIENT_MESSAGE_BYTES
+from app.schemas import examples
 from app.services.live import ConnectionLimiter, LiveHub
 
 
@@ -95,9 +98,25 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.include_router(infrastructure.router)
 
-    @app.get("/health", tags=["infrastructure"])
+    @app.get(
+        "/health",
+        tags=["infrastructure"],
+        summary="El proceso está vivo",
+        description=(
+            "Responde `ok` mientras el proceso atienda peticiones. No comprueba la base ni "
+            "Redis (para eso, `/ready`): el orquestador lo usa para saber si hay que reiniciarlo."
+        ),
+        responses={200: {"content": {"application/json": {"example": examples.HEALTH}}}},
+    )
     async def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    def openapi_with_examples() -> dict[str, Any]:
+        if app.openapi_schema is None:
+            app.openapi_schema = add_problem_examples(FastAPI.openapi(app))
+        return app.openapi_schema
+
+    app.openapi = openapi_with_examples  # type: ignore[method-assign]
 
     return app
 

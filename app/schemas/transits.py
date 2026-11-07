@@ -6,6 +6,9 @@ from uuid import UUID
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
+from app.schemas import examples
+from app.schemas.examples import with_example
+
 MAX_PAGE_SIZE = 200
 MAX_PAGE = 10_000
 DEFAULT_WINDOW_DAYS = 7
@@ -88,12 +91,14 @@ class AnchorageWaitResponse(BaseModel):
     wait_minutes: int = Field(description="Desde que llegó al fondeadero hasta que entró al Canal")
 
 
+@with_example(examples.TRANSIT_DETAIL)
 class TransitDetailResponse(TransitResponse):
     anchorage_wait: AnchorageWaitResponse | None = Field(
         description="`null` si no se detectó una espera en fondeo antes de este tránsito"
     )
 
 
+@with_example(examples.TRANSIT_PAGE)
 class TransitPageResponse(BaseModel):
     items: list[TransitResponse]
     total: int
@@ -101,6 +106,7 @@ class TransitPageResponse(BaseModel):
     size: int
 
 
+@with_example(examples.CURRENT_TRANSITS)
 class CurrentTransitsResponse(BaseModel):
     items: list[TransitResponse]
     total: int = Field(description="Tránsitos en curso; puede superar `items` si pasa del tope")

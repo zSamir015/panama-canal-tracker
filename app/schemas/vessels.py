@@ -5,6 +5,8 @@ from typing import Annotated, Literal, Self
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from app.schemas import examples
+from app.schemas.examples import with_example
 from app.services.canal_destination import CANAL_PORT_LOCODES, COUNTRY_ONLY
 
 MAX_PAGE_SIZE = 200
@@ -64,10 +66,12 @@ class PositionResponse(BaseModel):
     nav_status: int | None
 
 
+@with_example(examples.VESSEL_DETAIL)
 class VesselDetailResponse(VesselResponse):
     last_position: PositionResponse | None
 
 
+@with_example(examples.VESSEL_PAGE)
 class VesselPageResponse(BaseModel):
     items: list[VesselResponse]
     total: int
@@ -130,6 +134,7 @@ class TrackProperties(BaseModel):
     )
 
 
+@with_example(examples.VESSEL_TRACK)
 class VesselTrackResponse(BaseModel):
     """Feature GeoJSON (RFC 7946). `geometry` es `null` con menos de dos posiciones."""
 
@@ -201,6 +206,7 @@ class CanalBoundVesselResponse(BaseModel):
     reported_at: datetime
 
 
+@with_example(examples.CANAL_BOUND_PAGE)
 class CanalBoundPageResponse(BaseModel):
     items: list[CanalBoundVesselResponse]
     total: int

@@ -13,11 +13,14 @@ from redis.asyncio import Redis
 
 from app.core.auth import require_metrics_token
 from app.core.db import SessionFactory
+from app.schemas import examples
+from app.schemas.examples import with_example
 from app.services.metrics import CONTENT_TYPE, MetricsService, readiness, render
 
 router = APIRouter(tags=["infrastructure"])
 
 
+@with_example(examples.READY)
 class ReadyResponse(BaseModel):
     status: Literal["ready", "unavailable"]
     checks: dict[Literal["database", "redis"], Literal["ok", "failed"]]
@@ -42,7 +45,13 @@ def _session_factory(request: Request) -> SessionFactory:
         "y no lleva datos: lo usa el orquestador. `/health` solo dice que el proceso vive."
     ),
     response_model=ReadyResponse,
-    responses={HTTPStatus.SERVICE_UNAVAILABLE: {"model": ReadyResponse}},
+    responses={
+        HTTPStatus.SERVICE_UNAVAILABLE: {
+            "model": ReadyResponse,
+            "description": "Alguna dependencia falla",
+            "content": {"application/json": {"example": examples.READY_UNAVAILABLE}},
+        }
+    },
 )
 async def ready(
     response: Response,
@@ -72,8 +81,14 @@ async def ready(
     ),
     response_class=Response,
     responses={
-        HTTPStatus.OK: {"content": {"text/plain": {}}, "description": "Métricas"},
-        HTTPStatus.UNAUTHORIZED: {"description": "Token ausente o inválido"},
+        HTTPStatus.OK: {
+            "content": {"text/plain": {"example": examples.METRICS_TEXT}},
+            "description": "Métricas",
+        },
+        HTTPStatus.UNAUTHORIZED: {
+            "description": "No autenticado",
+            "content": {"application/problem+json": {}},
+        },
     },
     dependencies=[Depends(require_metrics_token)],
 )
