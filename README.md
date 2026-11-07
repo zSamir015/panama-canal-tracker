@@ -63,8 +63,11 @@ keeping a single upstream AIS connection. Details in [docs/ARCHITECTURE.md](docs
 | 3 | AIS ingestion worker | ✅ |
 | 4 | Real-time map and live demo | ✅ |
 | 5 | Transit detection and validation | ⏳ |
-| 6 | Anchorage waits and statistics | ⏳ |
+| 6 | Anchorage waits and statistics | ✅ |
 | 7 | Production hardening | ⏳ |
+
+Phase 6 is closed against synthetic data. Phase 5 stays open until the detector is validated
+against real traffic (task 5.7), so the thresholds behind the statistics are still estimates.
 
 Full plan: [docs/ROADMAP.md](docs/ROADMAP.md).
 

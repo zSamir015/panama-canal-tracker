@@ -325,9 +325,11 @@ Principio general: **denegar por defecto** — todo cerrado salvo lo que se abre
 
 ## 9. Estado actual
 
-> **Fase actual: 5 — Detección de tránsitos.** Las Fases 1 (`v0.1.0`), 2 (base de datos y
-> autenticación, `v0.2.0`), 3 (ingesta AIS, `v0.3.0`) y 4 (mapa en tiempo real y demo,
-> `v0.4.0`) están cerradas.
+> **Fase actual: 5 — Detección de tránsitos (falta la 5.7, validación con datos reales) y 7 en
+> curso.** Las Fases 1 (`v0.1.0`), 2 (base de datos y autenticación, `v0.2.0`), 3 (ingesta AIS,
+> `v0.3.0`), 4 (mapa en tiempo real y demo, `v0.4.0`) y 6 (esperas en fondeo y estadísticas,
+> `v0.6.0`) están cerradas. No hay `v0.5.0` hasta cerrar la 5.7. De la Fase 7 están hechas la
+> 7.1, 7.3 y 7.5, y a medias la 7.2 y la 7.6 (`docs/SECURITY_REVIEW.md`).
 
 ## 10. Comandos útiles
 
