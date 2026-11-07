@@ -1,0 +1,46 @@
+# Reglas de alerta de Prometheus para Panama Canal Tracker (tarea 7.1, ADR-0014).
+# Las métricas las exporta la API en `/metrics` (docs/ARCHITECTURE.md). Cárgalas con
+# `rule_files:` en `prometheus.yml`. Los umbrales son los del roadmap: 5 minutos sin mensajes.
+#
+# Ojo con la cobertura de AISStream en el Canal, que es escasa (docs/DATA_SOURCES.md §2b): con
+# pocos buques en el área puede haber huecos de más de 5 minutos sin que el worker esté mal.
+# Si `CanalAisNoMessages` salta demasiado, sube el umbral; no la desactives.
+groups:
+  - name: canal
+    rules:
+      - alert: CanalAisWorkerDown
+        expr: canal_ais_worker_available == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "El worker AIS no publica su estado desde hace más de 5 minutos"
+          description: "Sin worker no entran posiciones nuevas: el mapa y la detección de tránsitos se quedan parados."
+
+      - alert: CanalAisNoMessages
+        expr: canal_ais_last_message_age_seconds > 300
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "El worker lleva más de 5 minutos sin recibir mensajes de AISStream"
+          description: "El worker está vivo pero AISStream no le manda nada: conexión caída, suscripción rechazada o cobertura nula en el área."
+
+      - alert: CanalAisNoMessagesSinceStart
+        # El worker está disponible y nunca ha recibido un mensaje: no hay edad que medir.
+        expr: canal_ais_worker_available == 1 unless on() canal_ais_last_message_age_seconds
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "El worker lleva más de 5 minutos activo sin recibir ningún mensaje"
+          description: "Revisa la API key de AISStream y la suscripción (docs/DATA_SOURCES.md)."
+
+      - alert: CanalDependencyDown
+        expr: canal_dependency_up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "La API no alcanza {{ $labels.name }}"
+          description: "La base de datos o Redis no responden desde la API; `/ready` devuelve 503."

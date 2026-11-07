@@ -1,0 +1,115 @@
+# Tests de las reglas de `canal-alerts.yml`. Se ejecutan con:
+#   promtool test rules docker/prometheus/canal-alerts.test.yml
+# (o con la imagen oficial: ver docs/ARCHITECTURE.md §7).
+rule_files:
+  - canal-alerts.yml
+
+evaluation_interval: 1m
+
+tests:
+  - name: worker con mensajes recientes no alerta
+    interval: 1m
+    input_series:
+      - series: canal_ais_worker_available
+        values: "1x20"
+      - series: canal_ais_last_message_age_seconds
+        values: "30x20"
+    alert_rule_test:
+      - eval_time: 20m
+        alertname: CanalAisNoMessages
+        exp_alerts: []
+      - eval_time: 20m
+        alertname: CanalAisNoMessagesSinceStart
+        exp_alerts: []
+
+  - name: más de 5 minutos sin mensajes alerta tras 1 minuto
+    interval: 1m
+    input_series:
+      - series: canal_ais_worker_available
+        values: "1x20"
+      - series: canal_ais_last_message_age_seconds
+        # La edad crece 60 s por minuto desde 0: pasa de 300 en el minuto 6.
+        values: "0+60x20"
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: CanalAisNoMessages
+        exp_alerts: []
+      - eval_time: 8m
+        alertname: CanalAisNoMessages
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "El worker lleva más de 5 minutos sin recibir mensajes de AISStream"
+              description: "El worker está vivo pero AISStream no le manda nada: conexión caída, suscripción rechazada o cobertura nula en el área."
+
+  - name: exactamente 300 segundos no alerta
+    interval: 1m
+    input_series:
+      - series: canal_ais_last_message_age_seconds
+        values: "300x10"
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: CanalAisNoMessages
+        exp_alerts: []
+
+  - name: worker disponible que nunca recibió un mensaje alerta a los 5 minutos
+    interval: 1m
+    input_series:
+      - series: canal_ais_worker_available
+        values: "1x20"
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: CanalAisNoMessagesSinceStart
+        exp_alerts: []
+      - eval_time: 6m
+        alertname: CanalAisNoMessagesSinceStart
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "El worker lleva más de 5 minutos activo sin recibir ningún mensaje"
+              description: "Revisa la API key de AISStream y la suscripción (docs/DATA_SOURCES.md)."
+
+  - name: worker parado alerta a los 5 minutos y no por falta de mensajes
+    interval: 1m
+    input_series:
+      - series: canal_ais_worker_available
+        values: "0x20"
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: CanalAisWorkerDown
+        exp_alerts: []
+      - eval_time: 6m
+        alertname: CanalAisWorkerDown
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+            exp_annotations:
+              summary: "El worker AIS no publica su estado desde hace más de 5 minutos"
+              description: "Sin worker no entran posiciones nuevas: el mapa y la detección de tránsitos se quedan parados."
+      # Con el worker parado no hay edad ni "disponible": las otras reglas no se mezclan.
+      - eval_time: 6m
+        alertname: CanalAisNoMessagesSinceStart
+        exp_alerts: []
+
+  - name: dependencia caída alerta a los 2 minutos con el nombre
+    interval: 1m
+    input_series:
+      - series: 'canal_dependency_up{name="redis"}'
+        values: "0x10"
+      - series: 'canal_dependency_up{name="database"}'
+        values: "1x10"
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: CanalDependencyDown
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: CanalDependencyDown
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              name: redis
+            exp_annotations:
+              summary: "La API no alcanza redis"
+              description: "La base de datos o Redis no responden desde la API; `/ready` devuelve 503."

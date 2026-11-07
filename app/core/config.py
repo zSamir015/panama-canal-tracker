@@ -16,6 +16,7 @@ LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
 JWT_SECRET_PLACEHOLDER = "changeme"  # noqa: S105 (placeholder de .env.example, no es un secreto)
 JWT_SECRET_MIN_BYTES = 32
+METRICS_TOKEN_MIN_BYTES = 32
 DATABASE_URL_PLACEHOLDER = "postgresql+asyncpg://canal_app:changeme@localhost:5432/canal_tracker"
 DATABASE_DRIVER_SCHEME = "postgresql+asyncpg"
 DATABASE_PASSWORD_PLACEHOLDER = "changeme"  # noqa: S105 (placeholder de .env.example)
@@ -83,6 +84,9 @@ class Settings(BaseSettings):
     # Detección de tránsitos (5.3): sin señal durante más de estos minutos, un tránsito abierto se
     # aborta (docs/ARCHITECTURE.md §4.2).
     transit_signal_timeout_minutes: int = Field(default=30, ge=5, le=24 * 60)
+    # `/metrics` (7.1): token que Prometheus manda como `Authorization: Bearer`. Sin definir, el
+    # endpoint responde siempre 401: denegar por defecto, aunque el proxy no lo bloquee.
+    metrics_token: SecretStr | None = None
 
     @field_validator("database_url", "migrations_database_url")
     @classmethod
@@ -101,6 +105,14 @@ class Settings(BaseSettings):
     def require_redis_url(cls, value: SecretStr) -> SecretStr:
         if urlsplit(value.get_secret_value()).scheme not in REDIS_SCHEMES:
             raise ValueError("REDIS_URL debe usar el esquema redis:// o rediss://")
+        return value
+
+    @field_validator("metrics_token")
+    @classmethod
+    def require_long_metrics_token(cls, value: SecretStr | None) -> SecretStr | None:
+        # El mensaje nombra la variable pero no incluye el valor.
+        if value is not None and len(value.get_secret_value().encode()) < METRICS_TOKEN_MIN_BYTES:
+            raise ValueError(f"METRICS_TOKEN debe medir al menos {METRICS_TOKEN_MIN_BYTES} bytes")
         return value
 
     @field_validator("aisstream_url")

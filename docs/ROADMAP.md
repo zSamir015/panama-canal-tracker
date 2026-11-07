@@ -161,7 +161,7 @@ objetivo sin degradar la ingesta.
 
 ## Fase 7 — Producción y pulido de portafolio `[ ]`
 
-- [ ] 7.1 `/metrics` Prometheus y `/ready`; alerta si el worker lleva > 5 min sin mensajes
+- [x] 7.1 `/metrics` Prometheus y `/ready`; alerta si el worker lleva > 5 min sin mensajes
 - [ ] 7.2 Backups automáticos de la DB y procedimiento de restauración probado
 - [ ] 7.3 OpenAPI completo (descripciones y ejemplos en todos los endpoints)
 - [ ] 7.4 README final: GIFs, diagramas, decisiones técnicas, resultados de validación y carga
