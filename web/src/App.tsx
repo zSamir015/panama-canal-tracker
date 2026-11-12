@@ -70,9 +70,11 @@ export function App() {
         <div>
           <h1>Panama Canal Tracker</h1>
           {config.demo ? (
-            <p>Demo con datos simulados del Canal de Panamá.</p>
+            <p className="app__subtitle">Demo con datos simulados del Canal de Panamá.</p>
           ) : (
-            <p>Buques del Canal de Panamá en tiempo real a partir de datos AIS.</p>
+            <p className="app__subtitle">
+              Buques del Canal de Panamá en tiempo real a partir de datos AIS.
+            </p>
           )}
         </div>
         {mapReady && !config.demo && (

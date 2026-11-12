@@ -414,3 +414,42 @@
 .stats__error {
   color: #b71c1c;
 }
+
+/* Móvil (issue #123). Un solo punto de corte; en escritorio no cambia nada. */
+@media (max-width: 640px) {
+  /* El aviso de la demo, en una línea a 390 px; el texto no cambia (ADR-0011). */
+  .demo-banner {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.72rem;
+    line-height: 1.3;
+  }
+
+  /* Cabecera compacta: título y estado en una línea; las pestañas, si las hay, en la siguiente. */
+  .app__header {
+    gap: 0.25rem 0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .app__header h1 {
+    font-size: 1.1rem;
+  }
+
+  /* El aviso de la demo ya lo dice, y en la app el título basta. */
+  .app__header .app__subtitle {
+    display: none;
+  }
+
+  .app__header .app__status {
+    font-size: 0.85rem;
+  }
+
+  .app__tabs {
+    order: 1;
+    flex-basis: 100%;
+  }
+
+  .app__tabs button {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.85rem;
+  }
+}
