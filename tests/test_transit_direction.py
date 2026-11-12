@@ -355,6 +355,10 @@ def test_the_replay_keeps_the_course_and_speed_of_each_position() -> None:
         pytest.param("sog", 102.3, id="sog-not-available"),
         pytest.param("sog", "fast", id="sog-not-a-number"),
         pytest.param("sog", None, id="sog-missing"),
+        # `json.loads` acepta NaN e Infinity aunque no sean JSON estándar.
+        pytest.param("cog", math.nan, id="cog-nan"),
+        pytest.param("sog", math.inf, id="sog-infinity"),
+        pytest.param("sog", -math.inf, id="sog-minus-infinity"),
     ],
 )
 def test_an_unusable_course_or_speed_is_dropped_but_the_position_is_kept(
