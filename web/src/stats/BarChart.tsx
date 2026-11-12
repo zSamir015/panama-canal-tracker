@@ -1,3 +1,4 @@
+import type { Direction } from './api';
 import { DIRECTION_COLORS } from './colors';
 import { axisMax, type DayBar } from './series';
 import { shortDateText } from './format';
@@ -9,6 +10,12 @@ const GRID_LINES = 4;
 
 interface BarChartProps {
   bars: readonly DayBar[];
+  /** Tope del eje; por defecto, el de `bars`. Con un filtro de tipo se pasa el de todos los datos. */
+  max?: number;
+  /** Sentido resaltado: el otro se atenúa. */
+  highlight?: Direction | null;
+  /** Lo que se cuenta, para la etiqueta accesible: " de tipo Carga" o nada. */
+  subject?: string;
 }
 
 /**
@@ -17,8 +24,15 @@ interface BarChartProps {
  * enseña al pasar el ratón y los lectores de pantalla leen. Todo son números y fechas que
  * generamos nosotros: no hay texto de AIS aquí.
  */
-export function BarChart({ bars }: BarChartProps) {
-  const max = axisMax(bars);
+export function BarChart({
+  bars,
+  max = axisMax(bars),
+  highlight = null,
+  subject = '',
+}: BarChartProps) {
+  const barClass = (direction: Direction) =>
+    `bar-chart__bar bar-chart__bar--${direction}` +
+    (highlight !== null && highlight !== direction ? ' is-dimmed' : '');
   const plotWidth = WIDTH - MARGIN.left - MARGIN.right;
   const plotHeight = HEIGHT - MARGIN.top - MARGIN.bottom;
   const slot = plotWidth / Math.max(1, bars.length);
@@ -33,7 +47,7 @@ export function BarChart({ bars }: BarChartProps) {
       className="bar-chart"
       viewBox={`0 0 ${String(WIDTH)} ${String(HEIGHT)}`}
       role="img"
-      aria-label={`Tránsitos completados por día: ${String(total)} en ${String(bars.length)} días`}
+      aria-label={`Tránsitos${subject} completados por día: ${String(total)} en ${String(bars.length)} días`}
     >
       {Array.from({ length: GRID_LINES + 1 }, (_, line) => {
         const value = (max / GRID_LINES) * line;
@@ -59,7 +73,7 @@ export function BarChart({ bars }: BarChartProps) {
         return (
           <g key={bar.date}>
             <title>
-              {`${shortDateText(bar.date)}: ${String(bar.southbound + bar.northbound)} tránsitos ` +
+              {`${shortDateText(bar.date)}: ${String(bar.southbound + bar.northbound)} tránsitos${subject} ` +
                 `(Atlántico → Pacífico ${String(bar.southbound)}, ` +
                 `Pacífico → Atlántico ${String(bar.northbound)})`}
             </title>
@@ -69,6 +83,7 @@ export function BarChart({ bars }: BarChartProps) {
               width={barWidth}
               height={south}
               fill={DIRECTION_COLORS.southbound}
+              className={barClass('southbound')}
             />
             <rect
               x={x}
@@ -76,6 +91,7 @@ export function BarChart({ bars }: BarChartProps) {
               width={barWidth}
               height={north}
               fill={DIRECTION_COLORS.northbound}
+              className={barClass('northbound')}
             />
             {index % labelEvery === 0 && (
               <text
