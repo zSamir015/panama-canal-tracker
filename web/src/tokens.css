@@ -1,0 +1,45 @@
+/*
+ * Variables de diseño (issue #123): los colores, radios y sombras de la interfaz, en un solo
+ * sitio. Los colores por tipo de buque y de las gráficas se quedan en TypeScript
+ * (`map/vesselGeoJson.ts`, `stats/colors.ts`) porque MapLibre y el SVG los necesitan como valores
+ * de JavaScript.
+ */
+:root {
+  /* Marca y fondo */
+  --color-brand: #0b3d5c;
+  --color-on-brand: #f4f7fa;
+  --color-page: #f4f7fa;
+  --color-surface: #fff;
+  --color-surface-muted: #e8eef3;
+
+  /* Texto, de más a menos contraste */
+  --color-text: #1c2a35;
+  --color-text-strong: #263238;
+  --color-text-secondary: #3b4b58;
+  --color-text-muted: #607d8b;
+
+  /* Bordes */
+  --color-border: #b0bec5;
+  --color-border-subtle: #cfd8dc;
+  --color-divider: #eceff1;
+
+  /* Acción, error y avisos */
+  --color-accent: #1565c0;
+  --color-on-accent: #fff;
+  --color-danger: #b71c1c;
+  --color-notice: #8a5a00;
+  --color-warning-bg: #fff3cd;
+  --color-warning-border: #ffc107;
+  --color-warning-text: #5d4037;
+
+  /* Radios */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-sheet: 12px;
+
+  /* Sombras */
+  --shadow-panel: 0 1px 6px rgb(0 0 0 / 20%);
+  --shadow-sheet: 0 -2px 10px rgb(0 0 0 / 20%);
+}

@@ -6,8 +6,8 @@
     Roboto,
     sans-serif;
   line-height: 1.5;
-  color: #1c2a35;
-  background: #f4f7fa;
+  color: var(--color-text);
+  background: var(--color-page);
 }
 
 body {

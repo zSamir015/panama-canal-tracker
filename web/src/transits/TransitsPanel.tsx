@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import type { CurrentTransit } from './api';
 import { directionText, elapsedText, transitName } from './format';
 import { useCurrentTransits } from './queries';
@@ -13,14 +13,38 @@ interface TransitsPanelProps {
  * "En tránsito ahora": los buques que entraron por una entrada del Canal y aún no han salido por
  * la otra. Nombres y demás datos vienen de AIS: se pintan como texto con React, nunca como HTML
  * (AGENTS.md §8.7).
+ *
+ * En móvil es una barra al pie del mapa que se despliega como hoja inferior; en escritorio el CSS
+ * oculta el botón y la lista se ve siempre (issue #123).
  */
 export function TransitsPanel({ token, selectedMmsi, onSelect }: TransitsPanelProps) {
   const transits = useCurrentTransits(token);
   const now = useNow(30_000);
   const data = transits.data;
+  const [expanded, setExpanded] = useState(false);
+  const bodyId = useId();
+
+  // Al elegir un buque se pliega: en móvil su ficha ocupa la hoja inferior.
+  const select = (mmsi: number) => {
+    setExpanded(false);
+    onSelect(mmsi);
+  };
 
   return (
-    <aside className="transits-panel" aria-label="En tránsito ahora">
+    <aside
+      className={expanded ? 'transits-panel transits-panel--expanded' : 'transits-panel'}
+      aria-label="En tránsito ahora"
+    >
+      <button
+        type="button"
+        className="transits-panel__toggle"
+        aria-label="Lista de tránsitos"
+        aria-expanded={expanded}
+        aria-controls={bodyId}
+        onClick={() => {
+          setExpanded((value) => !value);
+        }}
+      />
       <h2>
         En tránsito ahora
         {data !== undefined && (
@@ -30,33 +54,35 @@ export function TransitsPanel({ token, selectedMmsi, onSelect }: TransitsPanelPr
           </>
         )}
       </h2>
-      {transits.isPending && <p>Cargando…</p>}
-      {transits.isError && (
-        <p className="transits-panel__error" role="alert">
-          {transits.error.message}
-        </p>
-      )}
-      {data?.items.length === 0 && (
-        <p className="transits-panel__empty">Ningún buque en tránsito.</p>
-      )}
-      {data !== undefined && data.items.length > 0 && (
-        <ul>
-          {data.items.map((transit) => (
-            <TransitRow
-              key={transit.id}
-              transit={transit}
-              now={now}
-              selected={transit.mmsi === selectedMmsi}
-              onSelect={onSelect}
-            />
-          ))}
-        </ul>
-      )}
-      {data !== undefined && data.total > data.items.length && (
-        <p className="transits-panel__note">
-          Se muestran {data.items.length} de {data.total}.
-        </p>
-      )}
+      <div id={bodyId} className="transits-panel__body">
+        {transits.isPending && <p>Cargando…</p>}
+        {transits.isError && (
+          <p className="transits-panel__error" role="alert">
+            {transits.error.message}
+          </p>
+        )}
+        {data?.items.length === 0 && (
+          <p className="transits-panel__empty">Ningún buque en tránsito.</p>
+        )}
+        {data !== undefined && data.items.length > 0 && (
+          <ul>
+            {data.items.map((transit) => (
+              <TransitRow
+                key={transit.id}
+                transit={transit}
+                now={now}
+                selected={transit.mmsi === selectedMmsi}
+                onSelect={select}
+              />
+            ))}
+          </ul>
+        )}
+        {data !== undefined && data.total > data.items.length && (
+          <p className="transits-panel__note">
+            Se muestran {data.items.length} de {data.total}.
+          </p>
+        )}
+      </div>
     </aside>
   );
 }

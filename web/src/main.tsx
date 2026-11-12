@@ -3,6 +3,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ApiError } from './api/client';
 import { App } from './App';
+import './tokens.css';
 import './index.css';
 
 // Un 401 no se arregla reintentando: el token caducó y hay que volver a entrar.

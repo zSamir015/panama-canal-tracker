@@ -11,8 +11,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  background: #0b3d5c;
-  color: #f4f7fa;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
 }
 
 .app__header h1 {
@@ -37,8 +37,8 @@
   flex: 1;
   min-height: 0;
   place-items: center;
-  background: #e8eef3;
-  color: #3b4b58;
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
 }
 
 /* Más específico que `.maplibregl-map { position: relative }`, que se carga después. */
@@ -51,13 +51,23 @@
   position: absolute;
   bottom: 2rem;
   left: 0.75rem;
-  margin: 0;
   padding: 0.5rem 0.75rem;
-  list-style: none;
   font-size: 0.8rem;
   background: rgb(255 255 255 / 90%);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   box-shadow: 0 1px 4px rgb(0 0 0 / 20%);
+}
+
+/* El botón de plegar solo existe en móvil (ver el bloque del final). */
+.map-legend__toggle,
+.transits-panel__toggle {
+  display: none;
+}
+
+.map-legend__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .map-legend li {
@@ -77,8 +87,8 @@
   gap: 0.75rem;
   width: min(22rem, calc(100% - 2rem));
   padding: 1.5rem;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
   box-shadow: 0 1px 6px rgb(0 0 0 / 15%);
 }
 
@@ -96,19 +106,19 @@
 .login input {
   padding: 0.5rem;
   font: inherit;
-  border: 1px solid #b0bec5;
-  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
 }
 
 .login button {
   padding: 0.6rem;
   font: inherit;
   font-weight: 600;
-  color: #fff;
+  color: var(--color-on-accent);
   cursor: pointer;
-  background: #0b3d5c;
+  background: var(--color-brand);
   border: 0;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .login button:disabled {
@@ -117,11 +127,11 @@
 }
 
 .login__notice {
-  color: #8a5a00;
+  color: var(--color-notice);
 }
 
 .login__error {
-  color: #b71c1c;
+  color: var(--color-danger);
 }
 
 .vessel-panel {
@@ -134,8 +144,8 @@
   overflow-y: auto;
   font-size: 0.9rem;
   background: rgb(255 255 255 / 95%);
-  border-radius: 8px;
-  box-shadow: 0 1px 6px rgb(0 0 0 / 20%);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-panel);
 }
 
 .vessel-panel__header {
@@ -155,7 +165,7 @@
   padding: 0 0.4rem;
   font-size: 1.4rem;
   line-height: 1;
-  color: #3b4b58;
+  color: var(--color-text-secondary);
   cursor: pointer;
   background: none;
   border: 0;
@@ -170,7 +180,7 @@
 
 .vessel-panel dt {
   font-weight: 600;
-  color: #3b4b58;
+  color: var(--color-text-secondary);
 }
 
 .vessel-panel dd {
@@ -181,11 +191,11 @@
 .vessel-panel__note {
   margin: 0;
   font-size: 0.8rem;
-  color: #607d8b;
+  color: var(--color-text-muted);
 }
 
 .vessel-panel__error {
-  color: #b71c1c;
+  color: var(--color-danger);
 }
 
 .transits-panel {
@@ -198,8 +208,8 @@
   overflow-y: auto;
   font-size: 0.85rem;
   background: rgb(255 255 255 / 95%);
-  border-radius: 8px;
-  box-shadow: 0 1px 6px rgb(0 0 0 / 20%);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-panel);
 }
 
 .transits-panel h2 {
@@ -209,7 +219,7 @@
 
 .transits-panel__count {
   font-weight: 400;
-  color: #607d8b;
+  color: var(--color-text-muted);
 }
 
 .transits-panel ul {
@@ -230,13 +240,13 @@
   cursor: pointer;
   background: none;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
 }
 
 .transits-panel__row:hover,
 .transits-panel__row[aria-pressed='true'] {
-  background: #e8eef3;
-  border-color: #b0bec5;
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
 }
 
 .transits-panel__name {
@@ -246,7 +256,7 @@
 
 .transits-panel__detail {
   font-size: 0.8rem;
-  color: #607d8b;
+  color: var(--color-text-muted);
 }
 
 .transits-panel p {
@@ -256,21 +266,21 @@
 .transits-panel__empty,
 .transits-panel__note {
   font-size: 0.8rem;
-  color: #607d8b;
+  color: var(--color-text-muted);
 }
 
 .transits-panel__error {
-  color: #b71c1c;
+  color: var(--color-danger);
 }
 
 .demo-banner {
   padding: 0.4rem 1rem;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #5d4037;
+  color: var(--color-warning-text);
   text-align: center;
-  background: #fff3cd;
-  border-bottom: 2px solid #ffc107;
+  background: var(--color-warning-bg);
+  border-bottom: 2px solid var(--color-warning-border);
 }
 
 .app__tabs {
@@ -286,7 +296,7 @@
   cursor: pointer;
   background: rgb(255 255 255 / 12%);
   border: 1px solid rgb(255 255 255 / 35%);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
 }
 
 .app__tabs button[aria-pressed='true'] {
@@ -299,8 +309,8 @@
   min-height: 0;
   padding: 1rem;
   overflow-y: auto;
-  background: #e8eef3;
-  color: #263238;
+  background: var(--color-surface-muted);
+  color: var(--color-text-strong);
 }
 
 .stats__header {
@@ -318,24 +328,24 @@
 }
 
 .stats__window button {
-  color: #263238;
-  background: #fff;
-  border-color: #b0bec5;
+  color: var(--color-text-strong);
+  background: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 .stats__window button[aria-pressed='true'] {
   font-weight: 700;
-  color: #fff;
-  background: #1565c0;
-  border-color: #1565c0;
+  color: var(--color-on-accent);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
 }
 
 .stats__card {
   max-width: 44rem;
   margin: 1rem 0;
   padding: 0.75rem 1rem;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
   box-shadow: 0 1px 4px rgb(0 0 0 / 15%);
 }
 
@@ -345,13 +355,13 @@
 }
 
 .bar-chart__grid {
-  stroke: #cfd8dc;
+  stroke: var(--color-border-subtle);
   stroke-width: 1;
 }
 
 .bar-chart__tick {
   font-size: 10px;
-  fill: #607d8b;
+  fill: var(--color-text-muted);
 }
 
 .stats__legend,
@@ -374,7 +384,7 @@
 .stats__legend span {
   width: 0.7rem;
   height: 0.7rem;
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
 }
 
 .stats__categories {
@@ -398,7 +408,7 @@
 .stats__table td {
   padding: 0.3rem 0.5rem;
   text-align: right;
-  border-bottom: 1px solid #eceff1;
+  border-bottom: 1px solid var(--color-divider);
 }
 
 .stats__table th:first-child {
@@ -408,9 +418,220 @@
 .stats__empty,
 .stats__note {
   font-size: 0.85rem;
-  color: #607d8b;
+  color: var(--color-text-muted);
 }
 
 .stats__error {
-  color: #b71c1c;
+  color: var(--color-danger);
+}
+
+/* Móvil (issue #123). Un solo punto de corte; en escritorio no cambia nada. */
+@media (max-width: 640px) {
+  /* El aviso de la demo, en una línea a 390 px; el texto no cambia (ADR-0011). */
+  .demo-banner {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.72rem;
+    line-height: 1.3;
+  }
+
+  /* Cabecera compacta: título y estado en una línea; las pestañas, si las hay, en la siguiente. */
+  .app__header {
+    gap: 0.25rem 0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .app__header h1 {
+    font-size: 1.1rem;
+  }
+
+  /* El aviso de la demo ya lo dice, y en la app el título basta. */
+  .app__header .app__subtitle {
+    display: none;
+  }
+
+  .app__header .app__status {
+    font-size: 0.85rem;
+  }
+
+  /* Con pestañas (app real): título arriba; estado y pestañas comparten la segunda línea. */
+  .app__header:has(.app__tabs) > div {
+    flex-basis: 100%;
+  }
+
+  .app__tabs {
+    order: 1;
+    margin-left: auto;
+  }
+
+  .app__tabs button {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  /*
+   * Hoja inferior. Con la ficha abierta, o con la lista de tránsitos desplegada, la hoja ocupa el
+   * 45 % de abajo y los controles del mapa (atribución incluida, que la licencia de los mosaicos
+   * exige visible) suben por encima. Un panel a la vez: con la ficha abierta, los tránsitos se
+   * ocultan.
+   */
+  .app__map {
+    --sheet-height: 45%;
+    --bar-height: 2.75rem;
+    --map-bottom: 0px;
+  }
+
+  .app__map:has(.transits-panel) {
+    --map-bottom: var(--bar-height);
+  }
+
+  .app__map:has(.vessel-panel) {
+    --map-bottom: 0px;
+  }
+
+  .app__map .vessel-map {
+    bottom: var(--map-bottom);
+  }
+
+  .app__map:has(.vessel-panel, .transits-panel--expanded) .maplibregl-ctrl-bottom-left,
+  .app__map:has(.vessel-panel, .transits-panel--expanded) .maplibregl-ctrl-bottom-right {
+    bottom: var(--sheet-height);
+  }
+
+  .app__map:has(.vessel-panel) .transits-panel {
+    display: none;
+  }
+
+  .vessel-panel,
+  .transits-panel--expanded {
+    box-sizing: border-box;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    height: var(--sheet-height);
+    max-height: none;
+    padding-top: 1.1rem;
+    background: var(--color-surface);
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+    box-shadow: var(--shadow-sheet);
+  }
+
+  /* Asa visual de la hoja; no se arrastra (se cierra con la × o con la barra). */
+  .vessel-panel::before,
+  .transits-panel--expanded::before {
+    position: absolute;
+    top: 0.4rem;
+    left: 50%;
+    width: 2.25rem;
+    height: 0.25rem;
+    content: '';
+    background: var(--color-border);
+    border-radius: var(--radius-xs);
+    transform: translateX(-50%);
+  }
+
+  /* "En tránsito ahora": plegado es una barra al pie, por debajo del mapa. */
+  .transits-panel {
+    box-sizing: border-box;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    min-height: var(--bar-height);
+    background: var(--color-surface);
+    max-height: none;
+    padding: 0.7rem 2.75rem 0.7rem 0.75rem;
+    border-radius: 0;
+    box-shadow: 0 -1px 6px rgb(0 0 0 / 15%);
+  }
+
+  .transits-panel h2 {
+    margin: 0;
+  }
+
+  .transits-panel--expanded h2 {
+    margin-bottom: 0.4rem;
+  }
+
+  .transits-panel:not(.transits-panel--expanded) .transits-panel__body {
+    display: none;
+  }
+
+  /* Toda la barra es el botón; la flecha dice hacia dónde va. */
+  .transits-panel__toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: block;
+    height: var(--bar-height);
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  .transits-panel__toggle::after {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    content: '▴';
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    transform: translateY(-50%);
+  }
+
+  .transits-panel__toggle[aria-expanded='true']::after {
+    content: '▾';
+  }
+
+  .transits-panel--expanded .transits-panel__toggle {
+    top: 0.6rem;
+  }
+
+  .transits-panel__toggle:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
+  /* Leyenda: una pastilla que se despliega, por encima de la atribución del mapa. */
+  .map-legend {
+    bottom: calc(var(--map-bottom) + 3.75rem);
+    left: 0.5rem;
+    padding: 0;
+  }
+
+  /* Con la hoja abierta, abajo solo queda la atribución: la leyenda se oculta. */
+  .app__map:has(.vessel-panel, .transits-panel--expanded) .map-legend {
+    display: none;
+  }
+
+  .map-legend__toggle {
+    display: block;
+    padding: 0.3rem 0.75rem;
+    font: inherit;
+    font-weight: 600;
+    color: var(--color-text-strong);
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  .map-legend__toggle::after {
+    margin-left: 0.35rem;
+    content: '▴';
+  }
+
+  .map-legend__toggle[aria-expanded='true']::after {
+    content: '▾';
+  }
+
+  .map-legend__list {
+    padding: 0 0.75rem 0.5rem;
+  }
+
+  .map-legend--collapsed .map-legend__list {
+    display: none;
+  }
 }
