@@ -15,6 +15,7 @@ sigue abierto y aún no ha agotado el timeout queda como `in_progress`.
 
 import argparse
 import json
+import math
 import sys
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Sequence
@@ -139,11 +140,20 @@ def _position(record: dict[str, Any]) -> PositionUpdate | None:
         received_at=received_at,
         lat=float(lat),
         lon=float(lon),
-        sog=None,
-        cog=None,
+        sog=_optional_number(record.get("sog"), minimum=0, maximum=102.3),
+        cog=_optional_number(record.get("cog"), minimum=0, maximum=360),
         heading=None,
         nav_status=None,
     )
+
+
+def _optional_number(value: object, *, minimum: float, maximum: float) -> float | None:
+    if not _number(value) or not math.isfinite(float(value)):
+        return None
+    numeric = float(value)
+    if not minimum <= numeric < maximum:
+        return None
+    return numeric
 
 
 def replay(positions: Sequence[PositionUpdate], *, timeout: timedelta) -> ReplayResult:

@@ -37,6 +37,29 @@ class AbortReason(StrEnum):
     REVERSAL = "reversal"  # salió de la zona de origen y volvió a ella
 
 
+INBOUND_COG: dict[ZoneId, float] = {
+    "atlantic_entrance": 180.0,
+    "pacific_entrance": 321.0,
+}
+MOVING_SOG = 1.0
+
+
+def heading_into_canal(zone: ZoneId, position: PositionUpdate) -> bool | None:
+    """Indica si el rumbo fiable apunta hacia el interior de la zona de entrada.
+
+    Devuelve `None` cuando falta COG/SOG o el buque está parado. Un rumbo exactamente de través
+    también es desconocido: solo se clasifica como entrada cuando la diferencia angular es menor
+    de 90 grados.
+    """
+    if position.cog is None or position.sog is None or position.sog < MOVING_SOG:
+        return None
+
+    difference = abs((position.cog - INBOUND_COG[zone] + 180) % 360 - 180)
+    if difference == 90:
+        return None
+    return difference < 90
+
+
 @dataclass(frozen=True, slots=True)
 class OpenTransit:
     """Un tránsito `in_progress`."""
@@ -127,6 +150,9 @@ def on_position(
             return replace(updated_track, must_leave=None), []
         if updated_track.must_leave == zone:
             return updated_track, []
+        heading = heading_into_canal(zone, position)
+        if heading is False:
+            return replace(updated_track, must_leave=zone), []
 
         transit = OpenTransit(
             origin=zone,
