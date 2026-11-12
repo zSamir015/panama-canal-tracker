@@ -1,5 +1,3 @@
-import { CATEGORY_LABELS, shipCategory } from '../map/vesselGeoJson';
-
 /** Estado de navegación AIS (ITU-R M.1371, mensaje 1, campo "navigational status"). */
 const NAV_STATUS: Readonly<Record<number, string>> = {
   0: 'Navegando con motor',
@@ -15,9 +13,9 @@ const NAV_STATUS: Readonly<Record<number, string>> = {
 
 const NO_DATA = '—';
 
-export function shipTypeText(shipType: number | null): string {
-  const label = CATEGORY_LABELS[shipCategory(shipType)];
-  return shipType === null ? label : `${label} (${String(shipType)})`;
+/** El código `ship_type` de AIS tal cual; la categoría se muestra aparte, con su color. */
+export function aisTypeCodeText(shipType: number | null): string {
+  return shipType === null ? NO_DATA : String(shipType);
 }
 
 export function navStatusText(status: number | null): string {

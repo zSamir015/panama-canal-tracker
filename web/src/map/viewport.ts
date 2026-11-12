@@ -25,3 +25,31 @@ function clamp(value: number, min: number, max: number): number {
 function round(value: number): number {
   return Math.round(value * 1e6) / 1e6;
 }
+
+/** Ancho a partir del cual la ficha es una hoja inferior; el mismo `@media` de `App.css`. */
+export const MOBILE_MEDIA_QUERY = '(max-width: 640px)';
+
+/** Parte del mapa que tapa la hoja en móvil; el mismo valor que `--sheet-height` en `App.css`. */
+export const MOBILE_SHEET_FRACTION = 0.45;
+
+/** Margen (px) que se deja entre el buque elegido y los bordes de la parte visible del mapa. */
+const FOCUS_MARGIN = 48;
+
+/**
+ * En móvil la ficha tapa la parte de abajo del mapa (issue #125). Dada la posición en pantalla
+ * del buque elegido, devuelve el desplazamiento vertical (`offset` de `easeTo`) que lo deja en el
+ * centro de la parte visible, o `null` si ya se ve con margen.
+ */
+export function focusOffset(
+  point: { x: number; y: number },
+  map: { width: number; height: number },
+  sheetFraction: number,
+): number | null {
+  const visibleBottom = map.height * (1 - sheetFraction);
+  const visible =
+    point.x >= FOCUS_MARGIN &&
+    point.x <= map.width - FOCUS_MARGIN &&
+    point.y >= FOCUS_MARGIN &&
+    point.y <= visibleBottom - FOCUS_MARGIN;
+  return visible ? null : -(map.height * sheetFraction) / 2;
+}

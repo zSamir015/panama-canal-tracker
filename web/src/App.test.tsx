@@ -171,7 +171,8 @@ describe('App', () => {
     // El nombre hostil se ve como texto: ni etiqueta <img> ni manejador de eventos.
     expect(await screen.findByRole('heading', { name: detail.name })).toBeVisible();
     expect(panel.querySelector('img')).toBeNull();
-    expect(panel).toHaveTextContent('Carga (70)');
+    expect(panel).toHaveTextContent('Carga');
+    expect(panel).toHaveTextContent('Código AIS70');
 
     await userEvent.keyboard('{Escape}');
     expect(

@@ -7,7 +7,7 @@ import {
   courseText,
   dimensionsText,
   navStatusText,
-  shipTypeText,
+  aisTypeCodeText,
   speedText,
 } from './format';
 import { trailFeature } from './trail';
@@ -119,8 +119,8 @@ describe('fetchVesselTrack', () => {
 
 describe('formatos de la ficha', () => {
   it('muestra cada dato o un guion si falta', () => {
-    expect(shipTypeText(70)).toBe('Carga (70)');
-    expect(shipTypeText(null)).toBe('Sin tipo');
+    expect(aisTypeCodeText(70)).toBe('70');
+    expect(aisTypeCodeText(null)).toBe('—');
     expect(navStatusText(1)).toBe('Fondeado');
     expect(navStatusText(14)).toBe('Sin definir (14)');
     expect(navStatusText(null)).toBe('—');

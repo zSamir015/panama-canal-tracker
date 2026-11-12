@@ -171,11 +171,53 @@
   border: 0;
 }
 
+.vessel-panel__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+  margin: 0.35rem 0 0;
+}
+
+/* Etiqueta de tipo: el color va en el punto, el texto queda oscuro (contraste AA). */
+.vessel-panel__type {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  padding: 0.1rem 0.55rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-strong);
+  background: var(--color-surface-muted);
+  border-radius: 999px;
+}
+
+.vessel-panel__swatch {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+}
+
+.vessel-panel__mmsi {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.vessel-panel__group h3 {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 .vessel-panel dl {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 7.5rem 1fr;
   gap: 0.2rem 0.75rem;
-  margin: 0.75rem 0 0.5rem;
+  margin: 0;
 }
 
 .vessel-panel dt {
@@ -189,7 +231,7 @@
 }
 
 .vessel-panel__note {
-  margin: 0;
+  margin: 0.6rem 0 0;
   font-size: 0.8rem;
   color: var(--color-text-muted);
 }
