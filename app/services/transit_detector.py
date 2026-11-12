@@ -8,12 +8,16 @@ Las reglas (docs/ARCHITECTURE.md §4.2):
 
 | Situación                                            | Resultado                              |
 |------------------------------------------------------|----------------------------------------|
-| sin tránsito y aparece en una zona de entrada        | abre `in_progress` desde esa zona      |
+| sin tránsito y aparece en una zona de entrada        | abre `in_progress` desde esa zona,     |
+|                                                      | salvo si su rumbo va hacia el mar      |
 | `in_progress` y aparece en la zona opuesta           | `completed` (dirección según el origen)|
 | `in_progress` y vuelve a la zona de origen           | `aborted` por reversa                  |
 | `in_progress` y pasa más del timeout sin señal       | `aborted` por timeout                  |
 
 Dirección, como la ACP: Atlántico a Pacífico es `southbound`; Pacífico a Atlántico, `northbound`.
+
+Entrar o salir (ADR-0016): por una zona de entrada pasan buques que entran al Canal y buques que
+salen de él. El rumbo sobre el fondo (COG) los separa; si no es fiable, se abre como si entrara.
 
 El estado es inmutable: cada función devuelve el estado nuevo y la lista de eventos, sin modificar
 el que recibe.
@@ -45,7 +49,7 @@ MOVING_SOG = 1.0
 
 
 def heading_into_canal(zone: ZoneId, position: PositionUpdate) -> bool | None:
-    """Indica si el rumbo fiable apunta hacia el interior de la zona de entrada.
+    """Indica si el buque navega hacia el interior del Canal desde esta zona de entrada (ADR-0016).
 
     Devuelve `None` cuando falta COG/SOG o el buque está parado. Un rumbo exactamente de través
     también es desconocido: solo se clasifica como entrada cuando la diferencia angular es menor

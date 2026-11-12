@@ -77,10 +77,23 @@ tránsito.
 - Si se elige timeout largo, debe ir con la solución del punto 2 (decidir entrada o salida por
   el rumbo o por la secuencia), porque si no los buques que salen quedan abiertos un día entero.
 
+## Después del issue #121: el rumbo decide si entra o sale
+
+El hallazgo 2 se corrigió (ADR-0016): un buque que pisa una zona de entrada con rumbo hacia el
+mar ya no abre un tránsito. Mismos datos y mismo procedimiento:
+
+| timeout | antes | después |
+|---|---|---|
+| 30 min (actual) | 0 completados, 46 abortados | 0 completados, 24 abortados (timeout) |
+| 1 440 min | 2 completados, 38 abortados, 5 en curso | 2 completados, 19 abortados (18 timeout, 1 reversal), 3 en curso |
+
+Desaparecen 22 tránsitos falsos y se mantienen los dos reales. Los 24 que quedan son buques que
+se vieron entrar y nunca llegaron a la otra zona dentro del timeout: la falta de cobertura del
+interior, que este cambio no puede arreglar.
+
 ## Siguiente
 
-1. Decidir si el sentido se infiere del rumbo al pisar la primera zona (cambio del detector,
-   con tests, requiere una tarea propia).
+1. ~~Decidir si el sentido se infiere del rumbo~~: hecho en el issue #121 (ADR-0016).
 2. Seguir recolectando; repetir con ≥ 14 días. Solo tiene sentido si cambia la cobertura.
 3. Evaluar una fuente con cobertura dentro del Canal (ver `docs/DATA_SOURCES.md`); el dueño
    descartó gasto, así que la alternativa es aceptar el límite y documentarlo en el README (7.4).
