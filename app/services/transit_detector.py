@@ -8,12 +8,16 @@ Las reglas (docs/ARCHITECTURE.md §4.2):
 
 | Situación                                            | Resultado                              |
 |------------------------------------------------------|----------------------------------------|
-| sin tránsito y aparece en una zona de entrada        | abre `in_progress` desde esa zona      |
+| sin tránsito y aparece en una zona de entrada        | abre `in_progress` desde esa zona,     |
+|                                                      | salvo si su rumbo va hacia el mar      |
 | `in_progress` y aparece en la zona opuesta           | `completed` (dirección según el origen)|
 | `in_progress` y vuelve a la zona de origen           | `aborted` por reversa                  |
 | `in_progress` y pasa más del timeout sin señal       | `aborted` por timeout                  |
 
 Dirección, como la ACP: Atlántico a Pacífico es `southbound`; Pacífico a Atlántico, `northbound`.
+
+Entrar o salir (ADR-0016): por una zona de entrada pasan buques que entran al Canal y buques que
+salen de él. El rumbo sobre el fondo (COG) los separa; si no es fiable, se abre como si entrara.
 
 El estado es inmutable: cada función devuelve el estado nuevo y la lista de eventos, sin modificar
 el que recibe.
@@ -35,6 +39,29 @@ class TransitDirection(StrEnum):
 class AbortReason(StrEnum):
     TIMEOUT = "timeout"  # demasiado tiempo sin señal
     REVERSAL = "reversal"  # salió de la zona de origen y volvió a ella
+
+
+INBOUND_COG: dict[ZoneId, float] = {
+    "atlantic_entrance": 180.0,
+    "pacific_entrance": 321.0,
+}
+MOVING_SOG = 1.0
+
+
+def heading_into_canal(zone: ZoneId, position: PositionUpdate) -> bool | None:
+    """Indica si el buque navega hacia el interior del Canal desde esta zona de entrada (ADR-0016).
+
+    Devuelve `None` cuando falta COG/SOG o el buque está parado. Un rumbo exactamente de través
+    también es desconocido: solo se clasifica como entrada cuando la diferencia angular es menor
+    de 90 grados.
+    """
+    if position.cog is None or position.sog is None or position.sog < MOVING_SOG:
+        return None
+
+    difference = abs((position.cog - INBOUND_COG[zone] + 180) % 360 - 180)
+    if difference == 90:
+        return None
+    return difference < 90
 
 
 @dataclass(frozen=True, slots=True)
@@ -127,6 +154,9 @@ def on_position(
             return replace(updated_track, must_leave=None), []
         if updated_track.must_leave == zone:
             return updated_track, []
+        heading = heading_into_canal(zone, position)
+        if heading is False:
+            return replace(updated_track, must_leave=zone), []
 
         transit = OpenTransit(
             origin=zone,

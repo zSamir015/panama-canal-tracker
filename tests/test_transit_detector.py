@@ -35,9 +35,12 @@ IN_THE_LAKE = (-79.90, 9.20)
 
 
 def position(at: datetime, point: tuple[float, float]) -> PositionUpdate:
+    # Sin COG: estos tests son de la máquina de estados y no dependen del rumbo. Con rumbo
+    # desconocido el detector abre el tránsito sin mirar hacia dónde va el buque; las reglas del
+    # rumbo (issue #121) están en tests/test_transit_direction.py.
     lon, lat = point
     return PositionUpdate(
-        mmsi=MMSI, received_at=at, lat=lat, lon=lon, sog=10.0, cog=180.0, heading=None, nav_status=0
+        mmsi=MMSI, received_at=at, lat=lat, lon=lon, sog=10.0, cog=None, heading=None, nav_status=0
     )
 
 

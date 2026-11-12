@@ -6,6 +6,11 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Changed
+- Detector de tránsitos (issue #121, ADR-0016): un buque que pisa una zona de entrada con rumbo
+  hacia el mar está saliendo del Canal y ya no abre un tránsito en sentido contrario. Sin rumbo
+  fiable (sin COG o SOG, parado o de través) se abre como antes. El replay lee `sog` y `cog`. Con
+  los datos reales de `docs/VALIDATION.md`, 24 abortados en lugar de 46 con el timeout de 30 min;
+  ningún umbral cambia.
 - Cobertura de AISStream remedida (2026-11-06): 11 posiciones de 10 buques en 5 min dentro del
   Canal, frente a 0 mensajes en octubre. Es escasa pero real; `docs/DATA_SOURCES.md` §2b y
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.

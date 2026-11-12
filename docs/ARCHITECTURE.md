@@ -198,7 +198,8 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
   ACP) y se versionan en el repo; su precisión se mide con datos reales (tarea 5.7).
 
 ### 4.2 Detección de tránsitos (máquina de estados por buque)
-- Entra a una zona de entrada → `transit` `in_progress`.
+- Entra a una zona de entrada → `transit` `in_progress`. Si su rumbo (COG) apunta al mar, está
+  saliendo del Canal y no abre nada; sin rumbo fiable (parado, sin COG) abre igual (ADR-0016).
 - Aparece en la zona de entrada opuesta → `completed`, con dirección y duración.
 - Sin señal más de `TRANSIT_SIGNAL_TIMEOUT_MINUTES` → `aborted`.
 - Vuelve a la misma entrada → `aborted` (reversa).
