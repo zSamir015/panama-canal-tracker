@@ -235,6 +235,8 @@ describe('App', () => {
     renderWithQuery(<App />);
     await signIn();
     expect(await screen.findByRole('status')).toHaveTextContent('En vivo · 1 buques');
+    // El punto verde acompaña al texto; no lo sustituye.
+    expect(screen.getByRole('status').querySelector('.connection-dot--ok')).not.toBeNull();
 
     await userEvent.click(screen.getByRole('button', { name: 'buque de prueba' }));
 

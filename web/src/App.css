@@ -467,6 +467,88 @@
   color: var(--color-danger);
 }
 
+/* Texto solo para lectores de pantalla (el patrón habitual; no usa `display: none`). */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+  border: 0;
+}
+
+/* Esqueletos de carga (issue #127): la forma de lo que va a llegar, con un pulso suave. */
+.skeleton {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.25rem 0;
+}
+
+.skeleton__line,
+.skeleton__block {
+  display: block;
+  background: var(--color-skeleton);
+  border-radius: var(--radius-sm);
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton__line {
+  height: 0.8rem;
+}
+
+/* Líneas de largo distinto: se parece más a texto que una pila de barras iguales. */
+.skeleton__line:nth-child(3n + 2) {
+  width: 85%;
+}
+
+.skeleton__line:nth-child(3n) {
+  width: 60%;
+}
+
+.skeleton__block {
+  height: 10rem;
+}
+
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* Punto del estado de la conexión (issue #127); el texto de al lado dice el estado. */
+.connection-dot {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-right: 0.4rem;
+  vertical-align: 0.05rem;
+  border-radius: 50%;
+}
+
+.connection-dot--ok {
+  background: var(--color-status-ok);
+}
+
+.connection-dot--pending {
+  background: var(--color-status-pending);
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.connection-dot--down {
+  background: var(--color-status-down);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton__line,
+  .skeleton__block,
+  .connection-dot--pending {
+    animation: none;
+  }
+}
+
 /* Móvil (issue #123). Un solo punto de corte; en escritorio no cambia nada. */
 @media (max-width: 640px) {
   /* El aviso de la demo, en una línea a 390 px; el texto no cambia (ADR-0011). */

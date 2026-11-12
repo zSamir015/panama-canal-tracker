@@ -175,6 +175,19 @@ describe('TransitsPanel', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
   });
 
+  it('mientras carga muestra un esqueleto', () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>(() => undefined)),
+    );
+    const { container } = renderWithQuery(
+      <TransitsPanel token="abc" selectedMmsi={null} onSelect={vi.fn()} />,
+    );
+
+    expect(container.querySelector('.skeleton[aria-busy="true"]')).not.toBeNull();
+    expect(screen.getByText('Cargando…')).toBeInTheDocument();
+  });
+
   it('avisa cuando no hay ninguno', async () => {
     stubTransits(() => Response.json({ items: [], total: 0 }));
     renderWithQuery(<TransitsPanel token="abc" selectedMmsi={null} onSelect={vi.fn()} />);

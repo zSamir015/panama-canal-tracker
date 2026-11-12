@@ -11,6 +11,7 @@ import { type LiveStatus, useLiveVessels } from './live/useLiveVessels';
 import { MapLegend } from './map/MapLegend';
 import { StatsView } from './stats/StatsView';
 import { TransitsPanel } from './transits/TransitsPanel';
+import { ConnectionDot } from './ui/ConnectionDot';
 import { useCurrentTransits } from './transits/queries';
 import { useVesselTrack } from './vessels/queries';
 import { trailFeature } from './vessels/trail';
@@ -101,6 +102,7 @@ export function App() {
         )}
         {mapReady && (
           <p className="app__status" role="status">
+            {!config.demo && <ConnectionDot status={live.status} />}
             {config.demo ? 'Demo' : STATUS_TEXT[live.status]} · {activeVessels.vessels.size} buques
           </p>
         )}

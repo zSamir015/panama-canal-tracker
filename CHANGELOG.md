@@ -6,6 +6,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Changed
+- Carga y conexión (issue #127). La ficha del buque, el panel de tránsitos y las estadísticas
+  muestran un esqueleto con la forma de lo que va a llegar (líneas, o un bloque en la gráfica) en
+  lugar de "Cargando…". Las formas son decorativas: el lector de pantalla sigue oyendo "Cargando…"
+  y `aria-busy`, y con `prefers-reduced-motion` no pulsan. Junto al estado de la conexión hay un
+  punto verde (en vivo), ámbar (conectando o reconectando) o rojo (sin conexión). Es decorativo:
+  el texto se mantiene y es lo que se anuncia. Cada color supera 3:1 sobre la cabecera.
 - Ficha del buque más clara (issue #125). Debajo del nombre hay una etiqueta de tipo con el
   color del mapa (el color va en el punto y el texto queda oscuro), y el MMSI va en monoespaciada.
   Los datos se reparten en "Movimiento" y "Buque", y el código AIS del tipo tiene fila propia. En

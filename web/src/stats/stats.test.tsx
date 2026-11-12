@@ -236,6 +236,19 @@ describe('StatsView', () => {
     ).toBeVisible();
   });
 
+  it('mientras carga muestra esqueletos: un bloque para el gráfico y líneas para las tablas', () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>(() => undefined)),
+    );
+    const { container } = renderWithQuery(
+      <StatsView token="abc" onUnauthorized={vi.fn()} now={() => NOW} />,
+    );
+
+    expect(container.querySelectorAll('.skeleton--chart')).toHaveLength(1);
+    expect(container.querySelectorAll('.skeleton--lines')).toHaveLength(2);
+  });
+
   it('avisa cuando no hay datos en el periodo', async () => {
     stubStats({
       daily: { items: [] },

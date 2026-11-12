@@ -10,6 +10,7 @@ import {
   speedText,
 } from './format';
 import { useVesselDetail } from './queries';
+import { Skeleton } from '../ui/Skeleton';
 
 interface VesselPanelProps {
   mmsi: number;
@@ -66,36 +67,40 @@ export function VesselPanel({ mmsi, token, live, onClose }: VesselPanelProps) {
         </span>
         <span className="vessel-panel__mmsi">MMSI {mmsi}</span>
       </p>
-      {detail.isPending && <p>Cargando…</p>}
+      {detail.isPending && <Skeleton lines={8} />}
       {detail.isError && (
         <p className="vessel-panel__error" role="alert">
           {detail.error.message}
         </p>
       )}
-      <div className="vessel-panel__group" role="group" aria-labelledby={movementId}>
-        <h3 id={movementId}>Movimiento</h3>
-        <dl>
-          <dt>Velocidad</dt>
-          <dd>{speedText(live?.sog ?? position?.sog ?? null)}</dd>
-          <dt>Rumbo</dt>
-          <dd>{courseText(live?.cog ?? position?.cog ?? null)}</dd>
-          <dt>Estado</dt>
-          <dd>{navStatusText(position?.nav_status ?? null)}</dd>
-          <dt>Última señal</dt>
-          <dd>{agoText(live?.ts ?? position?.received_at ?? null, now)}</dd>
-        </dl>
-      </div>
-      <div className="vessel-panel__group" role="group" aria-labelledby={vesselId}>
-        <h3 id={vesselId}>Buque</h3>
-        <dl>
-          <dt>IMO</dt>
-          <dd>{data?.imo ?? '—'}</dd>
-          <dt>Eslora × manga</dt>
-          <dd>{dimensionsText(data?.length_m ?? null, data?.beam_m ?? null)}</dd>
-          <dt>Código AIS</dt>
-          <dd>{aisTypeCodeText(shipType)}</dd>
-        </dl>
-      </div>
+      {!detail.isPending && (
+        <>
+          <div className="vessel-panel__group" role="group" aria-labelledby={movementId}>
+            <h3 id={movementId}>Movimiento</h3>
+            <dl>
+              <dt>Velocidad</dt>
+              <dd>{speedText(live?.sog ?? position?.sog ?? null)}</dd>
+              <dt>Rumbo</dt>
+              <dd>{courseText(live?.cog ?? position?.cog ?? null)}</dd>
+              <dt>Estado</dt>
+              <dd>{navStatusText(position?.nav_status ?? null)}</dd>
+              <dt>Última señal</dt>
+              <dd>{agoText(live?.ts ?? position?.received_at ?? null, now)}</dd>
+            </dl>
+          </div>
+          <div className="vessel-panel__group" role="group" aria-labelledby={vesselId}>
+            <h3 id={vesselId}>Buque</h3>
+            <dl>
+              <dt>IMO</dt>
+              <dd>{data?.imo ?? '—'}</dd>
+              <dt>Eslora × manga</dt>
+              <dd>{dimensionsText(data?.length_m ?? null, data?.beam_m ?? null)}</dd>
+              <dt>Código AIS</dt>
+              <dd>{aisTypeCodeText(shipType)}</dd>
+            </dl>
+          </div>
+        </>
+      )}
       <p className="vessel-panel__note">Estela: últimos 30 minutos.</p>
     </aside>
   );
