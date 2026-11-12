@@ -6,6 +6,14 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Changed
+- Interfaz en móvil (issue #123; por debajo de 640 px, el escritorio no cambia). Cabecera
+  compacta y aviso de demo en una línea: a 390 px pasan de 208 a 67 px en la demo. La leyenda se
+  pliega en una pastilla. "En tránsito ahora" es una barra al pie que se despliega como hoja
+  inferior, y la ficha del buque es una hoja inferior (45 % de la altura). Mientras hay una hoja
+  abierta, los controles y la atribución del mapa suben por encima y solo se ve un panel a la vez.
+  Los botones de plegar llevan `aria-expanded` y `aria-controls`. Colores, radios y sombras pasan a
+  variables CSS en `web/src/tokens.css`; los colores por tipo de buque siguen en TypeScript. Sin
+  dependencias nuevas; el CSS crece 0,8 kB comprimido.
 - Detector de tránsitos (issue #121, ADR-0016): un buque que pisa una zona de entrada con rumbo
   hacia el mar está saliendo del Canal y ya no abre un tránsito en sentido contrario. Sin rumbo
   fiable (sin COG o SOG, parado o de través) se abre como antes. El replay lee `sog` y `cog`. Con

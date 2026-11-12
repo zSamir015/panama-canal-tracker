@@ -141,6 +141,40 @@ describe('TransitsPanel', () => {
     expect(onSelect).toHaveBeenCalledWith(352000001);
   });
 
+  // El plegado solo se ve en móvil (el CSS oculta el botón en escritorio); aquí, el estado.
+  it('empieza plegado en una barra y se despliega al pulsarla', async () => {
+    stubTransits(() => Response.json(body));
+    const { container } = renderWithQuery(
+      <TransitsPanel token="abc" selectedMmsi={null} onSelect={vi.fn()} />,
+    );
+    await screen.findByText('PACIFIC STAR');
+
+    const toggle = screen.getByRole('button', { name: 'Lista de tránsitos' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(
+      container.querySelector(`#${toggle.getAttribute('aria-controls') ?? ''}`),
+    ).toContainElement(screen.getByText('PACIFIC STAR'));
+
+    await userEvent.click(toggle);
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(container.firstElementChild).toHaveClass('transits-panel--expanded');
+  });
+
+  it('se pliega al elegir un buque, para dejar sitio a su ficha', async () => {
+    stubTransits(() => Response.json(body));
+    const onSelect = vi.fn();
+    renderWithQuery(<TransitsPanel token="abc" selectedMmsi={null} onSelect={onSelect} />);
+    await screen.findByText('PACIFIC STAR');
+    const toggle = screen.getByRole('button', { name: 'Lista de tránsitos' });
+    await userEvent.click(toggle);
+
+    await userEvent.click(screen.getByRole('button', { name: /PACIFIC STAR/ }));
+
+    expect(onSelect).toHaveBeenCalledWith(352000001);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
   it('avisa cuando no hay ninguno', async () => {
     stubTransits(() => Response.json({ items: [], total: 0 }));
     renderWithQuery(<TransitsPanel token="abc" selectedMmsi={null} onSelect={vi.fn()} />);
