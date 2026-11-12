@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import type { LiveVessel } from '../live/protocol';
+import { CATEGORY_COLORS, CATEGORY_LABELS, shipCategory } from '../map/vesselGeoJson';
 import {
   agoText,
+  aisTypeCodeText,
   courseText,
   dimensionsText,
   navStatusText,
-  shipTypeText,
   speedText,
 } from './format';
 import { useVesselDetail } from './queries';
@@ -41,6 +42,10 @@ export function VesselPanel({ mmsi, token, live, onClose }: VesselPanelProps) {
   const data = detail.data;
   const position = data?.last_position;
   const name = live?.name ?? data?.name ?? null;
+  const shipType = live?.ship_type ?? data?.ship_type ?? null;
+  const category = shipCategory(shipType);
+  const movementId = useId();
+  const vesselId = useId();
 
   return (
     <aside className="vessel-panel" aria-label="Ficha del buque">
@@ -50,30 +55,47 @@ export function VesselPanel({ mmsi, token, live, onClose }: VesselPanelProps) {
           ×
         </button>
       </header>
+      <p className="vessel-panel__meta">
+        {/* El color va en el punto; el texto queda oscuro para leerse siempre (WCAG AA). */}
+        <span className="vessel-panel__type">
+          <span
+            className="vessel-panel__swatch"
+            style={{ background: CATEGORY_COLORS[category] }}
+          />
+          {CATEGORY_LABELS[category]}
+        </span>
+        <span className="vessel-panel__mmsi">MMSI {mmsi}</span>
+      </p>
       {detail.isPending && <p>Cargando…</p>}
       {detail.isError && (
         <p className="vessel-panel__error" role="alert">
           {detail.error.message}
         </p>
       )}
-      <dl>
-        <dt>MMSI</dt>
-        <dd>{mmsi}</dd>
-        <dt>IMO</dt>
-        <dd>{data?.imo ?? '—'}</dd>
-        <dt>Tipo</dt>
-        <dd>{shipTypeText(live?.ship_type ?? data?.ship_type ?? null)}</dd>
-        <dt>Eslora × manga</dt>
-        <dd>{dimensionsText(data?.length_m ?? null, data?.beam_m ?? null)}</dd>
-        <dt>Velocidad</dt>
-        <dd>{speedText(live?.sog ?? position?.sog ?? null)}</dd>
-        <dt>Rumbo</dt>
-        <dd>{courseText(live?.cog ?? position?.cog ?? null)}</dd>
-        <dt>Estado</dt>
-        <dd>{navStatusText(position?.nav_status ?? null)}</dd>
-        <dt>Última señal</dt>
-        <dd>{agoText(live?.ts ?? position?.received_at ?? null, now)}</dd>
-      </dl>
+      <div className="vessel-panel__group" role="group" aria-labelledby={movementId}>
+        <h3 id={movementId}>Movimiento</h3>
+        <dl>
+          <dt>Velocidad</dt>
+          <dd>{speedText(live?.sog ?? position?.sog ?? null)}</dd>
+          <dt>Rumbo</dt>
+          <dd>{courseText(live?.cog ?? position?.cog ?? null)}</dd>
+          <dt>Estado</dt>
+          <dd>{navStatusText(position?.nav_status ?? null)}</dd>
+          <dt>Última señal</dt>
+          <dd>{agoText(live?.ts ?? position?.received_at ?? null, now)}</dd>
+        </dl>
+      </div>
+      <div className="vessel-panel__group" role="group" aria-labelledby={vesselId}>
+        <h3 id={vesselId}>Buque</h3>
+        <dl>
+          <dt>IMO</dt>
+          <dd>{data?.imo ?? '—'}</dd>
+          <dt>Eslora × manga</dt>
+          <dd>{dimensionsText(data?.length_m ?? null, data?.beam_m ?? null)}</dd>
+          <dt>Código AIS</dt>
+          <dd>{aisTypeCodeText(shipType)}</dd>
+        </dl>
+      </div>
       <p className="vessel-panel__note">Estela: últimos 30 minutos.</p>
     </aside>
   );

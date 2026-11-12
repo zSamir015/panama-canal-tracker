@@ -16,7 +16,8 @@
   --color-text: #1c2a35;
   --color-text-strong: #263238;
   --color-text-secondary: #3b4b58;
-  --color-text-muted: #607d8b;
+  /* #546e7a y no #607d8b: 5,4:1 sobre blanco y 4,6:1 sobre surface-muted (WCAG AA, texto pequeño). */
+  --color-text-muted: #546e7a;
 
   /* Bordes */
   --color-border: #b0bec5;

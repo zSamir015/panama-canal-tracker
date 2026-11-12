@@ -6,6 +6,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Changed
+- Ficha del buque más clara (issue #125). Debajo del nombre hay una etiqueta de tipo con el
+  color del mapa (el color va en el punto y el texto queda oscuro), y el MMSI va en monoespaciada.
+  Los datos se reparten en "Movimiento" y "Buque", y el código AIS del tipo tiene fila propia. En
+  móvil, si el buque elegido queda bajo la hoja o fuera de pantalla, el mapa lo centra en la parte
+  visible (`easeTo`, sin animación con `prefers-reduced-motion`). El gris de texto secundario
+  pasa de `#607d8b` (4,37:1) a `#546e7a` (5,4:1) para cumplir WCAG AA en texto pequeño.
 - Interfaz en móvil (issue #123; por debajo de 640 px, el escritorio no cambia). Cabecera
   compacta y aviso de demo en una línea: a 390 px pasan de 208 a 67 px en la demo. La leyenda se
   pliega en una pastilla. "En tránsito ahora" es una barra al pie que se despliega como hoja

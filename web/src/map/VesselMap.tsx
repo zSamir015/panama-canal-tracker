@@ -17,7 +17,13 @@ import type { VesselState } from '../live/vesselStore';
 import { CATEGORY_COLORS, toFeatureCollection } from './vesselGeoJson';
 import canalZones from './canalZones.json';
 import { arrowIcon, dotIcon } from './vesselIcons';
-import { boundsToBbox, CANAL_BBOX } from './viewport';
+import {
+  boundsToBbox,
+  CANAL_BBOX,
+  focusOffset,
+  MOBILE_MEDIA_QUERY,
+  MOBILE_SHEET_FRACTION,
+} from './viewport';
 
 setWorkerUrl(workerUrl);
 
@@ -215,9 +221,44 @@ export function VesselMap({
     if (map?.getLayer(SELECTED_LAYER_ID)) {
       map.setFilter(SELECTED_LAYER_ID, selectedFilter(selectedMmsi));
     }
+    if (map && selectedMmsi !== null) {
+      keepVisibleAboveSheet(map, vesselsRef.current.get(selectedMmsi));
+    }
   }, [selectedMmsi]);
 
   return <div ref={containerRef} className="vessel-map" />;
+}
+
+/**
+ * En móvil la ficha es una hoja que tapa la parte de abajo del mapa (issue #125): si el buque
+ * elegido queda debajo o pegado a un borde, se centra en la parte visible. En escritorio, nada.
+ */
+function keepVisibleAboveSheet(map: MapLibreMap, vessel: { lon: number; lat: number } | undefined) {
+  if (vessel === undefined || !matches(MOBILE_MEDIA_QUERY)) {
+    return;
+  }
+  // Al abrirse la ficha el mapa cambia de alto (desaparece la barra de tránsitos): sin `resize`,
+  // MapLibre proyectaría con el tamaño anterior.
+  map.resize();
+  const point = map.project([vessel.lon, vessel.lat]);
+  const container = map.getContainer();
+  const offset = focusOffset(
+    point,
+    { width: container.clientWidth, height: container.clientHeight },
+    MOBILE_SHEET_FRACTION,
+  );
+  if (offset === null) {
+    return;
+  }
+  map.easeTo({
+    center: [vessel.lon, vessel.lat],
+    offset: [0, offset],
+    duration: matches('(prefers-reduced-motion: reduce)') ? 0 : 400,
+  });
+}
+
+function matches(query: string): boolean {
+  return typeof window.matchMedia === 'function' && window.matchMedia(query).matches;
 }
 
 function selectedFilter(mmsi: number | null): ExpressionSpecification {
