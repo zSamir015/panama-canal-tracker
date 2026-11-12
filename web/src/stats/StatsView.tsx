@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { ApiError } from '../api/client';
 import { BarChart } from './BarChart';
 import { DIRECTION_COLORS } from './colors';
-import type { Distribution } from './api';
+import type { Direction, Distribution } from './api';
 import { categoryText, minutesText } from './format';
 import { useDailyStats, useTransitDurations, useWaitingTimes, WINDOW_OPTIONS } from './queries';
-import { categoryTotals, dailySeries } from './series';
+import { axisMax, categoryTotals, dailySeries, itemsOfCategory } from './series';
 import { Skeleton } from '../ui/Skeleton';
 
 interface StatsViewProps {
@@ -21,6 +21,22 @@ export function StatsView({ token, onUnauthorized, now = Date.now }: StatsViewPr
   const daily = useDailyStats(token, days);
   const durations = useTransitDurations(token, days);
   const waiting = useWaitingTimes(token, days);
+  // Filtros de la gráfica diaria (issue #129): solo en el cliente, con los datos ya cargados.
+  const [highlight, setHighlight] = useState<Direction | null>(null);
+  const [category, setCategory] = useState<string | null>(null);
+  const filtering = highlight !== null || category !== null;
+  const clearFilters = () => {
+    setHighlight(null);
+    setCategory(null);
+  };
+
+  // Si al cambiar de periodo el tipo elegido ya no aparece, el filtro se quita solo. Se ajusta
+  // durante el render (el patrón de React para estado que depende de datos nuevos), no en un
+  // efecto, que pintaría una vez la gráfica vacía.
+  const categories = daily.data === undefined ? null : categoryTotals(daily.data.items);
+  if (category !== null && categories !== null && !categories.some(([name]) => name === category)) {
+    setCategory(null);
+  }
 
   const unauthorized = [daily, durations, waiting].some(
     (query) => query.error instanceof ApiError && query.error.status === 401,
@@ -51,33 +67,76 @@ export function StatsView({ token, onUnauthorized, now = Date.now }: StatsViewPr
         </div>
       </header>
 
-      <article className="stats__card">
-        <h3>Tránsitos completados por día</h3>
+      <article
+        className="stats__card"
+        onKeyDown={(event) => {
+          if (event.key === 'Escape' && filtering) {
+            event.stopPropagation();
+            clearFilters();
+          }
+        }}
+      >
+        <div className="stats__card-header">
+          <h3>Tránsitos completados por día</h3>
+          {filtering && (
+            <button type="button" className="stats__clear" onClick={clearFilters}>
+              Quitar filtros
+            </button>
+          )}
+        </div>
         <Loadable query={daily} skeleton={<Skeleton variant="chart" />}>
           {(data) => {
-            const bars = dailySeries(data.items, days, now());
+            const all = dailySeries(data.items, days, now());
+            const bars =
+              category === null
+                ? all
+                : dailySeries(itemsOfCategory(data.items, category), days, now());
             const total = data.items.reduce((sum, item) => sum + item.transits, 0);
             return total === 0 ? (
               <p className="stats__empty">No hay tránsitos completados en este periodo.</p>
             ) : (
               <>
-                <BarChart bars={bars} />
+                {/* La escala es la de todos los tránsitos: un tipo pequeño se ve pequeño. */}
+                <BarChart
+                  bars={bars}
+                  max={axisMax(all)}
+                  highlight={highlight}
+                  subject={category === null ? '' : ` de tipo ${categoryText(category)}`}
+                />
                 <ul className="stats__legend" aria-label="Sentido">
-                  <li>
-                    <span style={{ background: DIRECTION_COLORS.southbound }} />
-                    Atlántico → Pacífico
-                  </li>
-                  <li>
-                    <span style={{ background: DIRECTION_COLORS.northbound }} />
-                    Pacífico → Atlántico
-                  </li>
+                  {DIRECTIONS.map(([direction, label]) => (
+                    <li key={direction}>
+                      <button
+                        type="button"
+                        aria-pressed={highlight === direction}
+                        className={
+                          highlight !== null && highlight !== direction ? 'is-dimmed' : undefined
+                        }
+                        onClick={() => {
+                          setHighlight((current) => (current === direction ? null : direction));
+                        }}
+                      >
+                        <span style={{ background: DIRECTION_COLORS[direction] }} />
+                        {label}
+                      </button>
+                    </li>
+                  ))}
                 </ul>
                 <h4>Por tipo de buque</h4>
                 <ul className="stats__categories" aria-label="Tránsitos por tipo de buque">
-                  {categoryTotals(data.items).map(([category, transits]) => (
-                    <li key={category}>
-                      <span>{categoryText(category)}</span>
-                      <span>{transits}</span>
+                  {categoryTotals(data.items).map(([name, transits]) => (
+                    <li key={name}>
+                      <button
+                        type="button"
+                        aria-pressed={category === name}
+                        className={category !== null && category !== name ? 'is-dimmed' : undefined}
+                        onClick={() => {
+                          setCategory((current) => (current === name ? null : name));
+                        }}
+                      >
+                        <span>{categoryText(name)}</span>
+                        <span>{transits}</span>
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -122,6 +181,11 @@ export function StatsView({ token, onUnauthorized, now = Date.now }: StatsViewPr
     </section>
   );
 }
+
+const DIRECTIONS: readonly [Direction, string][] = [
+  ['southbound', 'Atlántico → Pacífico'],
+  ['northbound', 'Pacífico → Atlántico'],
+];
 
 interface LoadableProps<T> {
   query: { data: T | undefined; isPending: boolean; isError: boolean; error: Error | null };

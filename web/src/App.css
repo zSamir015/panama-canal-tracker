@@ -396,6 +396,15 @@
   height: auto;
 }
 
+.bar-chart__bar {
+  transition: opacity 150ms ease-out;
+}
+
+/* El sentido no resaltado se atenúa al 25 %. */
+.bar-chart__bar.is-dimmed {
+  opacity: 0.25;
+}
+
 .bar-chart__grid {
   stroke: var(--color-border-subtle);
   stroke-width: 1;
@@ -417,10 +426,63 @@
   font-size: 0.85rem;
 }
 
-.stats__legend li {
+.stats__card-header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+/* Leyenda y lista por tipo (issue #129): botones con el aspecto de una leyenda. */
+.stats__legend button,
+.stats__categories button {
   display: flex;
   gap: 0.35rem;
   align-items: center;
+  padding: 0.15rem 0.4rem;
+  margin: 0 -0.4rem;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  transition: opacity 150ms ease-out;
+}
+
+.stats__legend button:hover,
+.stats__categories button:hover {
+  background: var(--color-surface-muted);
+}
+
+.stats__legend button[aria-pressed='true'],
+.stats__categories button[aria-pressed='true'] {
+  font-weight: 700;
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+}
+
+.stats__legend button:focus-visible,
+.stats__categories button:focus-visible,
+.stats__clear:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.stats__legend .is-dimmed,
+.stats__categories .is-dimmed {
+  opacity: 0.45;
+}
+
+.stats__clear {
+  padding: 0.15rem 0.5rem;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--color-accent);
+  cursor: pointer;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
 }
 
 .stats__legend span {
@@ -434,9 +496,10 @@
   max-width: 18rem;
 }
 
-.stats__categories li {
-  display: flex;
+.stats__categories button {
   justify-content: space-between;
+  width: calc(100% + 0.8rem);
+  text-align: left;
 }
 
 .stats__table {
@@ -546,6 +609,12 @@
   .skeleton__block,
   .connection-dot--pending {
     animation: none;
+  }
+
+  .bar-chart__bar,
+  .stats__legend button,
+  .stats__categories button {
+    transition: none;
   }
 }
 

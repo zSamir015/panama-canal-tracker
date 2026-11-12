@@ -11,7 +11,7 @@ import {
   type DailyItem,
 } from './api';
 import { categoryText, minutesText, shortDateText } from './format';
-import { axisMax, categoryTotals, dailySeries } from './series';
+import { axisMax, categoryTotals, dailySeries, itemsOfCategory } from './series';
 import { StatsView } from './StatsView';
 
 const NOW = Date.parse('2026-11-06T12:00:00Z');
@@ -304,5 +304,152 @@ describe('StatsView', () => {
 
     expect(container.querySelector('svg script, svg foreignObject')).toBeNull();
     expect(container.querySelectorAll('svg rect').length).toBeGreaterThan(0);
+  });
+});
+
+describe('itemsOfCategory', () => {
+  it('sin categoría devuelve todos; con categoría, solo los suyos', () => {
+    expect(itemsOfCategory(daily.items, null)).toEqual(daily.items);
+    expect(itemsOfCategory(daily.items, 'tanker')).toEqual([daily.items[1], daily.items[2]]);
+    expect(itemsOfCategory(daily.items, 'fishing')).toEqual([]);
+  });
+});
+
+describe('StatsView: leyenda y filtros (issue #129)', () => {
+  // Un tipo pequeño (carga, 1) frente a uno grande (tanquero, 12): así se nota si la escala cambia.
+  const skewed = {
+    ...daily,
+    items: [item('2026-11-04', 'southbound', 12, 'tanker'), item('2026-11-05', 'southbound', 1)],
+  };
+
+  async function renderStats(overrides: Parameters<typeof stubStats>[0] = {}) {
+    stubStats(overrides);
+    renderWithQuery(<StatsView token="abc" onUnauthorized={vi.fn()} now={() => NOW} />);
+    return screen.findByRole('img', { name: /Tránsitos/ });
+  }
+
+  const bars = (chart: HTMLElement, direction: 'southbound' | 'northbound') => [
+    ...chart.querySelectorAll(`.bar-chart__bar--${direction}`),
+  ];
+
+  it('la leyenda de sentido resalta una serie y atenúa la otra; al repetir, se quita', async () => {
+    const chart = await renderStats();
+    const south = screen.getByRole('button', { name: 'Atlántico → Pacífico' });
+    expect(south).toHaveAttribute('aria-pressed', 'false');
+
+    await userEvent.click(south);
+
+    expect(south).toHaveAttribute('aria-pressed', 'true');
+    expect(bars(chart, 'northbound').every((bar) => bar.classList.contains('is-dimmed'))).toBe(
+      true,
+    );
+    expect(bars(chart, 'southbound').some((bar) => bar.classList.contains('is-dimmed'))).toBe(
+      false,
+    );
+
+    await userEvent.click(south);
+
+    expect(south).toHaveAttribute('aria-pressed', 'false');
+    expect(chart.querySelectorAll('.is-dimmed')).toHaveLength(0);
+  });
+
+  it('solo un sentido resaltado a la vez', async () => {
+    await renderStats();
+    const south = screen.getByRole('button', { name: 'Atlántico → Pacífico' });
+    const north = screen.getByRole('button', { name: 'Pacífico → Atlántico' });
+
+    await userEvent.click(south);
+    await userEvent.click(north);
+
+    expect(south).toHaveAttribute('aria-pressed', 'false');
+    expect(north).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('un tipo filtra la gráfica y conserva la escala de todos los tránsitos', async () => {
+    const chart = await renderStats({ daily: skewed });
+    // 12 + 1 = 13 tránsitos; el pico diario es 12, así que el eje llega a 15.
+    expect(chart).toHaveAccessibleName(/13 en 30 días/);
+    expect(within(chart).getByText('15')).toBeInTheDocument();
+
+    const cargo = screen.getByRole('button', { name: /Carga/ });
+    await userEvent.click(cargo);
+
+    expect(cargo).toHaveAttribute('aria-pressed', 'true');
+    const filtered = screen.getByRole('img', { name: /Tránsitos/ });
+    expect(filtered).toHaveAccessibleName(/de tipo Carga.*: 1 en 30 días/);
+    // Con 1 solo tránsito el eje sería 4 si se reescalara; sigue en 15.
+    expect(within(filtered).getByText('15')).toBeInTheDocument();
+    // El <title> de cada barra también dice qué se cuenta.
+    const titles = Array.from(filtered.querySelectorAll('g > title'), (t) => t.textContent);
+    expect(titles.every((text) => text.includes('tránsitos de tipo Carga'))).toBe(true);
+    expect(screen.getByRole('button', { name: /Tanquero/ })).toHaveClass('is-dimmed');
+  });
+
+  it('"Quitar filtros" aparece solo con algo activo y lo quita todo', async () => {
+    await renderStats({ daily: skewed });
+    expect(screen.queryByRole('button', { name: 'Quitar filtros' })).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /Carga/ }));
+    await userEvent.click(screen.getByRole('button', { name: 'Atlántico → Pacífico' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Quitar filtros' }));
+
+    expect(screen.getByRole('button', { name: /Carga/ })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Atlántico → Pacífico' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    expect(screen.queryByRole('button', { name: 'Quitar filtros' })).not.toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /Tránsitos/ })).toHaveAccessibleName(/13 en 30 días/);
+  });
+
+  it('Escape quita los filtros cuando el foco está dentro de la tarjeta', async () => {
+    await renderStats({ daily: skewed });
+    const cargo = screen.getByRole('button', { name: /Carga/ });
+    await userEvent.click(cargo);
+    expect(cargo).toHaveFocus();
+
+    await userEvent.keyboard('{Escape}');
+
+    expect(cargo).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('se maneja con el teclado: Tab hasta el botón y Espacio para activarlo', async () => {
+    await renderStats();
+    const south = screen.getByRole('button', { name: 'Atlántico → Pacífico' });
+    south.focus();
+
+    await userEvent.keyboard(' ');
+
+    expect(south).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('si al cambiar de periodo el tipo elegido desaparece, el filtro se quita solo', async () => {
+    let calls = 0;
+    const fetchMock = vi.fn<(url: string) => Promise<Response>>((url) => {
+      if (url.includes('/stats/daily')) {
+        calls += 1;
+        // Primera petición (30 días): hay carga. Segunda (7 días): solo tanqueros.
+        return Promise.resolve(
+          Response.json(
+            calls === 1
+              ? skewed
+              : { ...skewed, items: [item('2026-11-05', 'southbound', 4, 'tanker')] },
+          ),
+        );
+      }
+      if (url.includes('/stats/transit-durations')) {
+        return Promise.resolve(Response.json(durations));
+      }
+      return Promise.resolve(Response.json(waiting));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    renderWithQuery(<StatsView token="abc" onUnauthorized={vi.fn()} now={() => NOW} />);
+    await userEvent.click(await screen.findByRole('button', { name: /Carga/ }));
+
+    await userEvent.click(screen.getByRole('button', { name: '7 días' }));
+
+    const chart = await screen.findByRole('img', { name: /4 en 7 días/ });
+    expect(chart).not.toHaveAccessibleName(/de tipo/);
+    expect(screen.queryByRole('button', { name: 'Quitar filtros' })).not.toBeInTheDocument();
   });
 });
