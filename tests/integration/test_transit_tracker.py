@@ -34,8 +34,11 @@ def at(point: tuple[float, float], minutes: float, mmsi: int = MMSI) -> Position
         lat=lat,
         lon=lon,
         sog=8.0,
-        cog=180.0,
-        heading=180,
+        # Sin COG: estos tests son del tracker y la persistencia, no del rumbo. Un COG fijo de 180
+        # se leería como "sale" en la entrada del Pacífico (issue #121, ver
+        # tests/test_transit_direction.py).
+        cog=None,
+        heading=None,
         nav_status=0,
     )
 
