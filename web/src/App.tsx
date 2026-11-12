@@ -9,6 +9,8 @@ import { useDemoVessels } from './demo/useDemoVessels';
 import type { Bbox } from './live/protocol';
 import { type LiveStatus, useLiveVessels } from './live/useLiveVessels';
 import { MapLegend } from './map/MapLegend';
+import { GuideDialog } from './onboarding/GuideDialog';
+import { hasSeenGuide, rememberGuideSeen } from './onboarding/guideStorage';
 import { StatsView } from './stats/StatsView';
 import { TransitsPanel } from './transits/TransitsPanel';
 import { ConnectionDot } from './ui/ConnectionDot';
@@ -38,6 +40,12 @@ export function App() {
   const [bbox, setBbox] = useState<Bbox | null>(null);
   const [selectedMmsi, setSelectedMmsi] = useState<number | null>(null);
   const [view, setView] = useState<'map' | 'stats'>('map');
+  // Guía al primer uso (issue #137): sale sola hasta que se cierra una vez; luego, con el "?".
+  const [guideOpen, setGuideOpen] = useState(() => !hasSeenGuide());
+  const closeGuide = useCallback(() => {
+    setGuideOpen(false);
+    rememberGuideSeen();
+  }, []);
   // Un 4401 de `/ws/live` o un 401 de la API piden renovar el token; si la renovación dice que
   // ya no hay sesión, `useSession` pasa a `signedOut` con `expired` y se vuelve al login.
   const live = useLiveVessels(token, bbox, renew);
@@ -69,7 +77,22 @@ export function App() {
     <main className="app">
       <header className="app__header">
         <div>
-          <h1>Panama Canal Tracker</h1>
+          <div className="app__brand">
+            <h1>Panama Canal Tracker</h1>
+            {mapReady && (
+              <button
+                type="button"
+                className="app__help"
+                aria-label="Cómo usar el tracker"
+                aria-haspopup="dialog"
+                onClick={() => {
+                  setGuideOpen(true);
+                }}
+              >
+                ?
+              </button>
+            )}
+          </div>
           {config.demo ? (
             <p className="app__subtitle">Demo con datos simulados del Canal de Panamá.</p>
           ) : (
@@ -108,6 +131,8 @@ export function App() {
         )}
       </header>
       {config.demo && <DemoBanner />}
+      {/* Nunca encima del login: solo cuando ya se ve el mapa. */}
+      <GuideDialog open={mapReady && guideOpen} demo={config.demo} onClose={closeGuide} />
       {view === 'stats' && !config.demo && token !== null ? (
         <StatsView token={token} onUnauthorized={renew} />
       ) : (

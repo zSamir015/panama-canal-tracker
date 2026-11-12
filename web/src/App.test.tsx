@@ -279,3 +279,46 @@ describe('App', () => {
     expect(screen.queryByRole('navigation', { name: 'Vista' })).not.toBeInTheDocument();
   });
 });
+
+describe('Guía al primer uso (issue #137)', () => {
+  const guide = () => screen.queryByRole('dialog', { name: 'Cómo usar el tracker' });
+
+  it('no sale encima del login; sale al ver el mapa por primera vez', async () => {
+    stubApi();
+    renderWithQuery(<App />);
+
+    await screen.findByRole('heading', { name: 'Iniciar sesión' });
+    expect(guide()).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Cómo usar el tracker' })).not.toBeInTheDocument();
+
+    await signIn();
+    expect(await screen.findByRole('dialog', { name: 'Cómo usar el tracker' })).toBeVisible();
+  });
+
+  it('al cerrarla se recuerda y no vuelve a salir sola', async () => {
+    stubApi({ refreshStatuses: [200] });
+    const { unmount } = renderWithQuery(<App />);
+    await screen.findByRole('dialog', { name: 'Cómo usar el tracker' });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Entendido' }));
+    expect(guide()).not.toBeInTheDocument();
+
+    unmount();
+    renderWithQuery(<App />);
+    await screen.findByRole('button', { name: 'buque de prueba' });
+    expect(guide()).not.toBeInTheDocument();
+  });
+
+  it('el botón "?" de la cabecera la vuelve a abrir', async () => {
+    window.localStorage.setItem('panama-canal-tracker:guide-seen', '1');
+    stubApi({ refreshStatuses: [200] });
+    renderWithQuery(<App />);
+
+    const help = await screen.findByRole('button', { name: 'Cómo usar el tracker' });
+    expect(help).toHaveAttribute('aria-haspopup', 'dialog');
+    expect(guide()).not.toBeInTheDocument();
+
+    await userEvent.click(help);
+    expect(guide()).toBeVisible();
+  });
+});

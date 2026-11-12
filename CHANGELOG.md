@@ -6,6 +6,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Changed
+- Guía al primer uso (issue #137). La primera vez que se ve el mapa (en la app, después de
+  iniciar sesión; en la demo, al cargar) sale una tarjeta "Cómo usar el tracker" con 3 o 4 pasos:
+  en la app, ficha y estela, colores, "En tránsito ahora" y estadísticas; en la demo, mover el
+  mapa, colores y que los datos son simulados. Es un `<dialog>` nativo modal: atrapa el foco, se
+  cierra con "Entendido", la ✕ o Escape (sin cerrar también la ficha del buque) y el foco empieza
+  en "Entendido". Al cerrarla se guarda un único booleano en `localStorage` (ningún token ni dato
+  personal); un botón "?" junto al título la vuelve a abrir. Sin dependencias nuevas.
 - Estadísticas interactivas (issue #129). En "Tránsitos completados por día", la leyenda de
   sentido es un par de botones (`aria-pressed`) que resaltan una serie y atenúan la otra, y la
   lista "Por tipo de buque" filtra la gráfica a ese tipo con los datos ya cargados. El eje
