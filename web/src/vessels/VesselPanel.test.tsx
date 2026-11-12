@@ -86,6 +86,18 @@ describe('VesselPanel', () => {
     expect(within(vessel).getAllByText('—')).toHaveLength(2);
   });
 
+  it('mientras carga muestra un esqueleto en lugar de los datos', () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>(() => undefined)),
+    );
+    const { container } = renderPanel();
+
+    expect(container.querySelector('.skeleton[aria-busy="true"]')).not.toBeNull();
+    expect(screen.getByText('Cargando…')).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Movimiento' })).not.toBeInTheDocument();
+  });
+
   it('un nombre hostil se pinta como texto en la cabecera', async () => {
     const hostile = '<img src=x onerror=alert(1)>';
     stubDetail({ ...detail, name: hostile });

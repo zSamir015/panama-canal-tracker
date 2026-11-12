@@ -33,6 +33,14 @@
   --color-warning-border: #ffc107;
   --color-warning-text: #5d4037;
 
+  /* Estado de la conexión, sobre la cabecera (--color-brand): más de 3:1 cada uno (WCAG 1.4.11) */
+  --color-status-ok: #66bb6a;
+  --color-status-pending: #ffca28;
+  --color-status-down: #ff8a80;
+
+  /* Esqueletos de carga */
+  --color-skeleton: #dfe6ec;
+
   /* Radios */
   --radius-xs: 2px;
   --radius-sm: 4px;

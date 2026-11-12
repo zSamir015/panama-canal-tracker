@@ -6,6 +6,7 @@ import type { Distribution } from './api';
 import { categoryText, minutesText } from './format';
 import { useDailyStats, useTransitDurations, useWaitingTimes, WINDOW_OPTIONS } from './queries';
 import { categoryTotals, dailySeries } from './series';
+import { Skeleton } from '../ui/Skeleton';
 
 interface StatsViewProps {
   token: string;
@@ -52,7 +53,7 @@ export function StatsView({ token, onUnauthorized, now = Date.now }: StatsViewPr
 
       <article className="stats__card">
         <h3>Tránsitos completados por día</h3>
-        <Loadable query={daily}>
+        <Loadable query={daily} skeleton={<Skeleton variant="chart" />}>
           {(data) => {
             const bars = dailySeries(data.items, days, now());
             const total = data.items.reduce((sum, item) => sum + item.transits, 0);
@@ -88,7 +89,7 @@ export function StatsView({ token, onUnauthorized, now = Date.now }: StatsViewPr
 
       <article className="stats__card">
         <h3>Duración del tránsito</h3>
-        <Loadable query={durations}>
+        <Loadable query={durations} skeleton={<Skeleton lines={3} />}>
           {(data) => (
             <DistributionTable
               total={data.overall}
@@ -103,7 +104,7 @@ export function StatsView({ token, onUnauthorized, now = Date.now }: StatsViewPr
 
       <article className="stats__card">
         <h3>Espera en fondeo antes de entrar</h3>
-        <Loadable query={waiting}>
+        <Loadable query={waiting} skeleton={<Skeleton lines={3} />}>
           {(data) => (
             <DistributionTable
               total={data.overall}
@@ -125,9 +126,11 @@ export function StatsView({ token, onUnauthorized, now = Date.now }: StatsViewPr
 interface LoadableProps<T> {
   query: { data: T | undefined; isPending: boolean; isError: boolean; error: Error | null };
   children: (data: T) => React.ReactNode;
+  /** Lo que se ve mientras llegan los datos, con la forma de lo que va a llegar. */
+  skeleton: React.ReactNode;
 }
 
-function Loadable<T>({ query, children }: LoadableProps<T>) {
+function Loadable<T>({ query, children, skeleton }: LoadableProps<T>) {
   if (query.isError) {
     return (
       <p className="stats__error" role="alert">
@@ -136,7 +139,7 @@ function Loadable<T>({ query, children }: LoadableProps<T>) {
     );
   }
   if (query.data === undefined) {
-    return <p>Cargando…</p>;
+    return <>{skeleton}</>;
   }
   return <>{children(query.data)}</>;
 }

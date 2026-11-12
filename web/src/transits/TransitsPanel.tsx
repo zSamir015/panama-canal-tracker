@@ -2,6 +2,7 @@ import { useEffect, useId, useState } from 'react';
 import type { CurrentTransit } from './api';
 import { directionText, elapsedText, transitName } from './format';
 import { useCurrentTransits } from './queries';
+import { Skeleton } from '../ui/Skeleton';
 
 interface TransitsPanelProps {
   token: string;
@@ -55,7 +56,7 @@ export function TransitsPanel({ token, selectedMmsi, onSelect }: TransitsPanelPr
         )}
       </h2>
       <div id={bodyId} className="transits-panel__body">
-        {transits.isPending && <p>Cargando…</p>}
+        {transits.isPending && <Skeleton lines={3} />}
         {transits.isError && (
           <p className="transits-panel__error" role="alert">
             {transits.error.message}
