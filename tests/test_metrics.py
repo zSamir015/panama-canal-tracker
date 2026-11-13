@@ -174,8 +174,8 @@ def test_readiness_needs_both_dependencies() -> None:
 
 
 def test_the_metrics_token_is_optional_and_masked() -> None:
-    assert Settings(_env_file=None).metrics_token is None  # type: ignore[call-arg]
-    token = Settings(_env_file=None, metrics_token="x" * 40).metrics_token  # type: ignore[call-arg]
+    assert Settings(_env_file=None).metrics_token is None
+    token = Settings(_env_file=None, metrics_token="x" * 40).metrics_token
 
     assert isinstance(token, SecretStr)
     assert "x" * 10 not in repr(token)
@@ -183,7 +183,7 @@ def test_the_metrics_token_is_optional_and_masked() -> None:
 
 def test_a_short_metrics_token_is_rejected_without_echoing_it() -> None:
     with pytest.raises(ValidationError) as error:
-        Settings(_env_file=None, metrics_token="corto-pero-secreto")  # type: ignore[call-arg]
+        Settings(_env_file=None, metrics_token="corto-pero-secreto")
 
     assert "METRICS_TOKEN" in str(error.value)
     assert "corto-pero-secreto" not in str(error.value)

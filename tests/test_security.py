@@ -277,7 +277,7 @@ def test_error_message_never_contains_the_token(settings: Settings) -> None:
 
 def test_settings_only_allow_hs256() -> None:
     with pytest.raises(ValueError, match="HS256"):
-        Settings(_env_file=None, jwt_algorithm="none")  # type: ignore[arg-type]
+        Settings(_env_file=None, jwt_algorithm="none")
 
 
 def test_settings_bound_the_access_token_lifetime() -> None:

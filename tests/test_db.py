@@ -7,6 +7,7 @@ import pytest
 from fastapi import Depends, FastAPI
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+from sqlalchemy.pool import AsyncAdaptedQueuePool
 
 from app.core.config import Settings
 from app.core.db import DbSession, create_engine, get_db
@@ -44,17 +45,18 @@ def spy_app(app_settings: Settings) -> FastAPI:
 
 def test_importing_the_module_creates_no_engine() -> None:
     # `create_app()` es quien crea el engine; la configuración llega por parámetro.
-    settings = Settings(_env_file=None, database_url=FAKE_URL)  # type: ignore[arg-type]
+    settings = Settings(_env_file=None, database_url=FAKE_URL)
 
     engine = create_engine(settings)
 
     assert isinstance(engine, AsyncEngine)
     assert engine.dialect.driver == "asyncpg"
+    assert isinstance(engine.pool, AsyncAdaptedQueuePool)
     assert engine.pool.checkedout() == 0  # no abrió conexiones
 
 
 def test_engine_hides_parameters_and_does_not_echo() -> None:
-    settings = Settings(_env_file=None, database_url=FAKE_URL)  # type: ignore[arg-type]
+    settings = Settings(_env_file=None, database_url=FAKE_URL)
 
     engine = create_engine(settings)
 
@@ -63,7 +65,7 @@ def test_engine_hides_parameters_and_does_not_echo() -> None:
 
 
 def test_engine_repr_does_not_expose_the_password() -> None:
-    settings = Settings(_env_file=None, database_url=FAKE_URL)  # type: ignore[arg-type]
+    settings = Settings(_env_file=None, database_url=FAKE_URL)
 
     assert "pw-falsa-de-prueba" not in repr(create_engine(settings))
 

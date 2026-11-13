@@ -15,7 +15,10 @@ ROOT = Path(__file__).resolve().parent.parent
 def test_alembic_points_to_the_versioned_migration_directory() -> None:
     config = Config(str(ROOT / "alembic.ini"))
 
-    assert config.get_main_option("script_location").endswith("/alembic")
+    script_location = config.get_main_option("script_location")
+
+    assert script_location is not None
+    assert script_location.endswith("/alembic")
     assert (ROOT / "alembic" / "versions" / "20261018_0001_users_refresh_tokens.py").is_file()
     assert (ROOT / "alembic" / "versions" / "20261020_0002_vessels_positions.py").is_file()
     assert (ROOT / "alembic" / "versions" / "20261022_0003_canal_bound_vessels.py").is_file()

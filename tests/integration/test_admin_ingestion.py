@@ -151,9 +151,7 @@ async def test_a_corrupt_status_is_not_returned(admin: AsyncClient, redis: Redis
 
 
 async def test_redis_down_is_503(app: FastAPI, admin: AsyncClient) -> None:
-    down = create_redis(
-        Settings(app_env="test", redis_url="redis://:pw-falsa@127.0.0.1:1/15")  # type: ignore[arg-type]
-    )
+    down = create_redis(Settings(app_env="test", redis_url="redis://:pw-falsa@127.0.0.1:1/15"))
     app.dependency_overrides[get_redis] = lambda: down
 
     response = await admin.get(STATUS)

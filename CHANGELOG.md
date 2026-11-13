@@ -6,6 +6,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Changed
+- Los tests pasan `mypy --strict` y el CI los comprueba (`mypy app tests`, issue #145). Se
+  quitaron 21 `type: ignore` que ya sobraban (el plugin de pydantic entiende `Settings(...)`) y
+  se tiparon los demás casos (`Any` devueltos, `None` sin comprobar, nombres importados de
+  módulos que no los exportan). PyYAML no trae tipos: `pyproject.toml` lo exime solo a él.
 - Guía al primer uso (issue #137). La primera vez que se ve el mapa (en la app, después de
   iniciar sesión; en la demo, al cargar) sale una tarjeta "Cómo usar el tracker" con 3 o 4 pasos:
   en la app, ficha y estela, colores, "En tránsito ahora" y estadísticas; en la demo, mover el

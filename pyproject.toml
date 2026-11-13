@@ -86,3 +86,8 @@ fail_under = 80
 python_version = "3.12"
 strict = true
 plugins = ["pydantic.mypy"]
+
+# PyYAML no trae tipos; los tests solo lo usan para leer las reglas de alertas (tests/test_metrics.py).
+[[tool.mypy.overrides]]
+module = ["yaml"]
+ignore_missing_imports = true

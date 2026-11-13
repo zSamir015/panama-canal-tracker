@@ -255,7 +255,7 @@ async def test_keys_never_contain_emails_or_passwords(limited_app: FastAPI) -> N
 @pytest.fixture
 def redis_down(limited_app: FastAPI) -> FastAPI:
     # Puerto 1: nadie escucha, la conexión falla al momento.
-    settings = Settings(_env_file=None, redis_url="redis://:pw-falsa@127.0.0.1:1/0")  # type: ignore[arg-type]
+    settings = Settings(_env_file=None, redis_url="redis://:pw-falsa@127.0.0.1:1/0")
     limited_app.state.rate_limiter = AppRateLimiter(create_storage(settings))
     return limited_app
 

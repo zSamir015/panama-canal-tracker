@@ -12,12 +12,12 @@ from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient, Response
 from pwdlib import PasswordHash
 from pwdlib.hashers.argon2 import Argon2Hasher
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from app.core.db import SessionFactory
 from app.core.logging import configure_logging
-from app.core.security import PasswordCheck, decode_refresh_token
+from app.core.security import PasswordCheck, decode_refresh_token, verify_password
 from app.models.refresh_token import RefreshToken
 from app.models.user import User
 from app.repositories.user import UserRepository
@@ -196,7 +196,7 @@ async def test_wrong_password_and_unknown_email_get_the_same_401(client: AsyncCl
         assert "set-cookie" not in response.headers
 
     def comparable(response: Response) -> dict[str, object]:
-        body = response.json()
+        body: dict[str, object] = response.json()
         del body["request_id"]
         return body
 
@@ -208,9 +208,7 @@ async def test_login_upgrades_a_hash_with_old_parameters(
 ) -> None:
     old = PasswordHash((Argon2Hasher(time_cost=1, memory_cost=8192, parallelism=1),))
     async with sessions() as session:
-        await session.execute(
-            User.__table__.insert().values(email=EMAIL, hashed_password=old.hash(PASSWORD))
-        )
+        await session.execute(insert(User).values(email=EMAIL, hashed_password=old.hash(PASSWORD)))
         await session.commit()
 
     assert (await login(client)).status_code == 200
@@ -445,7 +443,7 @@ async def test_login_of_an_unknown_email_still_verifies_a_hash(
     # Anti-enumeración: el servicio tiene que pasar por `verify_password` (hash ficticio)
     # también cuando el email no existe, no responder antes.
     calls: list[str | None] = []
-    real = auth_service.verify_password
+    real = verify_password
 
     def spy(password: str, hashed: str | None) -> PasswordCheck:
         calls.append(hashed)

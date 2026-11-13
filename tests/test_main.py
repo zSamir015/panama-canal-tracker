@@ -64,7 +64,7 @@ def test_app_never_runs_in_debug_mode(app_env: str) -> None:
     # Con debug=True Starlette responde los 500 con la traza completa en HTML (AGENTS.md §8.12).
     settings = Settings(
         _env_file=None,
-        app_env=app_env,  # type: ignore[arg-type]
+        app_env=app_env,
         cors_origins=["https://tracker.example.com"],
         jwt_secret_key="x" * 32,
         database_url="postgresql+asyncpg://canal_app:pw-falsa-de-prueba@db:5432/canal_tracker",
