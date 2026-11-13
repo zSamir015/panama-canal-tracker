@@ -48,3 +48,14 @@ export function axisMax(bars: readonly DayBar[]): number {
   const step = peak <= 10 ? 2 : peak <= 20 ? 5 : 10;
   return Math.ceil(peak / step) * step;
 }
+
+/**
+ * Los datos de un tipo de buque, o todos con `null` (issue #129). La gráfica filtrada se dibuja
+ * con estos datos; la escala se calcula siempre con todos (`axisMax` de la serie completa).
+ */
+export function itemsOfCategory(
+  items: readonly DailyItem[],
+  category: string | null,
+): readonly DailyItem[] {
+  return category === null ? items : items.filter((item) => item.ship_category === category);
+}
