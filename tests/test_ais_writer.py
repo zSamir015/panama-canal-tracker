@@ -13,7 +13,6 @@ from sqlalchemy.exc import OperationalError
 
 from app.core.logging import configure_logging
 from app.services.ais_parser import PositionUpdate, VesselStatic
-from app.workers import ais_writer as ais_writer_module
 from app.workers.ais_writer import AisWriter, build_batch
 from app.workers.common import AisRecord, next_record
 
@@ -216,7 +215,7 @@ async def test_retries_wait_longer_each_time(monkeypatch: pytest.MonkeyPatch) ->
     async def record_sleep(seconds: float) -> None:
         waits.append(seconds)
 
-    monkeypatch.setattr(ais_writer_module.asyncio, "sleep", record_sleep)
+    monkeypatch.setattr(asyncio, "sleep", record_sleep)
     writer = AisWriter(
         queue=asyncio.Queue(),
         session_factory=UnreachableDatabase(),  # type: ignore[arg-type]

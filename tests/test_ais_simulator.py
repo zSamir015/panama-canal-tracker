@@ -46,7 +46,8 @@ def positions_by_vessel(messages: list[Any]) -> dict[int, list[PositionUpdate]]:
 
 
 def scenario_of(mmsi: int) -> str:
-    return next(v.scenario for v in sim.DEFAULT_FLEET if v.mmsi == mmsi)
+    scenario: str = next(v.scenario for v in sim.DEFAULT_FLEET if v.mmsi == mmsi)
+    return scenario
 
 
 # --- Contrato con el parser -----------------------------------------------------------------
@@ -244,8 +245,9 @@ def test_locks_are_crossed_slowly() -> None:
     )[vessel.mmsi]
 
     gatun_lat = (9.262, 9.282)
-    in_locks = [fix.sog for fix in track if gatun_lat[0] <= fix.lat <= gatun_lat[1]]
-    in_lake = [fix.sog for fix in track if 9.17 <= fix.lat <= 9.235]
+    speeds = [(fix.lat, fix.sog) for fix in track if fix.sog is not None]
+    in_locks = [sog for lat, sog in speeds if gatun_lat[0] <= lat <= gatun_lat[1]]
+    in_lake = [sog for lat, sog in speeds if 9.17 <= lat <= 9.235]
     assert in_locks and max(in_locks) < 3.5
     assert in_lake and min(in_lake) > 7
 

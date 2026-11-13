@@ -62,7 +62,7 @@ jobs:
         run: |
           pip install --require-hashes -r requirements-dev.lock
           pip install --no-deps -e .
-      - run: mypy app
+      - run: mypy app tests
 
   test:
     name: Tests (pytest)

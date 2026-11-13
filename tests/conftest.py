@@ -53,7 +53,7 @@ def app_settings() -> Settings:
         _env_file=None,
         app_env="test",
         cors_origins=["https://tracker.example.com"],
-        jwt_secret_key=TEST_JWT_KEY,  # type: ignore[arg-type]
+        jwt_secret_key=TEST_JWT_KEY,
     )
 
 

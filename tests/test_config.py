@@ -323,6 +323,6 @@ def test_redis_url_is_masked_in_repr() -> None:
 
 
 def test_transit_signal_timeout_defaults_to_30_minutes_and_is_bounded() -> None:
-    assert Settings(_env_file=None).transit_signal_timeout_minutes == 30  # type: ignore[call-arg]
+    assert Settings(_env_file=None).transit_signal_timeout_minutes == 30
     with pytest.raises(ValidationError):
-        Settings(_env_file=None, transit_signal_timeout_minutes=1)  # type: ignore[call-arg]
+        Settings(_env_file=None, transit_signal_timeout_minutes=1)
