@@ -211,7 +211,7 @@ async def test_after_a_failure_publishing_pauses_then_recovers() -> None:
 
 
 def test_client_has_short_timeouts_and_no_retries() -> None:
-    settings = Settings(_env_file=None, redis_url="redis://:pw-redis-falsa@127.0.0.1:6379/0")  # type: ignore[arg-type]
+    settings = Settings(_env_file=None, redis_url="redis://:pw-redis-falsa@127.0.0.1:6379/0")
 
     client = create_redis(settings)
 

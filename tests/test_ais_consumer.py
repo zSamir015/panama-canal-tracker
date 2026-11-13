@@ -25,10 +25,11 @@ from app.core.config import Settings
 from app.core.logging import configure_logging
 from app.services.ais_parser import PositionUpdate, VesselStatic
 from app.workers import ais_consumer
-from app.workers.ais_consumer import AisConsumer, AisRecord, backoff_delay, run_worker
+from app.workers.ais_consumer import AisConsumer, run_worker
 from app.workers.ais_writer import WriterStats
 from app.workers.anchorage_tracker import AnchorageTracker
 from app.workers.canal_bound_writer import CanalBoundStats
+from app.workers.common import AisRecord, backoff_delay
 from app.workers.transit_tracker import TransitTracker
 from tests.scripts_loader import load_script
 
@@ -519,10 +520,10 @@ def test_production_requires_wss() -> None:
         Settings(
             _env_file=None,
             app_env="production",
-            cors_origins=["https://tracker.example.com"],  # type: ignore[arg-type]
-            jwt_secret_key="x" * 32,  # type: ignore[arg-type]
-            database_url="postgresql+asyncpg://canal_app:pw-falsa@db:5432/canal",  # type: ignore[arg-type]
-            redis_url="redis://:pw-redis-falsa@redis:6379/0",  # type: ignore[arg-type]
+            cors_origins=["https://tracker.example.com"],
+            jwt_secret_key="x" * 32,
+            database_url="postgresql+asyncpg://canal_app:pw-falsa@db:5432/canal",
+            redis_url="redis://:pw-redis-falsa@redis:6379/0",
             aisstream_url="ws://127.0.0.1:8765",
         )
 

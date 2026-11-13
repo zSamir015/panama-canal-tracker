@@ -2,6 +2,7 @@
 
 import itertools
 import json
+from pathlib import Path
 
 import pytest
 
@@ -83,7 +84,7 @@ def test_frontend_copy_is_up_to_date() -> None:
     assert json.loads(exported) == json.loads(json.dumps(zones_geojson()))
 
 
-def test_export_check_flags_a_stale_copy(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_export_check_flags_a_stale_copy(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     stale = tmp_path / "canalZones.json"
     stale.write_text("{}\n", encoding="utf-8")
     monkeypatch.setattr(export_zones, "OUTPUT", stale)

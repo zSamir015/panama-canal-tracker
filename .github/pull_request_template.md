@@ -14,7 +14,7 @@ Closes #
 
 - [ ] `pytest` verde
 - [ ] `ruff check .` y `ruff format --check .` limpios
-- [ ] `mypy app` sin errores
+- [ ] `mypy app tests` sin errores
 - [ ] Probado manualmente (describir):
 
 ## Checklist de seguridad (AGENTS.md §8)

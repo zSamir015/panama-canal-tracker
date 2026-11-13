@@ -111,7 +111,7 @@ async def test_saved_batch_is_published_on_the_live_channel(
         await writer_for(sessions, publisher).flush([STATIC, position()])
         message = await next_live_message(subscriber)
     finally:
-        await subscriber.aclose()
+        await subscriber.aclose()  # type: ignore[no-untyped-call]  # redis-py sin anotar
         await publisher.close()
 
     assert message is not None
@@ -141,7 +141,7 @@ async def test_nothing_is_published_when_the_batch_is_not_saved(
         with pytest.raises(TimeoutError):
             await next_live_message(subscriber, wait_seconds=0.5)
     finally:
-        await subscriber.aclose()
+        await subscriber.aclose()  # type: ignore[no-untyped-call]  # redis-py sin anotar
         await publisher.close()
 
     assert publisher.stats.messages_published == 0
@@ -170,9 +170,7 @@ async def test_status_key_is_stored_with_an_expiry(redis: Redis, publisher: AisP
 
 async def test_positions_are_still_saved_when_redis_is_down(sessions: SessionFactory) -> None:
     down = AisPublisher(
-        create_redis(
-            Settings(app_env="test", redis_url="redis://:pw-falsa@127.0.0.1:1/15")  # type: ignore[arg-type]
-        )
+        create_redis(Settings(app_env="test", redis_url="redis://:pw-falsa@127.0.0.1:1/15"))
     )
     writer = writer_for(sessions, down)
 
@@ -198,7 +196,7 @@ async def test_redis_password_never_reaches_the_logs(
     )
     stream = io.StringIO()
     configure_logging("DEBUG", stream=stream)
-    publisher = AisPublisher(create_redis(Settings(app_env="test", redis_url=wrong)))  # type: ignore[arg-type]
+    publisher = AisPublisher(create_redis(Settings(app_env="test", redis_url=wrong)))
 
     await writer_for(sessions, publisher).flush([position()])
     await publisher.close()
@@ -244,7 +242,7 @@ async def test_worker_publishes_live_traffic_and_its_status(
         stop.set()
         await asyncio.wait_for(task, timeout=10)
     finally:
-        await subscriber.aclose()
+        await subscriber.aclose()  # type: ignore[no-untyped-call]  # redis-py sin anotar
         server.close()
         await server.wait_closed()
 

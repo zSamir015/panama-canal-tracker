@@ -107,6 +107,9 @@ async def owner_engine(db_settings: Settings) -> AsyncIterator[AsyncEngine]:
 
 TEST_MIGRATION_LOCK = "panama_canal_tracker_test_migrations"
 MIGRATION_RETRIES = 5
+# Lo que responde PostgreSQL cuando el planificador de TimescaleDB borra o actualiza la fila de
+# su catálogo de trabajos a la vez que el DDL del test (issue #141).
+SCHEDULER_RACES = ("tuple concurrently deleted", "tuple concurrently updated")
 
 
 @pytest.fixture
@@ -137,16 +140,18 @@ async def migrate(
     Al crear una política (refresco de un agregado, compresión), el planificador de TimescaleDB
     escribe de inmediato en su catálogo de trabajos. Si el siguiente DDL borra esa política a los
     pocos milisegundos (los tests suben y bajan el esquema sin pausa), PostgreSQL responde
-    "tuple concurrently deleted". Es una carrera del test con el planificador, no un fallo de la
-    migración: la transacción se deshace entera y reintentarla la resuelve. Cualquier otro error
-    se propaga sin reintentar.
+    "tuple concurrently deleted", o "tuple concurrently updated" si el planificador estaba
+    actualizando esa fila (p. ej. al bajar el esquema con `DROP MATERIALIZED VIEW`). Es una
+    carrera del test con el planificador, no un fallo de la migración: la transacción se deshace
+    entera y reintentarla la resuelve. Cualquier otro error se propaga sin reintentar.
     """
     for attempt in range(MIGRATION_RETRIES):
         try:
             async with connection.begin():
                 await connection.run_sync(alembic(action, revision))
         except InternalError as error:
-            if "tuple concurrently deleted" not in str(error) or attempt + 1 == MIGRATION_RETRIES:
+            race = any(message in str(error) for message in SCHEDULER_RACES)
+            if not race or attempt + 1 == MIGRATION_RETRIES:
                 raise
             await asyncio.sleep(0.2 * (attempt + 1))
         else:

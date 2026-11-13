@@ -31,6 +31,104 @@
   opacity: 1;
 }
 
+/* Título y botón "?" de la guía en la misma línea (issue #137). */
+.app__brand {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.app__help {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  line-height: 1;
+  color: inherit;
+  cursor: pointer;
+  background: rgb(255 255 255 / 12%);
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 50%;
+}
+
+.app__help:hover {
+  background: rgb(255 255 255 / 25%);
+}
+
+.app__help:focus-visible {
+  outline: 2px solid var(--color-on-brand);
+  outline-offset: 2px;
+}
+
+/* Guía al primer uso: `<dialog>` modal, centrado por el navegador. */
+.guide {
+  box-sizing: border-box;
+  width: min(26rem, calc(100% - 2rem));
+  padding: 1.25rem 1.5rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-panel);
+}
+
+.guide::backdrop {
+  background: rgb(0 0 0 / 45%);
+}
+
+.guide__header {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.guide h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--color-text-strong);
+}
+
+.guide__close {
+  padding: 0 0.4rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.guide__steps {
+  display: grid;
+  gap: 0.6rem;
+  margin: 1rem 0 1.25rem;
+  padding-left: 1.25rem;
+  line-height: 1.45;
+}
+
+.guide__ok {
+  display: block;
+  margin-left: auto;
+  padding: 0.5rem 1.1rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-on-accent);
+  cursor: pointer;
+  background: var(--color-accent);
+  border: 0;
+  border-radius: var(--radius-md);
+}
+
+.guide__close:focus-visible,
+.guide__ok:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 .app__map {
   position: relative;
   display: grid;
@@ -396,6 +494,15 @@
   height: auto;
 }
 
+.bar-chart__bar {
+  transition: opacity 150ms ease-out;
+}
+
+/* El sentido no resaltado se atenúa al 25 %. */
+.bar-chart__bar.is-dimmed {
+  opacity: 0.25;
+}
+
 .bar-chart__grid {
   stroke: var(--color-border-subtle);
   stroke-width: 1;
@@ -417,10 +524,63 @@
   font-size: 0.85rem;
 }
 
-.stats__legend li {
+.stats__card-header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+/* Leyenda y lista por tipo (issue #129): botones con el aspecto de una leyenda. */
+.stats__legend button,
+.stats__categories button {
   display: flex;
   gap: 0.35rem;
   align-items: center;
+  padding: 0.15rem 0.4rem;
+  margin: 0 -0.4rem;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  transition: opacity 150ms ease-out;
+}
+
+.stats__legend button:hover,
+.stats__categories button:hover {
+  background: var(--color-surface-muted);
+}
+
+.stats__legend button[aria-pressed='true'],
+.stats__categories button[aria-pressed='true'] {
+  font-weight: 700;
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+}
+
+.stats__legend button:focus-visible,
+.stats__categories button:focus-visible,
+.stats__clear:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.stats__legend .is-dimmed,
+.stats__categories .is-dimmed {
+  opacity: 0.45;
+}
+
+.stats__clear {
+  padding: 0.15rem 0.5rem;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--color-accent);
+  cursor: pointer;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
 }
 
 .stats__legend span {
@@ -434,9 +594,10 @@
   max-width: 18rem;
 }
 
-.stats__categories li {
-  display: flex;
+.stats__categories button {
   justify-content: space-between;
+  width: calc(100% + 0.8rem);
+  text-align: left;
 }
 
 .stats__table {
@@ -547,6 +708,12 @@
   .connection-dot--pending {
     animation: none;
   }
+
+  .bar-chart__bar,
+  .stats__legend button,
+  .stats__categories button {
+    transition: none;
+  }
 }
 
 /* Móvil (issue #123). Un solo punto de corte; en escritorio no cambia nada. */
@@ -566,6 +733,13 @@
 
   .app__header h1 {
     font-size: 1.1rem;
+  }
+
+  /* 24 px: el mínimo de WCAG 2.5.8 para un objetivo táctil. */
+  .app__help {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.85rem;
   }
 
   /* El aviso de la demo ya lo dice, y en la app el título basta. */

@@ -7,6 +7,7 @@ prueba aquí es el límite, no el login.
 
 import io
 import json
+import time
 from collections.abc import AsyncIterator, Iterator
 from datetime import UTC, datetime
 from uuid import uuid4
@@ -137,11 +138,53 @@ async def test_refresh_allows_10_per_minute_per_ip(client: AsyncClient) -> None:
     assert_rate_limited(await client.post(f"{AUTH}/refresh"))
 
 
-async def test_api_allows_120_requests_per_minute_per_user(client: AsyncClient) -> None:
+class Clock:
+    """Sustituye a `time.time`, el reloj con el que `limits` reparte las ventanas por minutos."""
+
+    def __init__(self, now: float) -> None:
+        self.now = now
+
+    def __call__(self) -> float:
+        return self.now
+
+
+@pytest.fixture
+def clock(monkeypatch: pytest.MonkeyPatch) -> Clock:
+    """Reloj parado a mitad de un minuto (issue #143).
+
+    El límite de la API es *sliding window counter* (ADR-0007), aproximado por diseño: suma la
+    ventana del minuto en curso y la del anterior ponderada por el tiempo que le queda. Con el
+    reloj real, si las peticiones de un test cruzaban un cambio de minuto, la cuenta bajaba y la
+    petición 121 pasaba: el test fallaba de vez en cuando. Parado, todas caen en la misma ventana.
+    """
+    fake = Clock(time.time() // 60 * 60 + 30)
+    monkeypatch.setattr(time, "time", fake)
+    return fake
+
+
+async def test_api_allows_120_requests_per_minute_per_user(
+    client: AsyncClient, clock: Clock
+) -> None:
     for _ in range(120):
         assert (await client.get(f"{AUTH}/me")).status_code == 200
 
     assert_rate_limited(await client.get(f"{AUTH}/me"))
+
+
+async def test_api_limit_weights_the_previous_minute(client: AsyncClient, clock: Clock) -> None:
+    # Documenta la aproximación aceptada en ADR-0007: 120 peticiones al final de un minuto y,
+    # 30 s después, ese minuto pesa la mitad (60), así que quedan otras 60 antes del 429.
+    clock.now = clock.now // 60 * 60 + 59.5
+    for _ in range(120):
+        assert (await client.get(f"{AUTH}/me")).status_code == 200
+
+    clock.now += 30
+    allowed = 0
+    while (response := await client.get(f"{AUTH}/me")).status_code == 200:
+        allowed += 1
+
+    assert allowed == 60
+    assert_rate_limited(response)
 
 
 async def test_api_limit_is_per_user_not_per_ip(limited_app: FastAPI, user: User) -> None:
@@ -212,7 +255,7 @@ async def test_keys_never_contain_emails_or_passwords(limited_app: FastAPI) -> N
 @pytest.fixture
 def redis_down(limited_app: FastAPI) -> FastAPI:
     # Puerto 1: nadie escucha, la conexión falla al momento.
-    settings = Settings(_env_file=None, redis_url="redis://:pw-falsa@127.0.0.1:1/0")  # type: ignore[arg-type]
+    settings = Settings(_env_file=None, redis_url="redis://:pw-falsa@127.0.0.1:1/0")
     limited_app.state.rate_limiter = AppRateLimiter(create_storage(settings))
     return limited_app
 
