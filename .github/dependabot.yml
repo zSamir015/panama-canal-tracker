@@ -1,9 +1,13 @@
 version: 2
+# Ninguna versión con menos de 14 días de publicada (regla del proyecto desde #64): da tiempo a
+# que se retire una versión rota o comprometida antes de que llegue aquí. Issue #139.
 updates:
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 14
     open-pull-requests-limit: 5
     groups:
       dev-tools:
@@ -12,11 +16,22 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 14
   - package-ecosystem: "npm"
     directory: "/web"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 14
     open-pull-requests-limit: 5
+    ignore:
+      # typescript-eslint 8.x solo admite typescript <6.1.0: con TS 7, `npm ci` falla.
+      - dependency-name: "typescript"
+        versions: [">=7.0.0"]
+      # Los tipos siguen al Node más antiguo que se ejecuta (CI en Node 24; `engines` admite 22).
+      - dependency-name: "@types/node"
+        versions: [">=25.0.0"]
     groups:
       dev-tools:
         dependency-type: "development"

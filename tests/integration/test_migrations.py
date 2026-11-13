@@ -32,7 +32,7 @@ async def test_upgrade_creates_the_tables_owned_by_the_migration_role(
     migrated: AsyncEngine,
 ) -> None:
     async with migrated.connect() as connection:
-        owners = dict(
+        owners: dict[str, str] = dict(
             (
                 await connection.execute(
                     text(
@@ -78,7 +78,8 @@ async def test_models_match_the_migrated_schema(migrated: AsyncEngine) -> None:
                 "include_object": include_object,
             },
         )
-        return compare_metadata(context, Base.metadata)
+        differences: list[Any] = compare_metadata(context, Base.metadata)
+        return differences
 
     async with migrated.connect() as connection:
         differences = await connection.run_sync(diff)

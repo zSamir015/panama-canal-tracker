@@ -56,7 +56,8 @@ Documentos de referencia (leer según la tarea):
 ## 3. Convenciones de código — backend (`app/`)
 
 - **Python 3.12**, todo async (`async def`, `asyncpg`, SQLAlchemy 2.0 async).
-- **Type hints obligatorios** en funciones públicas. `mypy --strict` debe pasar en `app/`.
+- **Type hints obligatorios** en funciones públicas. `mypy --strict` debe pasar en `app/` y en
+  `tests/` (el CI ejecuta `mypy app tests`).
 - Estilo: `ruff` (lint + format), línea máxima 100. Configurado en `pyproject.toml`.
 - Identificadores en **inglés**; comentarios y docstrings en **español** cuando expliquen lógica de
   negocio del Canal.
@@ -338,7 +339,7 @@ pip install --require-hashes -r requirements-dev.lock && pip install --no-deps -
 pre-commit install               # hooks: gitleaks, detect-private-key, ruff
 pytest                           # tests (configurados en pyproject.toml)
 ruff check . && ruff format .    # lint + formato
-mypy app                         # tipos
+mypy app tests                   # tipos
 docker compose up -d --wait      # db + redis (desde Fase 2); contraseñas en .env
 scripts/check_dev_services.sh    # verifica roles de la DB y contraseña de Redis
 uvicorn app.main:app --reload    # API

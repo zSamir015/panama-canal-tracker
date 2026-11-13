@@ -10,7 +10,7 @@ asistentes. Claude Code lo importa aquí:
 - Antes de cada tarea, leer el issue correspondiente y la fase actual en `docs/ROADMAP.md`.
 - Planificar antes de editar en tareas de más de un archivo; proponer el plan si la tarea toca
   arquitectura o un ADR.
-- Ejecutar `pytest`, `ruff check .` y `mypy app` antes de dar una tarea por terminada.
+- Ejecutar `pytest`, `ruff check .` y `mypy app tests` antes de dar una tarea por terminada.
 - No añadir trailers `Co-Authored-By` ni líneas "Generated with Claude Code" en commits ni PRs
   (AGENTS.md §2.9).
 - Aplicar la sección 8 de AGENTS.md (seguridad) en cada cambio y marcar el checklist de seguridad

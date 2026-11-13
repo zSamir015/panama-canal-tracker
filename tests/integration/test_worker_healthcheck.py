@@ -61,7 +61,7 @@ async def test_corrupt_status_is_unhealthy(redis: Redis) -> None:
 
 
 async def test_unreachable_redis_is_unhealthy(monkeypatch: pytest.MonkeyPatch) -> None:
-    down = Settings(app_env="test", redis_url="redis://:pw-falsa@127.0.0.1:1/15")  # type: ignore[arg-type]
+    down = Settings(app_env="test", redis_url="redis://:pw-falsa@127.0.0.1:1/15")
     monkeypatch.setattr(healthcheck, "get_settings", lambda: down)
 
     assert await healthcheck.check() is False

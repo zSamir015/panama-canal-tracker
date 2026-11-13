@@ -6,6 +6,24 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Changed
+- Los tests pasan `mypy --strict` y el CI los comprueba (`mypy app tests`, issue #145). Se
+  quitaron 21 `type: ignore` que ya sobraban (el plugin de pydantic entiende `Settings(...)`) y
+  se tiparon los demás casos (`Any` devueltos, `None` sin comprobar, nombres importados de
+  módulos que no los exportan). PyYAML no trae tipos: `pyproject.toml` lo exime solo a él.
+- Guía al primer uso (issue #137). La primera vez que se ve el mapa (en la app, después de
+  iniciar sesión; en la demo, al cargar) sale una tarjeta "Cómo usar el tracker" con 3 o 4 pasos:
+  en la app, ficha y estela, colores, "En tránsito ahora" y estadísticas; en la demo, mover el
+  mapa, colores y que los datos son simulados. Es un `<dialog>` nativo modal: atrapa el foco, se
+  cierra con "Entendido", la ✕ o Escape (sin cerrar también la ficha del buque) y el foco empieza
+  en "Entendido". Al cerrarla se guarda un único booleano en `localStorage` (ningún token ni dato
+  personal); un botón "?" junto al título la vuelve a abrir. Sin dependencias nuevas.
+- Estadísticas interactivas (issue #129). En "Tránsitos completados por día", la leyenda de
+  sentido es un par de botones (`aria-pressed`) que resaltan una serie y atenúan la otra, y la
+  lista "Por tipo de buque" filtra la gráfica a ese tipo con los datos ya cargados. El eje
+  conserva la escala de todos los tránsitos del periodo, así que un tipo pequeño se ve pequeño. La
+  etiqueta del SVG y el `<title>` de cada barra dicen qué se cuenta. "Quitar filtros" o Escape
+  (con el foco en la tarjeta) lo limpian todo, y si al cambiar de periodo el tipo desaparece, el
+  filtro se quita solo. Sin cambios de API ni dependencias nuevas.
 - Carga y conexión (issue #127). La ficha del buque, el panel de tránsitos y las estadísticas
   muestran un esqueleto con la forma de lo que va a llegar (líneas, o un bloque en la gráfica) en
   lugar de "Cargando…". Las formas son decorativas: el lector de pantalla sigue oyendo "Cargando…"

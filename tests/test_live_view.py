@@ -3,7 +3,7 @@
 import asyncio
 import json
 from datetime import UTC, datetime, timedelta
-from typing import Any
+from typing import Any, TypedDict
 
 import pytest
 from pydantic import ValidationError
@@ -38,7 +38,12 @@ def vessel(
     )
 
 
-OUTSIDE = {"lon": -78.0, "lat": 9.3}
+class Position(TypedDict):
+    lon: float
+    lat: float
+
+
+OUTSIDE: Position = {"lon": -78.0, "lat": 9.3}
 
 
 # --- Viewport y agrupación ------------------------------------------------------------------
