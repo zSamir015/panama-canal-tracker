@@ -59,12 +59,21 @@ from app.workers.transit_tracker import TransitStats, TransitTracker
 CANAL_BOUNDING_BOXES: tuple[tuple[tuple[float, float], tuple[float, float]], ...] = (
     ((8.4, -80.2), (9.7, -79.2)),
 )
+# Caja ampliada al Golfo de Panamá y los accesos del Caribe para medir llegadas tempranas.
+WIDE_CANAL_BOUNDING_BOXES: tuple[tuple[tuple[float, float], tuple[float, float]], ...] = (
+    ((7.8, -80.6), (10.2, -78.8)),
+)
+BOUNDING_BOX_PRESETS: dict[str, tuple[tuple[tuple[float, float], tuple[float, float]], ...]] = {
+    "canal": CANAL_BOUNDING_BOXES,
+    "wide": WIDE_CANAL_BOUNDING_BOXES,
+}
 MESSAGE_TYPES = (
     "PositionReport",
     "ShipStaticData",
     "StandardClassBPositionReport",
     "ExtendedClassBPositionReport",
     "StaticDataReport",
+    "LongRangeAisBroadcastMessage",
 )
 # Segunda conexión (#59, ADR-0009): datos estáticos de todo el mundo para encontrar los buques que
 # declaran como destino el Canal. Sin posiciones: serían cientos de mensajes por segundo.

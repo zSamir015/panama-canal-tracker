@@ -503,3 +503,91 @@ def test_static_data_report_class_b_is_parsed() -> None:
         lon=-79.85,
         received_at=RECEIVED_AT,
     )
+
+
+def test_long_range_type27_is_parsed_with_sentinels() -> None:
+    payload = json.dumps(
+        {
+            "MessageType": "LongRangeAisBroadcastMessage",
+            "MetaData": {"MMSI": 636022111},
+            "Message": {
+                "LongRangeAisBroadcastMessage": {
+                    "UserID": 636022111,
+                    "Latitude": 8.75,
+                    "Longitude": -79.45,
+                    "Sog": 14,
+                    "Cog": 355,
+                    "NavigationalStatus": 0,
+                }
+            },
+        }
+    )
+
+    assert parse_message(payload, received_at=RECEIVED_AT) == PositionUpdate(
+        mmsi=636022111,
+        received_at=RECEIVED_AT,
+        lat=8.75,
+        lon=-79.45,
+        sog=14.0,
+        cog=355.0,
+        heading=None,
+        nav_status=0,
+    )
+
+    unavailable = json.dumps(
+        {
+            "MessageType": "LongRangeAisBroadcastMessage",
+            "MetaData": {"MMSI": 636022111},
+            "Message": {
+                "LongRangeAisBroadcastMessage": {
+                    "UserID": 636022111,
+                    "Latitude": 8.75,
+                    "Longitude": -79.45,
+                    "Sog": 63,
+                    "Cog": 511,
+                    "NavigationalStatus": 15,
+                }
+            },
+        }
+    )
+    assert parse_message(unavailable, received_at=RECEIVED_AT) == PositionUpdate(
+        mmsi=636022111,
+        received_at=RECEIVED_AT,
+        lat=8.75,
+        lon=-79.45,
+        sog=None,
+        cog=None,
+        heading=None,
+        nav_status=None,
+    )
+
+
+def test_long_range_type27_rejects_missing_or_invalid_sog() -> None:
+    missing = json.dumps(
+        {
+            "MessageType": "LongRangeAisBroadcastMessage",
+            "MetaData": {"MMSI": 636022111},
+            "Message": {},
+        }
+    )
+    with pytest.raises(AisMessageRejected, match="missing_position_report"):
+        parse_message(missing, received_at=RECEIVED_AT)
+
+    bad_sog = json.dumps(
+        {
+            "MessageType": "LongRangeAisBroadcastMessage",
+            "MetaData": {"MMSI": 636022111},
+            "Message": {
+                "LongRangeAisBroadcastMessage": {
+                    "UserID": 636022111,
+                    "Latitude": 8.75,
+                    "Longitude": -79.45,
+                    "Sog": 64,
+                    "Cog": 120,
+                    "NavigationalStatus": 0,
+                }
+            },
+        }
+    )
+    with pytest.raises(AisMessageRejected, match="invalid_sog"):
+        parse_message(bad_sog, received_at=RECEIVED_AT)

@@ -65,3 +65,49 @@ def test_duration_is_bounded(minutes: str, capsys: pytest.CaptureFixture[str]) -
         coverage.main(["--minutes", minutes])
 
     assert "--minutes" in capsys.readouterr().err
+
+
+def test_counts_by_type_and_wide_bbox_preset(monkeypatch: pytest.MonkeyPatch) -> None:
+    type27 = json.dumps(
+        {
+            "MessageType": "LongRangeAisBroadcastMessage",
+            "MetaData": {"MMSI": 636022111},
+            "Message": {
+                "LongRangeAisBroadcastMessage": {
+                    "UserID": 636022111,
+                    "Latitude": 8.05,  # Golfo de Panamá (fuera de bbox estrecha, dentro de wide)
+                    "Longitude": -79.45,
+                    "Sog": 12,
+                    "Cog": 10,
+                    "NavigationalStatus": 0,
+                }
+            },
+        }
+    )
+    messages = sim.generate(start=START, duration=timedelta(minutes=2), seed=1)
+    first_pos = next(m.raw for m in messages if m.kind == "position")
+
+    sample = coverage.summarize(
+        [CONFIRMATION, first_pos, type27], started_at=START, seconds=60, bbox="wide"
+    )
+
+    assert sample.bbox == "wide"
+    assert sample.by_type == {"PositionReport": 1, "LongRangeAisBroadcastMessage": 1}
+    assert (sample.positions, sample.positions_in_canal) == (2, 1)
+
+    recorded_boxes: list[object] = []
+
+    async def fake_collect(url: str, api_key: str, seconds: float, *, boxes: object) -> list[str]:
+        recorded_boxes.append(boxes)
+        return [CONFIRMATION, type27]
+
+    from pydantic import SecretStr
+
+    class _FakeSettings:
+        aisstream_api_key = SecretStr("test-key")
+        aisstream_url = "ws://127.0.0.1:8765"
+
+    monkeypatch.setattr(coverage, "get_settings", _FakeSettings)
+    monkeypatch.setattr(coverage, "collect", fake_collect)
+    assert coverage.main(["--minutes", "1", "--bbox", "wide"]) == 0
+    assert recorded_boxes == [coverage.BOUNDING_BOX_PRESETS["wide"]]

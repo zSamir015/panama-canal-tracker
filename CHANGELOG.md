@@ -29,6 +29,11 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
     forzando `AIS_CANAL_BOUND_ENABLED=false` para poder convivir con `collect-ais.yml` dentro de las
     2 conexiones máximas de AISStream). Documentado en `docs/LOCAL_WORKER_MAC.md`,
     `docs/AIS_COLLECTOR.md`, `ADR-0012` y la regla 6 de `AGENTS.md`.
+- Soporte AIS Tipo 27 (`LongRangeAisBroadcastMessage`, pensado para recepción satelital) en
+  `app/services/ais_parser.py` y `MESSAGE_TYPES` de `app/workers/ais_consumer.py`, además de
+  desglose `by_type` y preset `--bbox wide` (Golfo de Panamá y accesos Caribe: `7.8..-80.6` a
+  `10.2..-78.8`) en `scripts/ais_coverage.py` para medir cobertura antes de ampliar la suscripción
+  del worker (issue #168).
 - Retención de copias de la base (tarea 7.2, issue #154): con `BACKUP_KEEP_DAYS=N`,
   `scripts/db_backup.sh` borra, después de una copia buena, las copias del mismo directorio con
   más de N días (nunca la recién hecha ni ficheros con otro nombre). `scripts/db_backup_check.sh`
