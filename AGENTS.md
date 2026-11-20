@@ -327,13 +327,11 @@ Principio general: **denegar por defecto** — todo cerrado salvo lo que se abre
 
 ## 9. Estado actual
 
-> **Fase actual: 7 — Producción y pulido de portafolio (en curso).** Las Fases 1 (`v0.1.0`), 2
-> (base de datos y autenticación, `v0.2.0`), 3 (ingesta AIS, `v0.3.0`), 4 (mapa en tiempo real y
-> demo, `v0.4.0`), 5 (detección de tránsitos y validación de 12,5 días con límite de cobertura
-> documentado en `docs/VALIDATION.md`, `v0.5.0`) y 6 (esperas en fondeo y estadísticas, `v0.6.0`)
-> están cerradas. De la Fase 7 están hechas la 7.1, 7.2, 7.3, 7.5 y 7.6
-> (`docs/SECURITY_REVIEW.md`); solo falta la 7.4 (README final). `v1.0.0` se entrega sin entorno
-> de producción (ADR-0017).
+> **Fase 7 — Producción y pulido de portafolio (cerrada; lista para `v1.0.0`).** Las Fases 0 a 7
+> (`v0.1.0`–`v0.6.0`, cerrando la Fase 7 con `7.1`–`7.6` completadas en `docs/ROADMAP.md` y
+> revisión de seguridad en `docs/SECURITY_REVIEW.md`) están terminadas. La validación con 12,5 días
+> de AIS real documenta la cobertura parcial en `docs/VALIDATION.md`, y `v1.0.0` se entrega sin
+> entorno de producción (ADR-0017).
 
 ## 10. Comandos útiles
 
