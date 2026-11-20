@@ -17,12 +17,14 @@ MAX_DESTINATION_LENGTH = 64
 _POSITION_REPORT = "PositionReport"
 _STANDARD_CLASS_B_REPORT = "StandardClassBPositionReport"
 _EXTENDED_CLASS_B_REPORT = "ExtendedClassBPositionReport"
+_LONG_RANGE_REPORT = "LongRangeAisBroadcastMessage"
 _STATIC_REPORT = "ShipStaticData"
 _CLASS_B_STATIC_REPORT = "StaticDataReport"
 _INTERESTING_MESSAGE_TYPES = {
     _POSITION_REPORT,
     _STANDARD_CLASS_B_REPORT,
     _EXTENDED_CLASS_B_REPORT,
+    _LONG_RANGE_REPORT,
     _STATIC_REPORT,
     _CLASS_B_STATIC_REPORT,
 }
@@ -189,6 +191,20 @@ class _StaticDataReport(BaseModel):
     report_b: _StaticDataReportB | None = Field(default=None, alias="ReportB")
 
 
+class _LongRangeAisBroadcastMessage(BaseModel):
+    """Mensaje 27 de AISStream (difusión de largo alcance pensada para recepción satelital)."""
+
+    model_config = ConfigDict(extra="ignore", strict=True)
+
+    user_id: StrictInt = Field(alias="UserID")
+    valid: StrictBool | None = Field(default=None, alias="Valid")
+    latitude: FiniteFloat = Field(alias="Latitude")
+    longitude: FiniteFloat = Field(alias="Longitude")
+    sog: FiniteFloat | None = Field(default=None, alias="Sog")
+    cog: FiniteFloat | None = Field(default=None, alias="Cog")
+    navigational_status: FiniteIntOrNone = Field(default=None, alias="NavigationalStatus")
+
+
 class _Message(BaseModel):
     model_config = ConfigDict(extra="ignore", strict=True)
 
@@ -198,6 +214,9 @@ class _Message(BaseModel):
     )
     extended_class_b: _ClassBPositionReport | None = Field(
         default=None, alias="ExtendedClassBPositionReport"
+    )
+    long_range: _LongRangeAisBroadcastMessage | None = Field(
+        default=None, alias="LongRangeAisBroadcastMessage"
     )
     ship_static_data: _ShipStaticData | None = Field(default=None, alias="ShipStaticData")
     static_data_report: _StaticDataReport | None = Field(default=None, alias="StaticDataReport")
@@ -256,6 +275,20 @@ def parse_message(
             raise AisMessageRejected("missing_position_report")
         return _build_position(envelope.metadata, class_b, None, received_at)
 
+    if envelope.message_type == _LONG_RANGE_REPORT:
+        long_range = envelope.message.long_range
+        if long_range is None:
+            raise AisMessageRejected("missing_position_report")
+        # Tipo 27 codifica SOG no disponible como 63 y COG no disponible como 511 (o 360).
+        return _build_position(
+            envelope.metadata,
+            long_range,
+            long_range.navigational_status,
+            received_at,
+            sog_unavailable=63,
+            allow_cog_511=True,
+        )
+
     if envelope.message_type == _CLASS_B_STATIC_REPORT:
         static_b = envelope.message.static_data_report
         if static_b is None:
@@ -309,20 +342,24 @@ def parse_message(
 
 def _build_position(
     metadata: _MetaData,
-    report: _PositionReport | _ClassBPositionReport,
+    report: _PositionReport | _ClassBPositionReport | _LongRangeAisBroadcastMessage,
     nav_status: int | None,
     received_at: datetime,
+    *,
+    sog_unavailable: float = 102.3,
+    allow_cog_511: bool = False,
 ) -> PositionUpdate:
     _validate_common(metadata.mmsi, report.user_id, report.valid)
     _validate_coordinates(report.latitude, report.longitude)
+    true_heading = getattr(report, "true_heading", None)
     return PositionUpdate(
         mmsi=report.user_id,
         received_at=received_at,
         lat=report.latitude,
         lon=report.longitude,
-        sog=_normalize_sog(report.sog),
-        cog=_normalize_cog(report.cog),
-        heading=_normalize_heading(report.true_heading),
+        sog=_normalize_sog(report.sog, unavailable=sog_unavailable),
+        cog=_normalize_cog(report.cog, allow_511=allow_cog_511),
+        heading=_normalize_heading(true_heading),
         nav_status=_normalize_nav_status(nav_status),
     )
 
@@ -347,16 +384,16 @@ def _is_valid_mmsi(mmsi: int) -> bool:
     return 100_000_000 <= mmsi <= 999_999_999
 
 
-def _normalize_sog(value: float | None) -> float | None:
-    if value is None or value == 102.3:
+def _normalize_sog(value: float | None, *, unavailable: float = 102.3) -> float | None:
+    if value is None or value == unavailable:
         return None
-    if not 0 <= value < 102.3:
+    if not 0 <= value < unavailable:
         raise AisMessageRejected("invalid_sog")
     return value
 
 
-def _normalize_cog(value: float | None) -> float | None:
-    if value is None or value == 360:
+def _normalize_cog(value: float | None, *, allow_511: bool = False) -> float | None:
+    if value is None or value == 360 or (allow_511 and value == 511):
         return None
     if not 0 <= value < 360:
         raise AisMessageRejected("invalid_cog")
