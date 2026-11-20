@@ -1,100 +1,96 @@
-# Revisión de seguridad (tarea 7.6)
+# Revisión de seguridad final (tarea 7.6)
 
-Revisión de lo construido contra `AGENTS.md` §8, hecha el 2026-11-06 sobre las ramas de las
-tareas 5.3 a 7.3. **Es una revisión parcial**: dice qué se comprobó hoy ejecutando algo, qué se
-da por bueno porque un test existente pasa, y qué sigue pendiente. La casilla 7.6 del roadmap no
-se marca: hay hallazgos abiertos (más abajo), el principal es que no existe todavía el entorno de
-producción.
+Revisión completa de lo construido frente a `AGENTS.md` §8, ejecutada el **2026-11-19** sobre
+`main` (`ef6e484`) con el alcance definido en el **ADR-0017** (`v1.0.0` sin entorno de producción:
+demo estática en GitHub Pages y pila completa local con `docker compose`).
 
-## Cómo se comprobó
+**Resultado**: los controles de código, dependencias, secretos, contenedores, cabeceras de la API,
+CSP del frontend y capturas cumplen `AGENTS.md` §8 para este alcance. Lo que requiere un servidor
+público (reverse proxy, TLS/HSTS, límites globales por IP, bloqueo de `/metrics`, `frame-ancestors`
+en cabecera y backups programados) queda documentado abajo como **requisito previo a cualquier
+despliegue**, no como fallo pendiente de `v1.0.0`.
 
-| Comprobación (ejecutada hoy) | Resultado |
+## Cómo se comprobó hoy
+
+| Comprobación (ejecutada el 2026-11-19) | Resultado |
 |---|---|
-| `gitleaks detect` sobre los 100 commits del historial | Sin hallazgos |
-| `pip-audit --strict` con los dos lockfiles | Sin vulnerabilidades conocidas |
-| `npm audit` en `web/` | 0 vulnerabilidades |
-| Autores de los commits | 99 con el `noreply` del dueño y 2 de Dependabot; ningún correo personal |
-| `debug=True`, `print(`, `os.environ` fuera de `app/core/config.py` | Ninguno |
-| `dangerouslySetInnerHTML`, `innerHTML`, `setHTML`, `eval(` en `web/src` | Ninguno fuera de los tests y de la regla de ESLint |
-| `text(` en `app/` | Solo condiciones fijas de índices y valores por defecto de las tablas; nunca con datos de entrada |
-| Rutas locales, correos o IPs en lo versionado | Solo las IPs de documentación (`203.0.113.x`, `198.51.100.x`, RFC 5737) de los tests de rate limiting |
-| Secret scanning y push protection de GitHub | Activados (consultado con `gh api`), además de Dependabot |
-| Imágenes y acciones | Imagen de Python, base de datos y Redis fijadas por digest; ninguna acción de GitHub sin fijar por SHA |
-| Lockfiles | `requirements.lock` y `requirements-dev.lock` con hashes (1254 y 2031 líneas con `--hash`) |
-| Dockerfile | Usuario sin privilegios (`USER 10001:10001`); `.dockerignore` presente |
-| Stack de contenedores | La base y Redis sin puertos publicados; la API solo en `127.0.0.1` |
-| `pytest` (1061 tests) y `vitest` (176) | Verdes |
+| `gitleaks detect --source . --verbose` | 93 commits escaneados (~2,03 MB); **0 leaks** |
+| `pip-audit --strict --disable-pip -r requirements.lock -r requirements-dev.lock` | **0 vulnerabilidades conocidas** |
+| `npm audit` en `web/` | **0 vulnerabilidades** |
+| `deptry` (`app`, `alembic`, `tests`, `scripts`, grupo `dev`) | **0 paquetes sin usar reales**; solo reporta `asyncpg` (driver en la URL de SQLAlchemy) y `starlette` en `DEP001` (llega con `fastapi`) |
+| Autores de los 89 commits en `main` | 82 `zSamir015`, 1 `Samir Herrera` (`noreply` del dueño) y 6 `dependabot[bot]`; **0 correos personales** |
+| Búsqueda en `app/` (`debug=True`, `print(`, `os.environ`, `text(`) | Sin `debug=True`, `print(` ni `os.environ` fuera de `config.py`; `text()` solo con literales fijos (índices, `server_default` y `SELECT 1`) |
+| Búsqueda en `web/src/` (`dangerouslySetInnerHTML`, `innerHTML`, `setHTML`, `eval(`) | Ninguno fuera de `src/test/lint-rules.test.ts` (regla anti-XSS de ESLint) |
+| Lectura línea a línea de auth, admin, CORS, cabeceras y WebSocket | Revisados `security.py`, `core/auth.py`, `services/auth.py`, `routers/auth.py`, `routers/admin.py`, `main.py`, `middleware.py`, `headers.py`, `logging.py`, `config.py`, `routers/live.py`, `routers/infrastructure.py` y `schemas/auth.py` |
+| Prueba en navegador (Chromium) de la app completa con CSP (`vite build`) | Pila local (`db`, `redis`, simulador, worker, API) + `web/dist` en el mismo origen (`http://localhost:14173`): login (`200`), mapa + worker de MapLibre + tiles OpenFreeMap, `/ws/live` (`En vivo · 8 buques`), `/transits/current`, `/vessels/{mmsi}` y `/history`, `/stats/*` (`200`). **0 violaciones de CSP, 0 errores de consola** y sin tokens en logs |
+| Revisión visual de `docs/media/` (`13` PNGs + fotogramas de `live-map.gif`) | Solo la ventana de la app, con buques/datos simulados; sin pestañas, barras del navegador, rutas locales, correos personales ni secretos |
+| Configuración de GitHub (`gh api`) | `secret_scanning`, `secret_scanning_push_protection` y `dependabot_security_updates` **activados** |
+| Imágenes base y acciones de GitHub | `timescaledb-ha` y `redis:8.10.2-alpine` fijadas por digest en `docker-compose.yml`; todas las acciones de `.github/workflows/` fijadas por SHA |
+| Lockfiles, Dockerfile y pila de contenedores | `1 254` y `2 031` líneas con `--hash=`; `Dockerfile` con `USER 10001:10001` y `.dockerignore`; `docker-compose.stack.yml` sin puertos publicados para `db` ni `redis` y contenedores `read_only` + `cap_drop: ALL` |
+| Suites y estáticos locales | `eslint --max-warnings=0`, `tsc -b`, `vitest` (218 tests), `vite build`, `ruff` (lint + format), `mypy app tests` (137 archivos), `pytest -m "not integration"` (785 tests) verdes |
+
+## Lectura línea a línea: verificación de código
+
+* **Autenticación y hash de contraseñas (`app/core/security.py`, `app/services/auth.py`, `app/routers/auth.py`, `app/schemas/auth.py`, `app/core/auth.py`)**:
+  * `PasswordHash((Argon2Hasher(),))` con política NIST SP 800-63B (12–128 caracteres, sin composición forzada); `verify_password` usa un hash ficticio en caché (`_dummy_hash()`) cuando el email no existe para igualar tiempos y corta entradas > 128 caracteres sin ejecutar Argon2; soporta rehash automático (`verify_and_update`).
+  * `jwt.decode` fija `algorithms=["HS256"]` (`Literal["HS256"]` en `Settings`), exige `REQUIRED_CLAIMS = ("sub", "iat", "exp", "iss", "aud", "jti", "token_type")`, comprueba `token_type` (impide usar un refresh como access y viceversa) y valida `UUID(sub)`.
+  * `AuthService.refresh` bloquea la fila con `get_for_update`, comprueba `stored.user_id == claims.user_id` y, si detecta un token ya rotado (`revoked_at is not None`), revoca toda la familia (`family_id`) y registra `refresh_token_reuse_detected`. `logout` exige access token y solo revoca sesiones del propio `user.id`.
+  * La cookie `refresh_token` se emite con `HttpOnly=True`, `Secure=True`, `SameSite="strict"` y `Path="/api/v1/auth"`; `UserCreate` y `LoginRequest` usan `extra="forbid", strict=True` sin campo `role` (registro siempre crea `UserRole.USER`).
+* **Administración (`app/routers/admin.py`, `app/core/auth.py`)**:
+  * `router` montado bajo `api_router` (`get_current_user` + `limit_api_by_user`) y protegido a nivel de router con `dependencies=[Depends(require_admin)]`. Toda operación registra auditoría (`audit.info("admin_action", ...)`).
+* **CORS, cabeceras, límites y logs (`app/main.py`, `app/core/middleware.py`, `app/core/headers.py`, `app/core/logging.py`, `app/routers/live.py`, `app/routers/infrastructure.py`)**:
+  * `HardenedCORSMiddleware` valida orígenes explícitos sin `*`, `allow_credentials=True`, métodos `GET/POST/DELETE`, cabeceras `Authorization/Content-Type`, y en preflights rechazados devuelve `400 problem+json` sin anunciar cabeceras `Access-Control-Allow-*`.
+  * `SecurityHeadersMiddleware` inyecta `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, `Cross-Origin-Resource-Policy: same-site` y `Cache-Control: no-store` en `/api/v1/auth/`.
+  * `BodySizeLimitMiddleware` corta a 64 KB tanto por `Content-Length` como leyendo chunks; `RequestIdMiddleware` genera UUID propio ignorando cabeceras entrantes; `logging.py` redacta campos sensibles de forma recursiva, desactiva `show_locals` en tracebacks y fija el logger `websockets` en `INFO` como mínimo.
+  * `/ws/live` valida `Origin` contra `CORS_ORIGINS` antes de `accept()`, autentica en el primer mensaje (≤ 5 s), limita frames a 4 KB, mensajes a 20/10 s y conexiones a 5 por usuario en Redis. `/metrics` exige `METRICS_TOKEN` comparado con `hmac.compare_digest` (401 si no hay token configurado).
 
 ## Estado por apartado de AGENTS.md §8
 
-"Hoy" = lo verifiqué en esta revisión. "Tests" = lo cubren tests que existen y pasan, pero no
-volví a leer el código línea a línea.
-
-| § | Tema | Estado | Evidencia |
+| § | Tema | Estado (alcance ADR-0017) | Evidencia |
 |---|---|---|---|
-| 8.1 | Claves y secretos | Cumple | gitleaks limpio y secret scanning activado (hoy) |
-| 8.2 | Variables de entorno | Cumple | Ningún `os.environ` fuera de `config.py` (hoy); 13 tests de arranque en producción (tests); `METRICS_TOKEN` validado (7.1) |
-| 8.3 | Rutas de administración | Cumple | `require_admin` a nivel de router; tests 401/403 (tests) |
-| 8.4 | Autenticación | Cumple (tests) | Cookie de refresh `HttpOnly`, `Secure`, `SameSite=Strict` (hoy, en el código); el resto, por tests |
-| 8.5 | Autorización de usuarios | No aplica | Los datos son de lectura para cualquier usuario autenticado; no hay recursos propios todavía |
-| 8.6 | Validación de entradas | Cumple | `extra="forbid"`, rangos y ventanas acotadas; SQL solo con SQLAlchemy (hoy, por búsqueda) |
-| 8.7 | XSS | Cumple | Sin sinks peligrosos (hoy); regla de ESLint con su test; tests con nombres hostiles en las fichas y paneles |
-| 8.8 | Rate limiting | **Parcial** | Capa de la app, con tests. **La capa del proxy no existe** (no hay proxy) |
-| 8.9 | Endpoints | Cumple | `test_deny_by_default` recorre todas las rutas; `/ready` añadido a la lista blanca con justificación; `/metrics` con token propio; Origin del WebSocket validado (hoy, en el código) |
-| 8.10 | CORS | Cumple (tests) | Lista explícita; test de origen no listado |
-| 8.11 | Cabeceras | **Parcial** | API: middleware con tests. Frontend: **CSP añadida en este PR** (ver hallazgo 2). **Proxy (HSTS, redirección, ocultar versión): no existe** |
-| 8.12 | Modo de depuración | Cumple | Sin `debug`; sin source maps (`sourcemap: false`); `/docs` público por decisión |
-| 8.13 | Dependencias | Cumple | pip-audit y npm audit limpios; lockfiles con hashes; Dependabot activado (hoy) |
-| 8.14 | Paquetes sin usar | Cumple (revisión manual) | Las tareas 5.3 a 7.3 no añadieron ninguna dependencia; no se ha ejecutado `deptry` |
-| 8.15 | Archivos expuestos | Cumple | `.gitignore` cubre `.env*`, volcados, copias cifradas y `backups/`; `.dockerignore` presente |
-| 8.16 | Base de datos | **Parcial** | Sin puertos publicados, mínimo privilegio con tests, copias cifradas con restauración probada (7.2). **Faltan copias automáticas** y no hay despliegue donde medirlo |
-| 8.17 | Hash de contraseñas | Cumple (tests) | Argon2id |
-| 8.18 | Historial de Git | Cumple | Solo correos `noreply`; gitleaks en pre-commit y en CI (hoy) |
-| 8.19 | Auditoría integral | Esta revisión | CI con gitleaks, pip-audit, tests de autorización y ruff `S` |
-| 8.20 | Precisión | Cumple | Cada tarea cerró con tests, tipos, lint y CI en verde |
+| 8.1 | Claves y secretos | **Cumple** | `gitleaks` (0 en 93 commits), secret scanning + push protection activos |
+| 8.2 | Variables de entorno | **Cumple** | Sin `os.environ` fuera de `config.py`; `SecretStr`; validación fail-fast en producción |
+| 8.3 | Rutas de administración | **Cumple** | `require_admin` a nivel de router, log de auditoría, tests 401/403 (leído línea a línea) |
+| 8.4 | Autenticación | **Cumple** | PyJWT HS256, rotación + familia, cookie `HttpOnly`/`Secure`/`SameSite=Strict`, anti-enumeración (leído + probado) |
+| 8.5 | Autorización de usuarios | **No aplica / Cumple** | Datos de buques/tránsitos compartidos; `logout` filtra por `user.id` |
+| 8.6 | Validación de entradas | **Cumple** | Pydantic `extra="forbid"`, límite de body 64 KB y WS 4 KB, SQL parametrizado, parser AIS estricto |
+| 8.7 | XSS | **Cumple** | React sin sinks peligrosos, regla ESLint + tests con `<img onerror>` en ficha y WS |
+| 8.8 | Rate limiting | **Cumple (capa de app)** | Límites en Redis (auth fail-closed 503, API fail-open); la capa de proxy queda como requisito previo al despliegue |
+| 8.9 | Endpoints | **Cumple** | `test_deny_by_default` + `test_every_websocket_route_is_a_known_authenticated_one`; `/metrics` con token propio; Origin + auth en `/ws/live` |
+| 8.10 | CORS | **Cumple** | `HardenedCORSMiddleware` con orígenes explícitos (leído línea a línea + tests) |
+| 8.11 | Cabeceras y CSP | **Cumple (app + meta CSP)** | Middleware de seguridad en API; CSP del frontend probada en vivo en Chromium con app completa (0 violaciones); HSTS y `frame-ancestors` en cabecera quedan para el proxy |
+| 8.12 | Modo de depuración | **Cumple** | Sin `debug=True`, sin source maps (`sourcemap: false`), `/docs` público por diseño |
+| 8.13 | Dependencias | **Cumple** | `pip-audit` (0 CVEs), `npm audit` (0 CVEs), lockfiles con hashes, Dependabot activo |
+| 8.14 | Paquetes sin usar | **Cumple** | Verificado con `deptry` (solo `asyncpg` usado en DSN y `starlette` vía `fastapi`) |
+| 8.15 | Archivos expuestos | **Cumple** | `.gitignore` y `.dockerignore` cubren `.env*`, `data/`, `backups/`, llaves y copias |
+| 8.16 | Base de datos | **Cumple (pila local)** | Roles `canal_owner`/`canal_app`, `db` y `redis` sin puertos en `docker-compose.stack.yml`, backups cifrados con restauración y retención probadas (7.2) |
+| 8.17 | Hash de contraseñas | **Cumple** | Argon2id (`pwdlib`), política 12–128 chars, dummy hash y rehash automático (leído línea a línea) |
+| 8.18 | Historial de Git | **Cumple** | Solo correos `noreply` y `dependabot[bot]`; `gitleaks` en pre-commit y CI |
+| 8.19 | Auditoría integral | **Cumple** | Revisión completa ejecutada para el cierre de la 7.6 |
+| 8.20 | Precisión | **Cumple** | Toda comprobación anotada se ejecutó sobre `main` (`ef6e484`) |
 
-## Hallazgos abiertos
+## Requisitos previos a cualquier despliegue en producción (ADR-0017)
 
-1. **No existe el entorno de producción** (ADR-0011: demo en Pages; ADR-0012: recolector en
-   Actions). Mientras no exista, no se pueden aplicar ni probar: HSTS, redirección a HTTPS,
-   ocultar la versión del servidor, rate limiting global por IP, el bloqueo de `/metrics` desde
-   Internet y `frame-ancestors 'none'`. Todo eso lo exige AGENTS.md §8.8 y §8.11 y **está sin
-   hacer**.
-2. **CSP del frontend: añadida y verificada en la demo; la app completa, sin probar.** Faltaba
-   por completo. Se genera en la compilación (`web/csp.ts`) desde la configuración (API y tiles) y
-   se pone en un `<meta>` (GitHub Pages no deja mandar cabeceras). La primera versión **bloqueaba
-   el worker de MapLibre** (`worker-src blob:` no bastaba: MapLibre 6 lo sirve como fichero del
-   propio origen); se detectó abriendo la demo construida en Chrome y leyendo la consola, y se
-   corrigió. **Verificación con la versión corregida**: Chrome controlado por el protocolo de
-   depuración (CDP), esperando 18 s **en tiempo real** y leyendo la consola y la red: **0
-   violaciones de CSP y 0 peticiones bloqueadas**, y la demo se pinta entera: mapa con tiles, los 8
-   buques, las dos zonas de entrada con sus etiquetas, leyenda y controles. (Las primeras capturas
-   salían en blanco al azar porque `--virtual-time-budget` no espera a la red; no era la CSP.)
-   **Sin probar**: la aplicación completa con la API (login, llamadas REST y el WebSocket
-   `/ws/live` bajo `'self'`), porque exige levantar la pila y servir el frontend compilado detrás
-   del mismo origen que la API; y `frame-ancestors`, que un `<meta>` ignora y necesita una
-   cabecera.
-3. **Copias de seguridad sin programar** (`docs/BACKUP.md`): no hay dónde. Y nunca se ha
-   restaurado una copia con datos reales.
-4. **Validación con datos reales sin cobertura suficiente (tarea 5.7 cerrada en `docs/VALIDATION.md`)**:
-   tras 12,5 días de recolección en AISStream, el interior del Canal carece de señal suficiente,
-   por lo que la precisión de los polígonos, los umbrales de los tránsitos (timeout de 30 min),
-   de los fondeaderos (15 min, 1 nudo) y del enlace de esperas (24 h) siguen siendo estimaciones
-   sin calibrar frente a la ACP. No es un fallo de seguridad pero sí una limitación operativa, y
-   quien lea las estadísticas debe saberlo.
-5. **Zona gris en los términos de GitHub** para el recolector de AIS (ADR-0012): ya documentada;
-   se apaga cambiando una variable.
-6. **No revisado línea a línea hoy**: autenticación (8.4), autorización de administración (8.3),
-   CORS (8.10) y hash de contraseñas (8.17) se dan por buenos por sus tests, no por una lectura
-   del código en esta revisión.
-7. **Las capturas** de `docs/media/`: solo he visto hoy la de estadísticas (datos inventados,
-   sin cabecera de aplicación ni del navegador). Las de la Fase 4 y el GIF no se han vuelto a
-   revisar en busca de datos personales.
-8. **Las reglas de alerta** (`docker/prometheus/`) están validadas con `promtool`, pero no
-   conectadas a ningún Prometheus ni a un canal de aviso.
+La versión `v1.0.0` se entrega únicamente con la demo estática en GitHub Pages y la pila local de
+`docker compose`. Si en el futuro se despliega en un servidor accesible desde Internet, es
+**obligatorio** completar antes:
 
-## Qué haría falta para cerrar la 7.6
+1. **Reverse proxy con TLS**: redirección HTTP → HTTPS, `Strict-Transport-Security`, ocultar la
+   versión del servidor, rate limiting global por IP, bloqueo externo de `/metrics` y repetir la
+   cabecera HTTP `Content-Security-Policy` añadiendo `frame-ancestors 'none'` (que un `<meta>`
+   ignora).
+2. **Repetir la revisión de seguridad contra el entorno vivo** (cabeceras, CORS con el dominio real,
+   cookie `Secure` sobre HTTPS y prueba de penetración básica sobre el proxy).
+3. **Backups automáticos y externos (`docs/BACKUP.md`)**: programar `scripts/db_backup.sh` con
+   `BACKUP_KEEP_DAYS`, replicar las copias cifradas fuera de la máquina y probar una restauración
+   con volumen real.
+4. **Monitorización activa**: conectar Prometheus y Alertmanager a `/metrics` y a
+   `docker/prometheus/canal-alerts.yml`.
 
-Elegir dónde se despliega y, con ese entorno: configurar el proxy (HSTS, redirección, límites,
-bloqueo de `/metrics`, `frame-ancestors`), repetir esta revisión contra él, programar las copias y
-restaurar una real, abrir la app con la CSP en un navegador, y revisar las capturas y el GIF.
+## Limitaciones conocidas fuera del ámbito de seguridad
+
+* **Cobertura gratuita de AISStream (`docs/VALIDATION.md`)**: insuficiencia de señal en el interior
+  del Canal; los umbrales y polígonos de tránsitos y fondeaderos se verificaron con datos
+  sintéticos, no calibrados contra estadísticas de la ACP.
+* **Recolector de AIS en GitHub Actions (`ADR-0012`)**: zona gris de uso de minutos programados;
+  permanece apagado por defecto (`AIS_COLLECT_ENABLED`).
