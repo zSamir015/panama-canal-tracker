@@ -12,6 +12,17 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   renovando el token y reconectando, así que el usuario no nota nada.
 
 ### Added
+- **ADR-0019**, recolector AIS continuo y worker estable en macOS (issue #163):
+  - `.github/workflows/collect-ais.yml` añade un job separado `chain` (`needs: collect`,
+    `permissions: actions: write`, `timeout-minutes: 5`, sin secretos ni acciones de terceros) que
+    solo en `main` y solo cuando `collect` termina con `success` encadena la siguiente ventana con
+    `gh workflow run collect-ais.yml --ref main` (si no hay otra en cola), manteniendo el cron cada
+    6 h como respaldo.
+  - `scripts/macos/run_worker_caffeinate.sh` y `scripts/macos/install_launchd_worker.sh` mantienen
+    vivo el worker en macOS con `launchd` + `caffeinate -i -s` (sin ejecutar `.env` como shell y
+    forzando `AIS_CANAL_BOUND_ENABLED=false` para poder convivir con `collect-ais.yml` dentro de las
+    2 conexiones máximas de AISStream). Documentado en `docs/LOCAL_WORKER_MAC.md`,
+    `docs/AIS_COLLECTOR.md`, `ADR-0012` y la regla 6 de `AGENTS.md`.
 - Retención de copias de la base (tarea 7.2, issue #154): con `BACKUP_KEEP_DAYS=N`,
   `scripts/db_backup.sh` borra, después de una copia buena, las copias del mismo directorio con
   más de N días (nunca la recién hecha ni ficheros con otro nombre). `scripts/db_backup_check.sh`

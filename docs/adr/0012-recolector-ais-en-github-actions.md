@@ -1,7 +1,7 @@
 # ADR-0012: Recolector AIS en GitHub Actions
 
 - **Fecha**: 2026-11-06
-- **Estado**: Aceptada
+- **Estado**: Aceptada (modificada por [ADR-0019](0019-recolector-continuo-y-worker-a-la-vez.md))
 - **Modifica**: la regla 6 de `AGENTS.md` (AISStream solo desde el proceso `worker`)
 
 ## Contexto
@@ -49,8 +49,9 @@ sube como artefacto. Arranca una ventana nueva cada 6 horas.
   detección de tránsitos está cerca de ese uso, pero no está garantizado. Lo peor que puede pasar
   es que limiten Actions en el repositorio; el recolector se apaga cambiando una variable.
 - **Los workflows programados se desactivan solos** tras 60 días sin actividad en el repositorio.
-- **Una conexión más a AISStream**: el worker usa dos (ADR-0009). No ejecutar el recolector a la
-  vez que el worker; si se arranca el worker, poner `AIS_COLLECT_ENABLED` en `false`.
+- **Una conexión más a AISStream**: el worker usa dos con `AIS_CANAL_BOUND_ENABLED=true`
+  (ADR-0009). Según [ADR-0019](0019-recolector-continuo-y-worker-a-la-vez.md), pueden ejecutarse a la
+  vez **solo con `AIS_CANAL_BOUND_ENABLED=false`** en el worker (1 conexión worker + 1 recolector).
 - **Excepción a la regla 6 de `AGENTS.md`**: la key de AISStream se usa también desde
   `scripts/ais_coverage.py` y `scripts/ais_collect.py`, nunca desde el navegador ni desde la API.
 - Los artefactos caducan a los 90 días. Se descargan y descifran en local (`data/`, fuera de git):

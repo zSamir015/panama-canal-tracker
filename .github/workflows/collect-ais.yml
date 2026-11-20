@@ -1,19 +1,21 @@
-# Recolector de posiciones AIS reales del Canal (ADR-0012, guía en docs/AIS_COLLECTOR.md).
-# Se conecta a AISStream unas 5 h 40 min, guarda las posiciones en un JSON Lines, lo cifra y lo
-# sube como artefacto. Cada 6 horas arranca otra ventana, así que cubre casi todo el día sin un
-# servidor encendido. Los datos alimentan el replay (5.5) y la validación con datos reales (5.7).
+# Recolector de posiciones AIS reales del Canal (ADR-0012, modificado por ADR-0019; guía en
+# docs/AIS_COLLECTOR.md). Se conecta a AISStream 340 min (~5 h 40 min), guarda posiciones en
+# JSON Lines, las cifra con gpg y sube el artefacto. Un job separado (`chain`) encadena la
+# siguiente ventana por `workflow_dispatch` solo si la recolección acabó bien y en `main`, dejando
+# el cron cada 6 h como respaldo por si la cadena se corta.
 #
 # Apagado por defecto: solo corre si la variable de repositorio AIS_COLLECT_ENABLED vale `true`.
 # Necesita los secretos AISSTREAM_API_KEY y AIS_COLLECT_PASSPHRASE.
 #
 # El repositorio es público y los artefactos de un repositorio público los puede descargar
 # cualquiera con cuenta de GitHub: por eso el fichero se cifra antes de subirlo y nunca se sube en
-# claro. No lo ejecutes a la vez que el worker (AISStream limita las conexiones por key).
+# claro. Puede convivir con el worker local solo si este corre con `AIS_CANAL_BOUND_ENABLED=false`
+# (ADR-0019).
 name: Collect AIS
 
 on:
   schedule:
-    # Cada 6 horas. GitHub puede retrasarlo unos minutos; la concurrencia evita que se solapen.
+    # Respaldo cada 6 horas por si la cadena de `workflow_dispatch` se interrumpe.
     - cron: "23 */6 * * *"
   workflow_dispatch:
     inputs:
@@ -21,6 +23,12 @@ on:
         description: "Minutos de recolección (0 a 350)"
         default: "340"
         required: false
+        type: string
+      chain:
+        description: "Encadenar la siguiente ventana de 340 min al terminar (desmarcar en pruebas cortas)"
+        default: true
+        required: false
+        type: boolean
 
 permissions: {}
 
@@ -86,3 +94,28 @@ jobs:
           retention-days: 90
           # Ya está cifrado: comprimirlo no ahorra nada.
           compression-level: 0
+
+  # Job aislado sin secretos ni acciones de terceros: solo dispara la siguiente ventana desde main.
+  chain:
+    name: Chain next window
+    needs: collect
+    if: >-
+      ${{ needs.collect.result == 'success' && vars.AIS_COLLECT_ENABLED == 'true' &&
+      github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.chain) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - name: Encadenar siguiente ventana
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          queued=$(gh run list --workflow collect-ais.yml --status queued --json databaseId --jq 'length')
+          waiting=$(gh run list --workflow collect-ais.yml --status waiting --json databaseId --jq 'length')
+          if [ "$((queued + waiting))" -eq 0 ]; then
+            gh workflow run collect-ais.yml --ref main -f minutes=340 -f chain=true
+          else
+            echo "Ya hay una ventana pendiente en cola ($queued queued, $waiting waiting); se omite disparo duplicado."
+          fi
