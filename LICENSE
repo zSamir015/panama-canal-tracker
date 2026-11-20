@@ -1,21 +1,27 @@
-MIT License
+Copyright (c) 2026 Samir Alexis Lorenzo Herrera. All rights reserved.
 
-Copyright (c) 2026 Samir Herrera
+This repository (source code, documentation, images and other files) is published so it can be
+viewed and evaluated, for example as part of the author's portfolio. No license is granted to use
+it beyond that.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Without the author's prior written permission, you may not use, copy, modify, merge, publish,
+distribute, sublicense, sell, host as a service, or create derivative works from any part of this
+repository, in whole or in part.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+You may:
+- view the source code and the documentation on GitHub;
+- use the public demo in a web browser;
+- fork the repository within GitHub, as the GitHub Terms of Service allow for public
+  repositories. A fork does not grant any of the rights listed above.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Earlier versions: commits up to and including cd0bc3d were published under the MIT License, and
+copies of those versions remain available under its terms. This notice applies to every later
+version.
+
+Third-party components (dependencies, map data, fonts and similar) keep their own licenses.
+
+To request permission, open an issue in this repository.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO EVENT
+SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE SOFTWARE OR
+ITS USE.

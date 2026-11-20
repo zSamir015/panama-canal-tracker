@@ -5,6 +5,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Changed
+- Licencia: de MIT a **todos los derechos reservados** (issue #166). El código sigue siendo público
+  para verlo y evaluarlo, pero usarlo, copiarlo o modificarlo requiere permiso escrito. Las
+  versiones hasta `cd0bc3d` se publicaron bajo MIT y siguen bajo MIT. Actualizados `LICENSE`, los
+  README, `pyproject.toml` (`LicenseRef-AllRightsReserved`) y `web/package.json` (`UNLICENSED`).
+
 ### Security
 - `/ws/live` se cierra con `4401` cuando caduca el access token con el que se abrió (issue #157,
   hallazgo de la revisión de seguridad 7.6). Antes, un token validado una vez mantenía el flujo en

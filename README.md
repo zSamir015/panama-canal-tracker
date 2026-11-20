@@ -6,7 +6,7 @@
 [Español](README.es.md)
 
 [![CI](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: All rights reserved](https://img.shields.io/badge/License-All%20rights%20reserved-red.svg)](LICENSE)
 
 **[Live demo](https://zsamir015.github.io/panama-canal-tracker/)** — runs directly in the browser on
 OSM-aligned simulated trajectories (or via **Ver demo sin cuenta** on the login screen, no API key
@@ -145,4 +145,4 @@ and profile. For local host development (`--reload`), see [AGENTS.md](AGENTS.md#
 
 ## License
 
-[MIT](LICENSE)
+All rights reserved. The code is public so it can be viewed and evaluated; using, copying or modifying it requires written permission. See [LICENSE](LICENSE).
