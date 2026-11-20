@@ -110,6 +110,7 @@ jobs:
       - name: Encadenar siguiente ventana
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           queued=$(gh run list --workflow collect-ais.yml --status queued --json databaseId --jq 'length')
           waiting=$(gh run list --workflow collect-ais.yml --status waiting --json databaseId --jq 'length')

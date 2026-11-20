@@ -40,6 +40,10 @@ La validación con 12,5 días de datos reales (`docs/VALIDATION.md`) mostró dos
 
 ## Consecuencias
 - La cobertura temporal del recolector sube de ~52 % a ~95 % con pausas breves entre ventanas.
+- **Zona gris en las condiciones de GitHub (riesgo heredado de ADR-0012, ampliado)**: con el
+  encadenamiento, Actions trabaja casi 24/7, acercándose más al uso como servidor permanente que
+  las condiciones de servicio restringen. Si GitHub limitara Actions en el repositorio, se apaga
+  al instante cambiando `AIS_COLLECT_ENABLED` a `false`.
 - Al aislar `actions: write` en `chain` (solo en `main` y solo tras `success`), ningún fallo de
   secretos o de red genera bucles de disparo.
 - `docs/AIS_COLLECTOR.md`, `docs/LOCAL_WORKER_MAC.md`, ADR-0012 y la regla 6 de `AGENTS.md` pasan a

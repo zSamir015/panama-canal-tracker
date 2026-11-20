@@ -59,7 +59,10 @@ def test_collect_workflow_chaining_and_permissions() -> None:
     assert "github.ref == 'refs/heads/main'" in cond
 
     chain_step = chain_job["steps"][0]
-    assert chain_step["env"] == {"GH_TOKEN": "${{ github.token }}"}
+    assert chain_step["env"] == {
+        "GH_TOKEN": "${{ github.token }}",
+        "GH_REPO": "${{ github.repository }}",
+    }
     assert "queued" in chain_step["run"]
     assert "gh workflow run collect-ais.yml --ref main" in chain_step["run"]
 
