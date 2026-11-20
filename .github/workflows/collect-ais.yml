@@ -1,7 +1,8 @@
 # Recolector de posiciones AIS reales del Canal (ADR-0012, guía en docs/AIS_COLLECTOR.md).
-# Se conecta a AISStream unas 5 h 40 min, guarda las posiciones en un JSON Lines, lo cifra y lo
-# sube como artefacto. Cada 6 horas arranca otra ventana, así que cubre casi todo el día sin un
-# servidor encendido. Los datos alimentan el replay (5.5) y la validación con datos reales (5.7).
+# Se conecta a AISStream 340 min (~5 h 40 min), guarda posiciones en JSON Lines, lo cifra con gpg
+# y lo sube como artefacto. Al acabar con éxito el paso de comprobación de secretos y ejecutar la
+# recolección, encadena la siguiente ventana con `workflow_dispatch` (si no hay otra en cola) para
+# cubrir ~95 % del tiempo; el cron cada 6 h queda como respaldo por si la cadena se interrumpe.
 #
 # Apagado por defecto: solo corre si la variable de repositorio AIS_COLLECT_ENABLED vale `true`.
 # Necesita los secretos AISSTREAM_API_KEY y AIS_COLLECT_PASSPHRASE.
@@ -13,7 +14,7 @@ name: Collect AIS
 
 on:
   schedule:
-    # Cada 6 horas. GitHub puede retrasarlo unos minutos; la concurrencia evita que se solapen.
+    # Respaldo cada 6 horas por si la cadena de `workflow_dispatch` se corta.
     - cron: "23 */6 * * *"
   workflow_dispatch:
     inputs:
@@ -21,6 +22,12 @@ on:
         description: "Minutos de recolección (0 a 350)"
         default: "340"
         required: false
+        type: string
+      chain:
+        description: "Encadenar la siguiente ventana de 340 min al terminar (desmarcar en pruebas cortas)"
+        default: true
+        required: false
+        type: boolean
 
 permissions: {}
 
@@ -34,15 +41,16 @@ jobs:
     name: Collect
     if: ${{ vars.AIS_COLLECT_ENABLED == 'true' }}
     runs-on: ubuntu-24.04
-    # Máximo de un job de Actions: 360 min. Recolecta 340 y deja margen para instalar y subir.
+    # Máximo de un job de Actions: 360 min. Recolecta 340 y deja margen para instalar, subir y encadenar.
     timeout-minutes: 355
     permissions:
       contents: read
-    # Los secretos van solo en los pasos que los usan, no en el job: así no los ven el checkout,
-    # setup-python ni la instalación de dependencias.
+      actions: write
+    # Los secretos y tokens van solo en los pasos que los usan, nunca heredados por todo el job.
     steps:
-      # Antes de gastar casi 6 horas: sin los dos secretos no tiene sentido empezar.
+      # Antes de gastar casi 6 horas: sin los dos secretos no tiene sentido empezar (ni encadenar).
       - name: Comprobar los secretos
+        id: secrets
         env:
           AISSTREAM_API_KEY: ${{ secrets.AISSTREAM_API_KEY }}
           AIS_COLLECT_PASSPHRASE: ${{ secrets.AIS_COLLECT_PASSPHRASE }}
@@ -62,6 +70,7 @@ jobs:
           pip install --require-hashes -r requirements.lock
           pip install --no-deps -e .
       - name: Recolectar
+        id: collect
         env:
           AISSTREAM_API_KEY: ${{ secrets.AISSTREAM_API_KEY }}
           # Por una variable de entorno y no dentro del script de la shell: evita inyección.
@@ -86,3 +95,20 @@ jobs:
           retention-days: 90
           # Ya está cifrado: comprimirlo no ahorra nada.
           compression-level: 0
+      # Solo encadena si los secretos existen y el recolector llegó a ejecutarse (evita bucles de error).
+      - name: Encadenar siguiente ventana
+        if: >-
+          ${{ always() && !cancelled() && vars.AIS_COLLECT_ENABLED == 'true' &&
+          steps.secrets.outcome == 'success' && steps.collect.outcome != 'skipped' &&
+          (github.event_name == 'schedule' || inputs.chain == true) }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          queued=$(gh run list --workflow collect-ais.yml --status queued --json databaseId --jq 'length')
+          waiting=$(gh run list --workflow collect-ais.yml --status waiting --json databaseId --jq 'length')
+          if [ "$((queued + waiting))" -eq 0 ]; then
+            gh workflow run collect-ais.yml --ref "$REF_NAME" -f minutes=340 -f chain=true
+          else
+            echo "Ya hay una ventana pendiente ($queued queued, $waiting waiting); se omite disparo duplicado."
+          fi
