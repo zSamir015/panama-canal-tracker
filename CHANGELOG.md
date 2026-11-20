@@ -5,6 +5,16 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-20
+
+Fase 7: producción y pulido de portafolio. Métricas Prometheus y `/ready`, copias de la base
+cifradas con retención y restauración probada, OpenAPI completo, revisión de seguridad final,
+renovación de la interfaz (temas claro, oscuro y satélite), recolector AIS continuo en GitHub
+Actions y worker estable en macOS (ADR-0019), y README final con los resultados de validación y de
+carga. Se entrega sin entorno de producción (ADR-0017). La cobertura gratuita de AISStream dentro
+del Canal es parcial (`docs/VALIDATION.md`): los umbrales siguen calibrados con trayectorias
+sintéticas.
+
 ### Changed
 - Cierre de la tarea **7.4** y de la **Fase 7** (`docs/ROADMAP.md`, `AGENTS.md §9`, issue #170):
   `README.md` y `README.es.md` incorporan las secciones de resultados de validación AIS real y carga
