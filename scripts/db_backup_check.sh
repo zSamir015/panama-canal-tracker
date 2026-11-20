@@ -11,7 +11,8 @@
 # 4. compara una huella de cada tabla y agregado (filas y suma MD5 del contenido), los chunks
 #    comprimidos, las políticas de TimescaleDB y los permisos de `canal_app`;
 # 5. comprueba que se niega a sobrescribir una base existente y que una copia alterada se detecta;
-# 6. borra las dos bases y los ficheros temporales (también si algo falla).
+# 6. comprueba la retención (`BACKUP_KEEP_DAYS`): borra solo copias viejas, nunca otros ficheros;
+# 7. borra las dos bases y los ficheros temporales (también si algo falla).
 #
 # No toca `canal_tracker` ni sus datos. Requiere `gpg` y el entorno de `.env`.
 set -euo pipefail
@@ -172,6 +173,26 @@ for leftover in "${dst}_x" "${dst}_y" "${dst}_z"; do
   [ "$(su -d postgres -c "SELECT count(*) FROM pg_database WHERE datname = '$leftover'")" = 0 ] ||
     fail "quedó la base a medias $leftover"
 done
+
+echo "6. Retención"
+ret="$workdir/retencion"
+mkdir -p "$ret"
+old=$(date -v-30d +%Y%m%d%H%M 2>/dev/null || date -d '30 days ago' +%Y%m%d%H%M)
+recent=$(date -v-2d +%Y%m%d%H%M 2>/dev/null || date -d '2 days ago' +%Y%m%d%H%M)
+for f in canal-vieja.dump.gpg canal-vieja.dump.gpg.sha256 otro-fichero.txt; do touch -t "$old" "$ret/$f"; done
+for f in canal-reciente.dump.gpg canal-reciente.dump.gpg.sha256; do touch -t "$recent" "$ret/$f"; done
+if BACKUP_KEEP_DAYS=abc DB_NAME="$src" scripts/db_backup.sh "$ret" >/dev/null 2>&1; then
+  fail "aceptó un BACKUP_KEEP_DAYS que no es un número"
+else
+  pass "rechaza un BACKUP_KEEP_DAYS que no es un número"
+fi
+newest=$(BACKUP_KEEP_DAYS=14 DB_NAME="$src" scripts/db_backup.sh "$ret" 2>/dev/null | tail -1)
+[ -f "$newest" ] && [ -f "$newest.sha256" ] && pass "la copia nueva se conserva" || fail "falta la copia nueva"
+[ ! -e "$ret/canal-vieja.dump.gpg" ] && [ ! -e "$ret/canal-vieja.dump.gpg.sha256" ] &&
+  pass "borra la copia de hace 30 días y su suma" || fail "no borró la copia de hace 30 días"
+[ -e "$ret/canal-reciente.dump.gpg" ] && [ -e "$ret/canal-reciente.dump.gpg.sha256" ] &&
+  pass "conserva la copia de hace 2 días" || fail "borró una copia dentro del plazo"
+[ -e "$ret/otro-fichero.txt" ] && pass "no toca ficheros que no son copias" || fail "borró un fichero que no es una copia"
 
 echo
 [ "$failures" -eq 0 ] && echo "Todo correcto: la copia se restaura y los datos coinciden." || { echo "$failures comprobaciones fallaron"; exit 1; }

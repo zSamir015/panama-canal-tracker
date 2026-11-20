@@ -119,6 +119,7 @@ historia se puede leer en orden:
 | [0014](docs/adr/0014-metricas-con-token-y-exposicion-manual.md) | `/metrics` con token propio y formato de Prometheus escrito a mano |
 | [0015](docs/adr/0015-copias-logicas-cifradas-con-gpg.md) | Copias lógicas cifradas con `pg_dump` y `gpg` |
 | [0016](docs/adr/0016-sentido-de-entrada-por-rumbo.md) | El rumbo (COG) decide si un buque entra o sale por una zona de entrada |
+| [0017](docs/adr/0017-v1-sin-entorno-de-produccion.md) | `v1.0.0` se entrega sin entorno de producción: demo en Pages y pila local |
 
 - **El trabajo**: cada tarea es un pull request con lo que cambia, por qué, cómo se probó y una
   lista de comprobación de seguridad: [pull requests fusionados](https://github.com/zSamir015/panama-canal-tracker/pulls?q=is%3Apr+is%3Amerged),

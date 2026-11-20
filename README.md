@@ -130,6 +130,7 @@ read in order:
 | [0014](docs/adr/0014-metricas-con-token-y-exposicion-manual.md) | `/metrics` con token propio y formato de Prometheus escrito a mano |
 | [0015](docs/adr/0015-copias-logicas-cifradas-con-gpg.md) | Copias lógicas cifradas con `pg_dump` y `gpg` |
 | [0016](docs/adr/0016-sentido-de-entrada-por-rumbo.md) | Course over ground decides whether a vessel enters or leaves through an entrance |
+| [0017](docs/adr/0017-v1-sin-entorno-de-produccion.md) | `v1.0.0` ships without a production environment: Pages demo and local stack |
 
 - **The work**: every task is a pull request with a description of what changed, why, how it was
   tested and a security checklist: [merged pull requests](https://github.com/zSamir015/panama-canal-tracker/pulls?q=is%3Apr+is%3Amerged),

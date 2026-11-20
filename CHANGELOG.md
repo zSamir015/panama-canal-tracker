@@ -5,6 +5,16 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Added
+- Retención de copias de la base (tarea 7.2, issue #154): con `BACKUP_KEEP_DAYS=N`,
+  `scripts/db_backup.sh` borra, después de una copia buena, las copias del mismo directorio con
+  más de N días (nunca la recién hecha ni ficheros con otro nombre). `scripts/db_backup_check.sh`
+  lo prueba, y la línea de cron de `docs/BACKUP.md` la usa en lugar de un `find -delete` sin
+  probar.
+- ADR-0017: `v1.0.0` se entrega sin entorno de producción. La 7.2 se cierra con las copias listas
+  para programarse; la 7.6 revisa la demo de Pages y la pila local, y deja el proxy, HSTS y el
+  resto como requisito previo a cualquier despliegue.
+
 ### Changed
 - Los tests pasan `mypy --strict` y el CI los comprueba (`mypy app tests`, issue #145). Se
   quitaron 21 `type: ignore` que ya sobraban (el plugin de pydantic entiende `Settings(...)`) y

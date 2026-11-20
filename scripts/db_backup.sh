@@ -7,13 +7,20 @@
 # al vuelo con `gpg` (AES-256, con comprobación de integridad) y lo deja en
 # `canal-AAAAMMDDTHHMMSSZ.dump.gpg` junto a su `.sha256`. Sin copia en claro en el disco: el volcado
 # viaja por una tubería. La contraseña de cifrado va por un descriptor de fichero, nunca en la
-# línea de comandos (se vería en `ps`). Variables: `DB_NAME` (por defecto `canal_tracker`) y
-# `GPG` (ruta del binario, por defecto `gpg`).
+# línea de comandos (se vería en `ps`). Variables: `DB_NAME` (por defecto `canal_tracker`), `GPG`
+# (ruta del binario, por defecto `gpg`) y `BACKUP_KEEP_DAYS` (si se define, al terminar borra del
+# directorio las copias `canal-*.dump.gpg` y sus `.sha256` con más de esos días; nunca la recién
+# hecha ni otros ficheros).
 set -euo pipefail
 
 : "${BACKUP_PASSPHRASE:?Define BACKUP_PASSPHRASE (guárdala en un gestor de contraseñas: sin ella la copia no se puede leer)}"
 if [ "${#BACKUP_PASSPHRASE}" -lt 20 ]; then
   echo "BACKUP_PASSPHRASE debe tener al menos 20 caracteres (openssl rand -base64 32)" >&2
+  exit 2
+fi
+keep_days=${BACKUP_KEEP_DAYS:-}
+if [ -n "$keep_days" ] && ! [[ "$keep_days" =~ ^[1-9][0-9]*$ ]]; then
+  echo "BACKUP_KEEP_DAYS debe ser un número entero de días mayor que 0" >&2
   exit 2
 fi
 GPG=${GPG:-gpg}
@@ -38,4 +45,11 @@ docker compose exec -T db bash -c \
 mv "$partial" "$file"
 trap - EXIT
 (cd "$dir" && shasum -a 256 "$(basename "$file")" >"$(basename "$file").sha256")
+
+# Retención: solo después de una copia buena, y solo ficheros con el nombre de una copia.
+if [ -n "$keep_days" ]; then
+  find "$dir" -maxdepth 1 -type f \( -name 'canal-*.dump.gpg' -o -name 'canal-*.dump.gpg.sha256' \) \
+    -mtime +"$keep_days" ! -name "$(basename "$file")" ! -name "$(basename "$file").sha256" \
+    -print -delete >&2
+fi
 echo "$file"
