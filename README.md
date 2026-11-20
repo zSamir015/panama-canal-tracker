@@ -62,12 +62,14 @@ keeping a single upstream AIS connection. Details in [docs/ARCHITECTURE.md](docs
 | 2 | Database and authentication | ✅ |
 | 3 | AIS ingestion worker | ✅ |
 | 4 | Real-time map and live demo | ✅ |
-| 5 | Transit detection and validation | ⏳ |
+| 5 | Transit detection and validation | ✅ |
 | 6 | Anchorage waits and statistics | ✅ |
 | 7 | Production hardening | ⏳ |
 
-Phase 6 is closed against synthetic data. Phase 5 stays open until the detector is validated
-against real traffic (task 5.7), so the thresholds behind the statistics are still estimates.
+Phase 5 and Phase 6 are closed. The real-data validation in [docs/VALIDATION.md](docs/VALIDATION.md)
+(12.5 days of recorded AISStream feeds) shows that free AISStream coverage inside the Canal is too
+sparse to validate precision against ACP counts, so thresholds and polygons remain estimates
+verified against synthetic trajectories.
 
 Full plan: [docs/ROADMAP.md](docs/ROADMAP.md).
 
@@ -132,13 +134,14 @@ read in order:
 - **The work**: every task is a pull request with a description of what changed, why, how it was
   tested and a security checklist: [merged pull requests](https://github.com/zSamir015/panama-canal-tracker/pulls?q=is%3Apr+is%3Amerged),
   [issues](https://github.com/zSamir015/panama-canal-tracker/issues).
-- **The releases**: one annotated tag per closed phase, `v0.1.0` to `v0.4.0` so far
+- **The releases**: one annotated tag per closed phase, `v0.1.0` to `v0.6.0`
   ([tags](https://github.com/zSamir015/panama-canal-tracker/tags)). The changelog is in
   [CHANGELOG.md](CHANGELOG.md).
-- **What is still open**: the results of validating the detector against real traffic (task 5.7)
-  are not published yet, because that needs days of recorded AIS data; the thresholds and polygons
-  are estimates until then. The production deployment (reverse proxy, scheduled backups) does not
-  exist either; [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) lists what is missing.
+- **What is still open**: [docs/VALIDATION.md](docs/VALIDATION.md) documents the 12.5-day
+  validation run and accepts the AISStream coverage limit inside the Canal (without a paid source,
+  detector thresholds and polygons remain uncalibrated estimates). The production deployment
+  (reverse proxy, scheduled backups) does not exist yet;
+  [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) lists what is missing.
 
 ## License
 

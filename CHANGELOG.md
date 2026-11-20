@@ -44,11 +44,6 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   Los botones de plegar llevan `aria-expanded` y `aria-controls`. Colores, radios y sombras pasan a
   variables CSS en `web/src/tokens.css`; los colores por tipo de buque siguen en TypeScript. Sin
   dependencias nuevas; el CSS crece 0,8 kB comprimido.
-- Detector de tránsitos (issue #121, ADR-0016): un buque que pisa una zona de entrada con rumbo
-  hacia el mar está saliendo del Canal y ya no abre un tránsito en sentido contrario. Sin rumbo
-  fiable (sin COG o SOG, parado o de través) se abre como antes. El replay lee `sog` y `cog`. Con
-  los datos reales de `docs/VALIDATION.md`, 24 abortados en lugar de 46 con el timeout de 30 min;
-  ningún umbral cambia.
 - Cobertura de AISStream remedida (2026-11-06): 11 posiciones de 10 buques en 5 min dentro del
   Canal, frente a 0 mensajes en octubre. Es escasa pero real; `docs/DATA_SOURCES.md` §2b y
   `docs/ARCHITECTURE.md` §8 ya no la dan por nula.
@@ -88,6 +83,26 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   esperando en fondeadero. Reglas de alerta en `docker/prometheus/canal-alerts.yml`, entre ellas
   más de 5 minutos sin mensajes, validadas con `promtool check rules` y con tests de reglas
   (`canal-alerts.test.yml`). No exporta métricas de peticiones HTTP.
+
+## [0.5.0] - 2026-11-19
+
+Fase 5: detección de tránsitos y validación con datos reales. Polígonos aproximados de las
+entradas, máquina de estados pura con inferencia de entrada/salida por rumbo (`ADR-0016`),
+persistencia e integración en el worker, API `/transits`, panel en el mapa, recolector en GitHub
+Actions y replay de validación sobre 12,5 días de tráfico AIS real (`docs/VALIDATION.md`). La
+cobertura gratuita de AISStream en el interior del Canal es insuficiente para validar precisión
+frente a la ACP, por lo que se acepta la limitación documentada y los umbrales siguen siendo
+estimaciones verificadas con trayectorias sintéticas.
+
+### Added
+- Validación con datos reales (tarea 5.7, issue #152): replay de `docs/VALIDATION.md` ampliado a
+  12,5 días (`2026-11-07` a `2026-11-19`, 29 ejecuciones legibles, 156,3 h de escucha, 8 286
+  posiciones de 500 buques). Confirma la falta de cobertura interior en AISStream (además de la
+  caída total de la entrada atlántica desde el 12 de noviembre): 2 tránsitos completados con
+  timeout de 24 h (0 con 30–240 min; 30 abortados) frente a ~228 esperados según la media de la
+  ACP ajustada al tiempo de escucha. Se pasan también los datos por `anchorage_detector` (304
+  visitas con 30 min; 2 578 posiciones paradas fuera de los rectángulos) y se acepta el límite de
+  cobertura sin cambiar umbrales ni polígonos.
 - Panel "En tránsito ahora" (tarea 5.6): lista de los buques con tránsito `in_progress` (nombre,
   sentido Atlántico → Pacífico o al revés y cuánto llevan en el Canal) sobre el mapa. Se recarga
   cada 30 s con `GET /transits/current` y, al pulsar un buque, lo selecciona en el mapa y abre su
@@ -125,6 +140,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   cerrado, orden lon/lat, sentido antihorario, sin autocruces). `scripts/export_zones.py` genera la
   copia que lee el mapa, que las dibuja con contorno discontinuo y etiqueta; un test falla si la
   copia se desfasa. Se usarán en la detección de tránsitos (5.2 y 5.3).
+
+### Changed
+- Detector de tránsitos (issue #121, ADR-0016): un buque que pisa una zona de entrada con rumbo
+  hacia el mar está saliendo del Canal y ya no abre un tránsito en sentido contrario. Sin rumbo
+  fiable (sin COG o SOG, parado o de través) se abre como antes. El replay lee `sog` y `cog`. Con
+  los datos reales de `docs/VALIDATION.md`, 24 abortados en lugar de 46 con el timeout de 30 min en
+  la primera semana (30 abortados en el periodo completo de 12,5 días); ningún umbral cambia.
 
 ## [0.6.0] - 2026-11-06
 
