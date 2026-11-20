@@ -39,7 +39,8 @@ for name, url, default_port in (
     ("DATABASE_URL", settings.database_url, 5432),
     ("REDIS_URL", settings.redis_url, 6379),
 ):
-    parsed = urlsplit(url)
+    # En Settings son SecretStr (llevan la contraseña): se leen aquí y nunca se imprimen.
+    parsed = urlsplit(url.get_secret_value())
     if parsed.hostname:
         checks.append((name, parsed.hostname, parsed.port or default_port))
 

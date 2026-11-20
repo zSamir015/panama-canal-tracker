@@ -11,6 +11,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   versiones hasta `cd0bc3d` se publicaron bajo MIT y siguen bajo MIT. Actualizados `LICENSE`, los
   README, `pyproject.toml` (`LicenseRef-AllRightsReserved`) y `web/package.json` (`UNLICENSED`).
 
+### Fixed
+- `scripts/macos/run_worker_caffeinate.sh` fallaba siempre al comprobar PostgreSQL y Redis:
+  `DATABASE_URL` y `REDIS_URL` son `SecretStr` en `Settings` y el wrapper los pasaba tal cual a
+  `urlsplit`, así que el LaunchAgent salía con código 1 en bucle (issue #172). Nuevo
+  `tests/test_macos_worker_wrapper.py` ejecuta esa comprobación.
+
 ### Security
 - `/ws/live` se cierra con `4401` cuando caduca el access token con el que se abrió (issue #157,
   hallazgo de la revisión de seguridad 7.6). Antes, un token validado una vez mantenía el flujo en
