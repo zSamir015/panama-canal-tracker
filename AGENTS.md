@@ -41,11 +41,12 @@ Documentos de referencia (leer según la tarea):
 3. Contraseñas hasheadas con **Argon2id** vía `pwdlib`. JWT con **PyJWT**. (ADR-0003)
 4. Todo endpoint protegido valida JWT; los endpoints de admin validan rol.
 5. **Ninguna tarea se da por terminada sin tests pasando** (`pytest` verde) y `ruff` limpio.
-6. AISStream: **como máximo dos conexiones WebSocket por API key** (área del Canal y destinos al
-   Canal, cada una con su suscripción), solo desde el proceso `worker` (y los scripts de medición
-   y recolección, `scripts/ais_coverage.py` y `scripts/ais_collect.py`, que no se ejecutan a la
-   vez que el worker), con reconexión y backoff exponencial. Nunca desde el navegador ni desde
-   la API. (ADR-0002, ADR-0004, ADR-0009, ADR-0012)
+6. AISStream: **como máximo dos conexiones WebSocket simultáneas por API key**, solo desde el
+   proceso `worker` (o el recolector/medidor `scripts/ais_collect.py` y `scripts/ais_coverage.py`),
+   con reconexión y backoff exponencial. Nunca desde el navegador ni desde la API. El recolector de
+   GitHub (`collect-ais.yml`) y el worker local pueden correr **a la vez solo con
+   `AIS_CANAL_BOUND_ENABLED=false`** en el worker (1 conexión del worker + 1 del recolector = 2).
+   (ADR-0002, ADR-0004, ADR-0009, ADR-0012, ADR-0019)
 7. No modificar `docs/` salvo para reflejar una decisión real; toda decisión nueva va en un ADR
    en `docs/adr/` con el siguiente número libre.
 8. **Seguridad**: cumplir la sección 8 completa en cada cambio. Denegar por defecto.

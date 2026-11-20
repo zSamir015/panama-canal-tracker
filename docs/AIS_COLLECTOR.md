@@ -5,9 +5,13 @@ encendido, para el replay (tarea 5.5) y la validación con datos reales (tarea 5
 
 ## Cómo funciona
 
-Cada 6 horas, el workflow `Collect AIS` se conecta a AISStream durante 340 minutos, guarda las
-posiciones en un JSON Lines, lo cifra con `gpg` y lo sube como artefacto de la ejecución. Está
-**apagado por defecto**.
+El workflow `Collect AIS` se conecta a AISStream durante 340 minutos (~5 h 40 min), guarda las
+posiciones en JSON Lines, las cifra con `gpg` y sube el artefacto (`job collect`, solo con
+`contents: read`). Cuando ese job termina **con éxito** en `main` (y `AIS_COLLECT_ENABLED` sigue en
+`true`), un job separado `chain` (sin secretos ni acciones de terceros, solo `actions: write` y
+`timeout-minutes: 5`) comprueba que no exista otro run pendiente y dispara la siguiente ventana con
+`gh workflow run collect-ais.yml --ref main`, reduciendo los huecos frente al cron (~52 % → ~95 %).
+El cron cada 6 horas queda como respaldo si la cadena se corta. Está **apagado por defecto**.
 
 ## Activarlo (una vez)
 
@@ -25,10 +29,13 @@ posiciones en un JSON Lines, lo cifra con `gpg` y lo sube como artefacto de la e
 
 3. En *Variables*, crea `AIS_COLLECT_ENABLED` con el valor `true`.
 
-4. Para probar sin esperar al cron: *Actions → Collect AIS → Run workflow*, con `minutes` en `5`.
+4. Para probar sin esperar al cron ni iniciar bucle continuo: *Actions → Collect AIS → Run
+   workflow*, con `minutes` en `5` y **`chain` desmarcado (`false`)**.
+   Si quieres arrancar la captura continua al instante, déjalo con `minutes=340` y `chain=true`.
 
-No ejecutes el recolector a la vez que el worker: AISStream limita las conexiones por key
-(ADR-0009). Si arrancas el worker, pon `AIS_COLLECT_ENABLED` en `false`.
+Worker local y recolector pueden ejecutarse **a la vez solo con `AIS_CANAL_BOUND_ENABLED=false`**
+en el worker (`1` conexión del worker + `1` del recolector = `2` conexiones, ADR-0019). Si prefieres
+usar `AIS_CANAL_BOUND_ENABLED=true`, apaga antes `AIS_COLLECT_ENABLED=false`.
 
 ## Apagarlo
 
@@ -85,7 +92,8 @@ vida; medirlos es parte de la validación de la 5.7.
 
 ## Límites
 
-- Entre ventanas hay unos 15 minutos sin conexión, y GitHub puede retrasar el cron.
+- Entre el fin de una ventana encadenada y el arranque de la siguiente suele haber apenas 1–2 minutos
+  de transición; si GitHub Actions retrasa la cola, el respaldo cron de cada 6 h reanuda la cadena.
 - La cobertura de AISStream en el Canal es escasa (`docs/DATA_SOURCES.md` §2b): es normal que
   una ventana de casi 6 horas deje pocos miles de líneas.
 - Las condiciones de GitHub piden usar Actions para probar, desplegar y publicar el proyecto.
