@@ -170,8 +170,9 @@ objetivo sin degradar la ingesta.
 - [x] 7.3 OpenAPI completo (descripciones y ejemplos en todos los endpoints)
 - [ ] 7.4 README final: GIFs, diagramas, decisiones técnicas, resultados de validación y carga
 - [x] 7.5 Sección "How it was built" enlazando roadmap, ADRs, issues y releases
-- [ ] 7.6 Revisión de seguridad final (dependencias, headers, CORS, secretos, capturas)
-      (hecha una primera pasada en `docs/SECURITY_REVIEW.md`; alcance sin producción, ADR-0017)
+- [x] 7.6 Revisión de seguridad final (dependencias, headers, CORS, secretos, capturas)
+      (`docs/SECURITY_REVIEW.md`, alcance sin producción de ADR-0017; lo que exige un servidor
+      queda en "Antes de desplegar")
 
 **Release**: `v1.0.0`.
 

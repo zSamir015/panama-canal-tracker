@@ -330,7 +330,7 @@ Principio general: **denegar por defecto** — todo cerrado salvo lo que se abre
 > (base de datos y autenticación, `v0.2.0`), 3 (ingesta AIS, `v0.3.0`), 4 (mapa en tiempo real y
 > demo, `v0.4.0`), 5 (detección de tránsitos y validación de 12,5 días con límite de cobertura
 > documentado en `docs/VALIDATION.md`, `v0.5.0`) y 6 (esperas en fondeo y estadísticas, `v0.6.0`)
-> están cerradas. De la Fase 7 están hechas la 7.1, 7.2, 7.3 y 7.5, y a medias la 7.6
+> están cerradas. De la Fase 7 están hechas la 7.1, 7.2, 7.3, 7.5 y 7.6
 > (`docs/SECURITY_REVIEW.md`); falta la 7.4. `v1.0.0` se entrega sin entorno de producción
 > (ADR-0017).
 

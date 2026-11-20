@@ -5,6 +5,14 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Security
+- Revisión de seguridad final (tarea 7.6, issue #156) en `docs/SECURITY_REVIEW.md`, con el alcance
+  de ADR-0017. Se repitieron gitleaks, pip-audit, npm audit y deptry; se leyó línea a línea la
+  autenticación, la administración, CORS y el hash de contraseñas; se revisaron las capturas y el
+  GIF; y se probó por primera vez la app completa con la CSP en Chrome (0 violaciones, WebSocket
+  incluido). Un hallazgo, arreglado en #158. Los riesgos aceptados y los requisitos antes de
+  desplegar quedan escritos.
+
 ### Added
 - Retención de copias de la base (tarea 7.2, issue #154): con `BACKUP_KEEP_DAYS=N`,
   `scripts/db_backup.sh` borra, después de una copia buena, las copias del mismo directorio con
