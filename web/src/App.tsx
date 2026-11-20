@@ -6,15 +6,27 @@ import { useSession } from './auth/useSession';
 import { config } from './config';
 import { DemoBanner } from './demo/DemoBanner';
 import { useDemoVessels } from './demo/useDemoVessels';
-import type { Bbox } from './live/protocol';
+import type { Bbox, LiveVessel } from './live/protocol';
 import { type LiveStatus, useLiveVessels } from './live/useLiveVessels';
 import { MapLegend } from './map/MapLegend';
+import { MapSidebar } from './map/MapSidebar';
+import type { MapFocusTarget } from './map/VesselMap';
 import { GuideDialog } from './onboarding/GuideDialog';
 import { hasSeenGuide, rememberGuideSeen } from './onboarding/guideStorage';
 import { StatsView } from './stats/StatsView';
+import {
+  applyDocumentTheme,
+  BASEMAP_STORAGE_KEY,
+  type BasemapMode,
+  readStoredBasemap,
+  readStoredTheme,
+  THEME_STORAGE_KEY,
+  type ThemeMode,
+  writeStorage,
+} from './theme';
 import { TransitsPanel } from './transits/TransitsPanel';
-import { ConnectionDot } from './ui/ConnectionDot';
 import { useCurrentTransits } from './transits/queries';
+import { ConnectionDot } from './ui/ConnectionDot';
 import { useVesselTrack } from './vessels/queries';
 import { trailFeature } from './vessels/trail';
 import { VesselPanel } from './vessels/VesselPanel';
@@ -40,6 +52,10 @@ export function App() {
   const [bbox, setBbox] = useState<Bbox | null>(null);
   const [selectedMmsi, setSelectedMmsi] = useState<number | null>(null);
   const [view, setView] = useState<'map' | 'stats'>('map');
+  const [theme, setTheme] = useState<ThemeMode>(readStoredTheme);
+  const [basemap, setBasemap] = useState<BasemapMode>(readStoredBasemap);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [focusTarget, setFocusTarget] = useState<MapFocusTarget | null>(null);
   // Guía al primer uso (issue #137): sale sola hasta que se cierra una vez; luego, con el "?".
   const [guideOpen, setGuideOpen] = useState(() => !hasSeenGuide());
   const closeGuide = useCallback(() => {
@@ -52,6 +68,15 @@ export function App() {
   const demo = useDemoVessels();
   const track = useVesselTrack(selectedMmsi, token);
 
+  useEffect(() => {
+    applyDocumentTheme(theme);
+    writeStorage(THEME_STORAGE_KEY, theme);
+  }, [theme]);
+
+  useEffect(() => {
+    writeStorage(BASEMAP_STORAGE_KEY, basemap);
+  }, [basemap]);
+
   const closePanel = useCallback(() => {
     setSelectedMmsi(null);
   }, []);
@@ -61,6 +86,10 @@ export function App() {
     setView('map');
     session.signOut();
   }, [session]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((current) => (current === 'dark' ? 'light' : 'dark'));
+  }, []);
 
   // El panel de tránsitos no existe en la demo estática (ADR-0011): no hay API detrás. Esta
   // consulta comparte clave y caché con la del panel, así que no duplica la petición.
@@ -78,6 +107,25 @@ export function App() {
   const activeVessels = config.demo ? demo : live;
   const mapReady = config.demo || (session.status === 'signedIn' && token !== null);
   const selectedLive = selectedMmsi === null ? undefined : activeVessels.vessels.get(selectedMmsi);
+
+  const focusAndSelectVessel = useCallback((vessel: LiveVessel) => {
+    setSelectedMmsi(vessel.mmsi);
+    setFocusTarget((prev) => ({ lon: vessel.lon, lat: vessel.lat, seq: (prev?.seq ?? 0) + 1 }));
+  }, []);
+
+  const selectAndMaybeFocus = useCallback(
+    (mmsi: number | null) => {
+      setSelectedMmsi(mmsi);
+      if (mmsi === null) {
+        return;
+      }
+      const vessel = activeVessels.vessels.get(mmsi);
+      if (vessel !== undefined) {
+        setFocusTarget((prev) => ({ lon: vessel.lon, lat: vessel.lat, seq: (prev?.seq ?? 0) + 1 }));
+      }
+    },
+    [activeVessels.vessels],
+  );
 
   return (
     <main className="app">
@@ -107,49 +155,86 @@ export function App() {
             </p>
           )}
         </div>
-        {(mapReady || !config.demo) && (
-          <div className="app__header-controls">
-            {mapReady && !config.demo && (
-              <nav className="app__tabs" aria-label="Vista">
-                <button
-                  type="button"
-                  aria-pressed={view === 'map'}
-                  onClick={() => {
-                    setView('map');
-                  }}
-                >
-                  Mapa
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={view === 'stats'}
-                  onClick={() => {
-                    setView('stats');
-                  }}
-                >
-                  Estadísticas
-                </button>
-              </nav>
-            )}
-            {mapReady && (
-              <p className="app__status" role="status">
-                {!config.demo && <ConnectionDot status={live.status} />}
-                {config.demo ? 'Demo' : STATUS_TEXT[live.status]} · {activeVessels.vessels.size}{' '}
-                buques
-              </p>
-            )}
-            {mapReady && !config.demo && (
+        <div className="app__header-controls">
+          {mapReady && !config.demo && (
+            <nav className="app__tabs" aria-label="Vista">
               <button
                 type="button"
-                className="app__logout"
-                aria-label="Cerrar sesión"
-                onClick={handleSignOut}
+                aria-pressed={view === 'map'}
+                onClick={() => {
+                  setView('map');
+                }}
               >
-                Salir
+                Mapa
               </button>
+              <button
+                type="button"
+                aria-pressed={view === 'stats'}
+                onClick={() => {
+                  setView('stats');
+                }}
+              >
+                Estadísticas
+              </button>
+            </nav>
+          )}
+          {mapReady && (
+            <p className="app__status" role="status">
+              {!config.demo && <ConnectionDot status={live.status} />}
+              {config.demo ? 'Demo' : STATUS_TEXT[live.status]} · {activeVessels.vessels.size}{' '}
+              buques
+            </p>
+          )}
+          <button
+            type="button"
+            className="app__theme"
+            aria-label={theme === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
+            aria-pressed={theme === 'dark'}
+            title={theme === 'dark' ? 'Tema claro' : 'Tema oscuro'}
+            onClick={toggleTheme}
+          >
+            {theme === 'dark' ? (
+              <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="3.25"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M8 1.5v1.4M8 13.1v1.4M1.5 8h1.4M13.1 8h1.4M3.4 3.4l1 1M11.6 11.6l1 1M12.6 3.4l-1 1M4.4 11.6l-1 1"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
+                <path
+                  d="M12.9 10.2A5.5 5.5 0 0 1 5.8 3.1a5.75 5.75 0 1 0 7.1 7.1Z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinejoin="round"
+                />
+              </svg>
             )}
-          </div>
-        )}
+            <span>{theme === 'dark' ? 'Claro' : 'Oscuro'}</span>
+          </button>
+          {mapReady && !config.demo && (
+            <button
+              type="button"
+              className="app__logout"
+              aria-label="Cerrar sesión"
+              onClick={handleSignOut}
+            >
+              Salir
+            </button>
+          )}
+        </div>
       </header>
       {config.demo && <DemoBanner />}
       {/* Nunca encima del login: solo cuando ya se ve el mapa. */}
@@ -159,41 +244,106 @@ export function App() {
       ) : (
         <section className="app__map" aria-label="Mapa en vivo">
           {mapReady ? (
-            <>
-              <Suspense
-                fallback={
-                  <div className="app__splash">
-                    <span className="app__spinner" aria-hidden="true" />
-                    <p>Cargando el mapa…</p>
-                  </div>
+            <div className={sidebarCollapsed ? 'workspace workspace--collapsed' : 'workspace'}>
+              <MapSidebar
+                vessels={activeVessels.vessels}
+                selectedMmsi={selectedMmsi}
+                onSelectVessel={focusAndSelectVessel}
+                onClearSelection={closePanel}
+                demo={config.demo}
+                transitsCount={transits.data?.total ?? null}
+                collapsed={sidebarCollapsed}
+                onToggleCollapse={() => {
+                  setSidebarCollapsed((prev) => !prev);
+                }}
+                detailSlot={
+                  selectedMmsi !== null && !config.demo && token !== null ? (
+                    <VesselPanel
+                      key={selectedMmsi}
+                      mmsi={selectedMmsi}
+                      token={token}
+                      live={selectedLive}
+                      onClose={closePanel}
+                    />
+                  ) : null
                 }
-              >
-                <VesselMap
-                  vessels={activeVessels.vessels}
-                  onViewportChange={setBbox}
-                  selectedMmsi={selectedMmsi}
-                  onSelect={setSelectedMmsi}
-                  trail={selectedMmsi === null ? null : trailFeature(track.data, selectedLive)}
-                />
-              </Suspense>
-              <MapLegend />
-              {!config.demo && token !== null && (
-                <TransitsPanel
-                  token={token}
-                  selectedMmsi={selectedMmsi}
-                  onSelect={setSelectedMmsi}
-                />
-              )}
-              {selectedMmsi !== null && !config.demo && token !== null && (
-                <VesselPanel
-                  key={selectedMmsi}
-                  mmsi={selectedMmsi}
-                  token={token}
-                  live={selectedLive}
-                  onClose={closePanel}
-                />
-              )}
-            </>
+                transitsSlot={
+                  !config.demo && token !== null ? (
+                    <TransitsPanel
+                      token={token}
+                      selectedMmsi={selectedMmsi}
+                      onSelect={selectAndMaybeFocus}
+                    />
+                  ) : null
+                }
+              />
+              <div className="workspace__stage">
+                <Suspense
+                  fallback={
+                    <div className="app__splash">
+                      <span className="app__spinner" aria-hidden="true" />
+                      <p>Cargando el mapa…</p>
+                    </div>
+                  }
+                >
+                  <VesselMap
+                    vessels={activeVessels.vessels}
+                    onViewportChange={setBbox}
+                    selectedMmsi={selectedMmsi}
+                    onSelect={setSelectedMmsi}
+                    trail={selectedMmsi === null ? null : trailFeature(track.data, selectedLive)}
+                    basemap={basemap}
+                    theme={theme}
+                    focusTarget={focusTarget}
+                  />
+                </Suspense>
+                <div className="map-toolbar">
+                  {sidebarCollapsed && (
+                    <button
+                      type="button"
+                      className="map-toolbar__expand"
+                      aria-label="Mostrar panel lateral"
+                      onClick={() => {
+                        setSidebarCollapsed(false);
+                      }}
+                    >
+                      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                        <path
+                          d="M6 3.5 10.5 8 6 12.5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.75"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <span>Panel</span>
+                    </button>
+                  )}
+                  <div className="basemap-switch" role="group" aria-label="Capa base del mapa">
+                    <button
+                      type="button"
+                      aria-pressed={basemap === 'map'}
+                      onClick={() => {
+                        setBasemap('map');
+                      }}
+                    >
+                      Estándar
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={basemap === 'satellite'}
+                      onClick={() => {
+                        setBasemap('satellite');
+                      }}
+                    >
+                      Satélite
+                    </button>
+                  </div>
+                </div>
+                <MapLegend />
+              </div>
+            </div>
           ) : session.status === 'restoring' ? (
             <div className="app__splash">
               <span className="app__spinner" aria-hidden="true" />

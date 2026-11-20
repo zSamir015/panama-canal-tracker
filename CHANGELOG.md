@@ -24,11 +24,16 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ### Changed
 - Pulido integral de UI/UX en `web/` (issue #161): `LoginForm` permite alternar entre "Iniciar
   sesión" y "Crear cuenta" (`POST /api/v1/auth/register` con entrada automática) y la cabecera
-  incorpora el botón para cerrar sesión (`POST /api/v1/auth/logout`). Se añaden estados
-  `hover`/`focus-visible` uniformes, superficie translúcida con `backdrop-filter` en paneles del
-  mapa, iconos SVG direccionales en `TransitsPanel`, vista de Estadísticas centrada con rejilla de
-  2 columnas para las tablas desde 761 px y desglose por tipo en rejilla, splash de carga y
-  ajuste compacto móvil para mantener la cabecera en 2 líneas y la ficha legible sin scroll.
+  incorpora el botón para cerrar sesión (`POST /api/v1/auth/logout`). Barra lateral operativa en
+  escritorio (colapsable) con buscador por nombre o MMSI, filtros por tipo de buque, pestaña
+  «En tránsito» y ficha del buque sin tapar las entradas del Canal; selector de mapa base
+  **Estándar / Satélite** (Esri World Imagery sin API key, ADR-0018, con permiso explícito en CSP)
+  y conmutador de tema claro / oscuro (`OpenFreeMap dark`) persistido en `localStorage`.
+  Actualizada la ruta del simulador AIS (`scripts/ais_simulator.py`) y `web/src/demo/recording.json`
+  siguiendo el canal navegable real de OpenStreetMap para evitar cruces por tierra en Bahía Limón,
+  Lago Gatún y Corte Culebra. Se añaden estados `hover`/`focus-visible` uniformes, iconos SVG
+  direccionales en `TransitsPanel`, vista de Estadísticas centrada con rejilla de 2 columnas desde
+  761 px, splash de carga y ajuste compacto móvil.
 - Los tests pasan `mypy --strict` y el CI los comprueba (`mypy app tests`, issue #145). Se
   quitaron 21 `type: ignore` que ya sobraban (el plugin de pydantic entiende `Settings(...)`) y
   se tiparon los demás casos (`Any` devueltos, `None` sin comprobar, nombres importados de

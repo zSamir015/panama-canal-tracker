@@ -29,6 +29,7 @@
   /* Acción, error y avisos */
   --color-accent: #1565c0;
   --color-accent-hover: #0d50a0;
+  --color-accent-text: #1565c0;
   --color-accent-soft: #e8f1fb;
   --color-on-accent: #fff;
   --color-danger: #b71c1c;
@@ -64,4 +65,45 @@
 
   /* Movimiento */
   --transition-fast: 150ms ease-out;
+}
+
+/* Tema oscuro con contraste AA en textos, superficies y botones. */
+[data-theme='dark'] {
+  --color-brand: #082336;
+  --color-brand-hover: #0e3550;
+  --color-on-brand: #eef4f8;
+  --color-page: #0c141d;
+  --color-surface: #131f2b;
+  --color-surface-glass: rgb(19 31 43 / 92%);
+  --color-surface-muted: #1b2a38;
+
+  --color-text: #e2ebf2;
+  --color-text-strong: #f8fafc;
+  --color-text-secondary: #b7c6d4;
+  --color-text-muted: #8da2b5;
+
+  --color-border: #33485c;
+  --color-border-subtle: #243647;
+  --color-divider: #1e2e3d;
+
+  --color-accent: #1d70b8;
+  --color-accent-hover: #155892;
+  --color-accent-text: #7dd3fc;
+  --color-accent-soft: rgb(56 189 248 / 16%);
+  --color-on-accent: #fff;
+  --color-danger: #f87171;
+  --color-danger-bg: rgb(239 68 68 / 16%);
+  --color-danger-border: rgb(248 113 113 / 45%);
+  --color-notice: #fbbf24;
+  --color-notice-bg: rgb(251 191 36 / 14%);
+  --color-notice-border: rgb(251 191 36 / 40%);
+  --color-warning-bg: #3b2e0f;
+  --color-warning-border: #b45309;
+  --color-warning-text: #fde68a;
+
+  --color-skeleton: #223242;
+
+  --shadow-panel: 0 6px 20px rgb(0 0 0 / 45%), 0 1px 4px rgb(0 0 0 / 32%);
+  --shadow-card: 0 2px 8px rgb(0 0 0 / 36%), 0 1px 2px rgb(0 0 0 / 24%);
+  --shadow-sheet: 0 -4px 18px rgb(0 0 0 / 48%);
 }

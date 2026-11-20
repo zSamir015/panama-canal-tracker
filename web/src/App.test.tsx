@@ -291,6 +291,39 @@ describe('App', () => {
     expect(screen.queryByText(/caducó/)).not.toBeInTheDocument();
     expect(fetchMock.mock.calls.some(([url]) => url.endsWith('/auth/logout'))).toBe(true);
   });
+  it('alterna tema oscuro/claro, capa satelital y colapso del panel lateral', async () => {
+    window.localStorage.setItem('panama-canal-tracker:guide-seen', '1');
+    stubApi({ refreshStatuses: [200] });
+    renderWithQuery(<App />);
+
+    await screen.findByRole('button', { name: 'buque de prueba' });
+
+    const themeBtn = screen.getByRole('button', { name: 'Cambiar a tema oscuro' });
+    await userEvent.click(themeBtn);
+    expect(document.documentElement.dataset.theme).toBe('dark');
+    expect(screen.getByRole('button', { name: 'Cambiar a tema claro' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+
+    const satBtn = screen.getByRole('button', { name: 'Satélite' });
+    await userEvent.click(satBtn);
+    expect(satBtn).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Estándar' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Ocultar panel lateral' }));
+    const expandBtn = screen.getByRole('button', { name: 'Mostrar panel lateral' });
+    expect(expandBtn).toBeVisible();
+    await userEvent.click(expandBtn);
+    expect(screen.queryByRole('button', { name: 'Mostrar panel lateral' })).not.toBeInTheDocument();
+
+    // Restaurar estado limpio para otros tests.
+    await userEvent.click(screen.getByRole('button', { name: 'Cambiar a tema claro' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Estándar' }));
+  });
 });
 
 describe('Guía al primer uso (issue #137)', () => {
