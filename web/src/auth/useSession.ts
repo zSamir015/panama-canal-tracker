@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { refreshSession, type Session } from './session';
+import { logoutSession, refreshSession, type Session } from './session';
 
 export type SessionStatus = 'restoring' | 'signedOut' | 'signedIn';
 
@@ -23,6 +23,8 @@ export interface SessionApi {
   expired: boolean;
   /** Tras un login correcto. */
   signIn: (session: Session) => void;
+  /** Cierra la sesión en el servidor (best-effort) y limpia el token en memoria. */
+  signOut: () => void;
   /**
    * La API rechazó `rejectedToken` (401 o cierre 4401): renovar ya. Si ese token ya no es el
    * actual, otra renovación se adelantó y no hace falta nada.
@@ -49,7 +51,10 @@ function signedOut(expired: boolean): State {
  * cuando la API lo rechaza. Si la renovación falla por red, el token actual se conserva y se
  * reintenta; si la API dice que no hay sesión (401), toca volver a entrar.
  */
-export function useSession(refresh: () => Promise<Session | null> = refreshSession): SessionApi {
+export function useSession(
+  refresh: () => Promise<Session | null> = refreshSession,
+  logout: (token: string) => Promise<void> = logoutSession,
+): SessionApi {
   // Al cargar, lo primero es intentar recuperar la sesión de la cookie.
   const [state, setState] = useState<State>({
     status: 'restoring',
@@ -106,6 +111,15 @@ export function useSession(refresh: () => Promise<Session | null> = refreshSessi
     setState(signedIn(session, Date.now()));
   }, []);
 
+  const signOut = useCallback(() => {
+    setState((current) => {
+      if (current.session !== null) {
+        void logout(current.session.accessToken);
+      }
+      return signedOut(false);
+    });
+  }, [logout]);
+
   const renew = useCallback((rejectedToken: string) => {
     setState((current) =>
       current.status === 'signedIn' && current.session?.accessToken === rejectedToken
@@ -119,6 +133,7 @@ export function useSession(refresh: () => Promise<Session | null> = refreshSessi
     token: state.session?.accessToken ?? null,
     expired: state.expired,
     signIn,
+    signOut,
     renew,
   };
 }

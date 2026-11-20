@@ -52,7 +52,12 @@ export function VesselPanel({ mmsi, token, live, onClose }: VesselPanelProps) {
     <aside className="vessel-panel" aria-label="Ficha del buque">
       <header className="vessel-panel__header">
         <h2>{displayName(name)}</h2>
-        <button type="button" onClick={onClose} aria-label="Cerrar la ficha">
+        <button
+          type="button"
+          className="vessel-panel__close"
+          onClick={onClose}
+          aria-label="Cerrar la ficha"
+        >
           ×
         </button>
       </header>

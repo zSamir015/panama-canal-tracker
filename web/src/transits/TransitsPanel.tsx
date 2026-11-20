@@ -96,6 +96,7 @@ interface TransitRowProps {
 }
 
 function TransitRow({ transit, now, selected, onSelect }: TransitRowProps) {
+  const isSouth = transit.direction === 'southbound';
   return (
     <li>
       <button
@@ -110,6 +111,32 @@ function TransitRow({ transit, now, selected, onSelect }: TransitRowProps) {
           {transitName(transit.vessel_name, transit.mmsi)}
         </span>
         <span className="transits-panel__detail">
+          <svg
+            className="transits-panel__dir-icon"
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            aria-hidden="true"
+          >
+            {isSouth ? (
+              <path
+                d="M6 2v8m0 0-3-3m3 3 3-3"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            ) : (
+              <path
+                d="M6 10V2m0 0-3 3m3-3 3 3"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            )}
+          </svg>
           {directionText(transit.direction)} · {elapsedText(transit.entered_at, now)}
         </span>
       </button>

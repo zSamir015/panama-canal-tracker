@@ -22,6 +22,9 @@ export function MapLegend() {
       >
         Leyenda
       </button>
+      <p className="map-legend__title" aria-hidden="true">
+        Tipos de buque
+      </p>
       <ul id={listId} className="map-legend__list" aria-label="Tipos de buque">
         {Object.entries(CATEGORY_LABELS).map(([category, label]) => (
           <li key={category}>

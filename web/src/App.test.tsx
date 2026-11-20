@@ -277,6 +277,19 @@ describe('App', () => {
     await screen.findByRole('heading', { name: 'Iniciar sesión' });
 
     expect(screen.queryByRole('navigation', { name: 'Vista' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Cerrar sesión' })).not.toBeInTheDocument();
+  });
+
+  it('cierra la sesión desde la cabecera y vuelve al login sin aviso de caducidad', async () => {
+    const fetchMock = stubApi({ refreshStatuses: [200] });
+    renderWithQuery(<App />);
+
+    const logoutBtn = await screen.findByRole('button', { name: 'Cerrar sesión' });
+    await userEvent.click(logoutBtn);
+
+    expect(await screen.findByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
+    expect(screen.queryByText(/caducó/)).not.toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([url]) => url.endsWith('/auth/logout'))).toBe(true);
   });
 });
 

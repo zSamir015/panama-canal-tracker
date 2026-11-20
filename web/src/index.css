@@ -8,8 +8,16 @@
   line-height: 1.5;
   color: var(--color-text);
   background: var(--color-page);
+  color-scheme: light;
+  accent-color: var(--color-accent);
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
   margin: 0;
+}
+
+::selection {
+  color: var(--color-on-brand);
+  background: var(--color-brand);
 }

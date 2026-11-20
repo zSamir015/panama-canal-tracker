@@ -56,6 +56,12 @@ export function App() {
     setSelectedMmsi(null);
   }, []);
 
+  const handleSignOut = useCallback(() => {
+    setSelectedMmsi(null);
+    setView('map');
+    session.signOut();
+  }, [session]);
+
   // El panel de tránsitos no existe en la demo estática (ADR-0011): no hay API detrás. Esta
   // consulta comparte clave y caché con la del panel, así que no duplica la petición.
   const transits = useCurrentTransits(config.demo ? null : token);
@@ -101,33 +107,48 @@ export function App() {
             </p>
           )}
         </div>
-        {mapReady && !config.demo && (
-          <nav className="app__tabs" aria-label="Vista">
-            <button
-              type="button"
-              aria-pressed={view === 'map'}
-              onClick={() => {
-                setView('map');
-              }}
-            >
-              Mapa
-            </button>
-            <button
-              type="button"
-              aria-pressed={view === 'stats'}
-              onClick={() => {
-                setView('stats');
-              }}
-            >
-              Estadísticas
-            </button>
-          </nav>
-        )}
-        {mapReady && (
-          <p className="app__status" role="status">
-            {!config.demo && <ConnectionDot status={live.status} />}
-            {config.demo ? 'Demo' : STATUS_TEXT[live.status]} · {activeVessels.vessels.size} buques
-          </p>
+        {(mapReady || !config.demo) && (
+          <div className="app__header-controls">
+            {mapReady && !config.demo && (
+              <nav className="app__tabs" aria-label="Vista">
+                <button
+                  type="button"
+                  aria-pressed={view === 'map'}
+                  onClick={() => {
+                    setView('map');
+                  }}
+                >
+                  Mapa
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={view === 'stats'}
+                  onClick={() => {
+                    setView('stats');
+                  }}
+                >
+                  Estadísticas
+                </button>
+              </nav>
+            )}
+            {mapReady && (
+              <p className="app__status" role="status">
+                {!config.demo && <ConnectionDot status={live.status} />}
+                {config.demo ? 'Demo' : STATUS_TEXT[live.status]} · {activeVessels.vessels.size}{' '}
+                buques
+              </p>
+            )}
+            {mapReady && !config.demo && (
+              <button
+                type="button"
+                className="app__logout"
+                aria-label="Cerrar sesión"
+                onClick={handleSignOut}
+              >
+                Salir
+              </button>
+            )}
+          </div>
         )}
       </header>
       {config.demo && <DemoBanner />}
@@ -139,7 +160,14 @@ export function App() {
         <section className="app__map" aria-label="Mapa en vivo">
           {mapReady ? (
             <>
-              <Suspense fallback={<p>Cargando el mapa…</p>}>
+              <Suspense
+                fallback={
+                  <div className="app__splash">
+                    <span className="app__spinner" aria-hidden="true" />
+                    <p>Cargando el mapa…</p>
+                  </div>
+                }
+              >
                 <VesselMap
                   vessels={activeVessels.vessels}
                   onViewportChange={setBbox}
@@ -167,7 +195,10 @@ export function App() {
               )}
             </>
           ) : session.status === 'restoring' ? (
-            <p>Recuperando la sesión…</p>
+            <div className="app__splash">
+              <span className="app__spinner" aria-hidden="true" />
+              <p>Recuperando la sesión…</p>
+            </div>
           ) : (
             <LoginForm
               onLogin={session.signIn}

@@ -49,135 +49,141 @@ export function StatsView({ token, onUnauthorized, now = Date.now }: StatsViewPr
 
   return (
     <section className="stats" aria-label="Estadísticas">
-      <header className="stats__header">
-        <h2>Estadísticas del Canal</h2>
-        <div role="group" aria-label="Periodo" className="stats__window">
-          {WINDOW_OPTIONS.map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={option === days}
-              onClick={() => {
-                setDays(option);
-              }}
-            >
-              {option} días
-            </button>
-          ))}
-        </div>
-      </header>
+      <div className="stats__container">
+        <header className="stats__header">
+          <h2>Estadísticas del Canal</h2>
+          <div role="group" aria-label="Periodo" className="stats__window">
+            {WINDOW_OPTIONS.map((option) => (
+              <button
+                key={option}
+                type="button"
+                aria-pressed={option === days}
+                onClick={() => {
+                  setDays(option);
+                }}
+              >
+                {option} días
+              </button>
+            ))}
+          </div>
+        </header>
 
-      <article
-        className="stats__card"
-        onKeyDown={(event) => {
-          if (event.key === 'Escape' && filtering) {
-            event.stopPropagation();
-            clearFilters();
-          }
-        }}
-      >
-        <div className="stats__card-header">
-          <h3>Tránsitos completados por día</h3>
-          {filtering && (
-            <button type="button" className="stats__clear" onClick={clearFilters}>
-              Quitar filtros
-            </button>
-          )}
-        </div>
-        <Loadable query={daily} skeleton={<Skeleton variant="chart" />}>
-          {(data) => {
-            const all = dailySeries(data.items, days, now());
-            const bars =
-              category === null
-                ? all
-                : dailySeries(itemsOfCategory(data.items, category), days, now());
-            const total = data.items.reduce((sum, item) => sum + item.transits, 0);
-            return total === 0 ? (
-              <p className="stats__empty">No hay tránsitos completados en este periodo.</p>
-            ) : (
-              <>
-                {/* La escala es la de todos los tránsitos: un tipo pequeño se ve pequeño. */}
-                <BarChart
-                  bars={bars}
-                  max={axisMax(all)}
-                  highlight={highlight}
-                  subject={category === null ? '' : ` de tipo ${categoryText(category)}`}
-                />
-                <ul className="stats__legend" aria-label="Sentido">
-                  {DIRECTIONS.map(([direction, label]) => (
-                    <li key={direction}>
-                      <button
-                        type="button"
-                        aria-pressed={highlight === direction}
-                        className={
-                          highlight !== null && highlight !== direction ? 'is-dimmed' : undefined
-                        }
-                        onClick={() => {
-                          setHighlight((current) => (current === direction ? null : direction));
-                        }}
-                      >
-                        <span style={{ background: DIRECTION_COLORS[direction] }} />
-                        {label}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-                <h4>Por tipo de buque</h4>
-                <ul className="stats__categories" aria-label="Tránsitos por tipo de buque">
-                  {categoryTotals(data.items).map(([name, transits]) => (
-                    <li key={name}>
-                      <button
-                        type="button"
-                        aria-pressed={category === name}
-                        className={category !== null && category !== name ? 'is-dimmed' : undefined}
-                        onClick={() => {
-                          setCategory((current) => (current === name ? null : name));
-                        }}
-                      >
-                        <span>{categoryText(name)}</span>
-                        <span>{transits}</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            );
+        <article
+          className="stats__card"
+          onKeyDown={(event) => {
+            if (event.key === 'Escape' && filtering) {
+              event.stopPropagation();
+              clearFilters();
+            }
           }}
-        </Loadable>
-      </article>
+        >
+          <div className="stats__card-header">
+            <h3>Tránsitos completados por día</h3>
+            {filtering && (
+              <button type="button" className="stats__clear" onClick={clearFilters}>
+                Quitar filtros
+              </button>
+            )}
+          </div>
+          <Loadable query={daily} skeleton={<Skeleton variant="chart" />}>
+            {(data) => {
+              const all = dailySeries(data.items, days, now());
+              const bars =
+                category === null
+                  ? all
+                  : dailySeries(itemsOfCategory(data.items, category), days, now());
+              const total = data.items.reduce((sum, item) => sum + item.transits, 0);
+              return total === 0 ? (
+                <p className="stats__empty">No hay tránsitos completados en este periodo.</p>
+              ) : (
+                <>
+                  {/* La escala es la de todos los tránsitos: un tipo pequeño se ve pequeño. */}
+                  <BarChart
+                    bars={bars}
+                    max={axisMax(all)}
+                    highlight={highlight}
+                    subject={category === null ? '' : ` de tipo ${categoryText(category)}`}
+                  />
+                  <ul className="stats__legend" aria-label="Sentido">
+                    {DIRECTIONS.map(([direction, label]) => (
+                      <li key={direction}>
+                        <button
+                          type="button"
+                          aria-pressed={highlight === direction}
+                          className={
+                            highlight !== null && highlight !== direction ? 'is-dimmed' : undefined
+                          }
+                          onClick={() => {
+                            setHighlight((current) => (current === direction ? null : direction));
+                          }}
+                        >
+                          <span style={{ background: DIRECTION_COLORS[direction] }} />
+                          {label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <h4>Por tipo de buque</h4>
+                  <ul className="stats__categories" aria-label="Tránsitos por tipo de buque">
+                    {categoryTotals(data.items).map(([name, transits]) => (
+                      <li key={name}>
+                        <button
+                          type="button"
+                          aria-pressed={category === name}
+                          className={
+                            category !== null && category !== name ? 'is-dimmed' : undefined
+                          }
+                          onClick={() => {
+                            setCategory((current) => (current === name ? null : name));
+                          }}
+                        >
+                          <span>{categoryText(name)}</span>
+                          <span className="stats__category-count">{transits}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              );
+            }}
+          </Loadable>
+        </article>
 
-      <article className="stats__card">
-        <h3>Duración del tránsito</h3>
-        <Loadable query={durations} skeleton={<Skeleton lines={3} />}>
-          {(data) => (
-            <DistributionTable
-              total={data.overall}
-              rows={[
-                ['Atlántico → Pacífico', data.by_direction.southbound],
-                ['Pacífico → Atlántico', data.by_direction.northbound],
-              ]}
-            />
-          )}
-        </Loadable>
-      </article>
+        <div className="stats__grid">
+          <article className="stats__card">
+            <h3>Duración del tránsito</h3>
+            <Loadable query={durations} skeleton={<Skeleton lines={3} />}>
+              {(data) => (
+                <DistributionTable
+                  total={data.overall}
+                  rows={[
+                    ['Atlántico → Pacífico', data.by_direction.southbound],
+                    ['Pacífico → Atlántico', data.by_direction.northbound],
+                  ]}
+                />
+              )}
+            </Loadable>
+          </article>
 
-      <article className="stats__card">
-        <h3>Espera en fondeo antes de entrar</h3>
-        <Loadable query={waiting} skeleton={<Skeleton lines={3} />}>
-          {(data) => (
-            <DistributionTable
-              total={data.overall}
-              rows={[
-                ['Fondeadero Atlántico', data.by_anchorage.atlantic],
-                ['Fondeadero Pacífico', data.by_anchorage.pacific],
-              ]}
-            />
-          )}
-        </Loadable>
-        <p className="stats__note">
-          Solo los tránsitos en los que se detectó al buque esperando en un fondeadero.
-        </p>
-      </article>
+          <article className="stats__card">
+            <h3>Espera en fondeo antes de entrar</h3>
+            <Loadable query={waiting} skeleton={<Skeleton lines={3} />}>
+              {(data) => (
+                <DistributionTable
+                  total={data.overall}
+                  rows={[
+                    ['Fondeadero Atlántico', data.by_anchorage.atlantic],
+                    ['Fondeadero Pacífico', data.by_anchorage.pacific],
+                  ]}
+                />
+              )}
+            </Loadable>
+            <p className="stats__note">
+              Solo los tránsitos en los que se detectó al buque esperando en un fondeadero.
+            </p>
+          </article>
+        </div>
+      </div>
     </section>
   );
 }
