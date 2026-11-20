@@ -1,20 +1,21 @@
-# Recolector de posiciones AIS reales del Canal (ADR-0012, guía en docs/AIS_COLLECTOR.md).
-# Se conecta a AISStream 340 min (~5 h 40 min), guarda posiciones en JSON Lines, lo cifra con gpg
-# y lo sube como artefacto. Al acabar con éxito el paso de comprobación de secretos y ejecutar la
-# recolección, encadena la siguiente ventana con `workflow_dispatch` (si no hay otra en cola) para
-# cubrir ~95 % del tiempo; el cron cada 6 h queda como respaldo por si la cadena se interrumpe.
+# Recolector de posiciones AIS reales del Canal (ADR-0012, modificado por ADR-0019; guía en
+# docs/AIS_COLLECTOR.md). Se conecta a AISStream 340 min (~5 h 40 min), guarda posiciones en
+# JSON Lines, las cifra con gpg y sube el artefacto. Un job separado (`chain`) encadena la
+# siguiente ventana por `workflow_dispatch` solo si la recolección acabó bien y en `main`, dejando
+# el cron cada 6 h como respaldo por si la cadena se corta.
 #
 # Apagado por defecto: solo corre si la variable de repositorio AIS_COLLECT_ENABLED vale `true`.
 # Necesita los secretos AISSTREAM_API_KEY y AIS_COLLECT_PASSPHRASE.
 #
 # El repositorio es público y los artefactos de un repositorio público los puede descargar
 # cualquiera con cuenta de GitHub: por eso el fichero se cifra antes de subirlo y nunca se sube en
-# claro. No lo ejecutes a la vez que el worker (AISStream limita las conexiones por key).
+# claro. Puede convivir con el worker local solo si este corre con `AIS_CANAL_BOUND_ENABLED=false`
+# (ADR-0019).
 name: Collect AIS
 
 on:
   schedule:
-    # Respaldo cada 6 horas por si la cadena de `workflow_dispatch` se corta.
+    # Respaldo cada 6 horas por si la cadena de `workflow_dispatch` se interrumpe.
     - cron: "23 */6 * * *"
   workflow_dispatch:
     inputs:
@@ -41,16 +42,15 @@ jobs:
     name: Collect
     if: ${{ vars.AIS_COLLECT_ENABLED == 'true' }}
     runs-on: ubuntu-24.04
-    # Máximo de un job de Actions: 360 min. Recolecta 340 y deja margen para instalar, subir y encadenar.
+    # Máximo de un job de Actions: 360 min. Recolecta 340 y deja margen para instalar y subir.
     timeout-minutes: 355
     permissions:
       contents: read
-      actions: write
-    # Los secretos y tokens van solo en los pasos que los usan, nunca heredados por todo el job.
+    # Los secretos van solo en los pasos que los usan, no en el job: así no los ven el checkout,
+    # setup-python ni la instalación de dependencias.
     steps:
-      # Antes de gastar casi 6 horas: sin los dos secretos no tiene sentido empezar (ni encadenar).
+      # Antes de gastar casi 6 horas: sin los dos secretos no tiene sentido empezar.
       - name: Comprobar los secretos
-        id: secrets
         env:
           AISSTREAM_API_KEY: ${{ secrets.AISSTREAM_API_KEY }}
           AIS_COLLECT_PASSPHRASE: ${{ secrets.AIS_COLLECT_PASSPHRASE }}
@@ -70,7 +70,6 @@ jobs:
           pip install --require-hashes -r requirements.lock
           pip install --no-deps -e .
       - name: Recolectar
-        id: collect
         env:
           AISSTREAM_API_KEY: ${{ secrets.AISSTREAM_API_KEY }}
           # Por una variable de entorno y no dentro del script de la shell: evita inyección.
@@ -95,20 +94,27 @@ jobs:
           retention-days: 90
           # Ya está cifrado: comprimirlo no ahorra nada.
           compression-level: 0
-      # Solo encadena si los secretos existen y el recolector llegó a ejecutarse (evita bucles de error).
+
+  # Job aislado sin secretos ni acciones de terceros: solo dispara la siguiente ventana desde main.
+  chain:
+    name: Chain next window
+    needs: collect
+    if: >-
+      ${{ needs.collect.result == 'success' && vars.AIS_COLLECT_ENABLED == 'true' &&
+      github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.chain) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
       - name: Encadenar siguiente ventana
-        if: >-
-          ${{ always() && !cancelled() && vars.AIS_COLLECT_ENABLED == 'true' &&
-          steps.secrets.outcome == 'success' && steps.collect.outcome != 'skipped' &&
-          (github.event_name == 'schedule' || inputs.chain == true) }}
         env:
           GH_TOKEN: ${{ github.token }}
-          REF_NAME: ${{ github.ref_name }}
         run: |
           queued=$(gh run list --workflow collect-ais.yml --status queued --json databaseId --jq 'length')
           waiting=$(gh run list --workflow collect-ais.yml --status waiting --json databaseId --jq 'length')
           if [ "$((queued + waiting))" -eq 0 ]; then
-            gh workflow run collect-ais.yml --ref "$REF_NAME" -f minutes=340 -f chain=true
+            gh workflow run collect-ais.yml --ref main -f minutes=340 -f chain=true
           else
-            echo "Ya hay una ventana pendiente ($queued queued, $waiting waiting); se omite disparo duplicado."
+            echo "Ya hay una ventana pendiente en cola ($queued queued, $waiting waiting); se omite disparo duplicado."
           fi

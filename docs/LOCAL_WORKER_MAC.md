@@ -22,10 +22,11 @@ solo si falla o al iniciar sesión, y evitando el reposo mientras esté conectad
 2. Entorno `.venv` creado con las dependencias instaladas.
 3. Fichero `.env` en la raíz del repositorio con tu `AISSTREAM_API_KEY` real (`AISSTREAM_URL`,
    `DATABASE_URL` y `REDIS_URL`).
-   - **Importante (límite de AISStream)**: con cuenta gratuita (máximo 3 conexiones por clave),
-     si también ejecutas el recolector continuo de GitHub (`collect-ais.yml`) con la **misma**
-     API key, deja `AIS_CANAL_BOUND_ENABLED=false` en `.env` (1 conexión worker + 1 recolector) o
-     desactiva `AIS_COLLECT_ENABLED` cuando uses 2 conexiones en el worker.
+   - **Convivencia con GitHub Actions (`ADR-0019`)**: el recolector (`collect-ais.yml`) y el worker
+     local pueden ejecutarse **a la vez solo con `AIS_CANAL_BOUND_ENABLED=false`** en el worker
+     (`1` conexión worker + `1` recolector = `2` máximo). El script
+     `scripts/macos/run_worker_caffeinate.sh` fija explícitamente `AIS_CANAL_BOUND_ENABLED=false`
+     al arrancar.
 
 ## Instalación y gestión
 

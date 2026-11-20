@@ -6,11 +6,12 @@ encendido, para el replay (tarea 5.5) y la validación con datos reales (tarea 5
 ## Cómo funciona
 
 El workflow `Collect AIS` se conecta a AISStream durante 340 minutos (~5 h 40 min), guarda las
-posiciones en JSON Lines, las cifra con `gpg` y sube el artefacto. Al finalizar cada ejecución
-(y siempre que `AIS_COLLECT_ENABLED` siga en `true`), comprueba que no exista otro job en cola y
-dispara la siguiente ventana con `workflow_dispatch`, reduciendo los huecos de escucha frente al
-cron (~52 % → ~95 % del tiempo). El cron cada 6 horas permanece como respaldo por si la cadena se
-interrumpe. Está **apagado por defecto**.
+posiciones en JSON Lines, las cifra con `gpg` y sube el artefacto (`job collect`, solo con
+`contents: read`). Cuando ese job termina **con éxito** en `main` (y `AIS_COLLECT_ENABLED` sigue en
+`true`), un job separado `chain` (sin secretos ni acciones de terceros, solo `actions: write` y
+`timeout-minutes: 5`) comprueba que no exista otro run pendiente y dispara la siguiente ventana con
+`gh workflow run collect-ais.yml --ref main`, reduciendo los huecos frente al cron (~52 % → ~95 %).
+El cron cada 6 horas queda como respaldo si la cadena se corta. Está **apagado por defecto**.
 
 ## Activarlo (una vez)
 
@@ -32,9 +33,9 @@ interrumpe. Está **apagado por defecto**.
    workflow*, con `minutes` en `5` y **`chain` desmarcado (`false`)**.
    Si quieres arrancar la captura continua al instante, déjalo con `minutes=340` y `chain=true`.
 
-No ejecutes el recolector a la vez que el worker local con la misma clave: AISStream limita las
-conexiones por key (`ADR-0009`). Si usas una segunda API key o apagas el worker, mantén
-`AIS_COLLECT_ENABLED` acorde.
+Worker local y recolector pueden ejecutarse **a la vez solo con `AIS_CANAL_BOUND_ENABLED=false`**
+en el worker (`1` conexión del worker + `1` del recolector = `2` conexiones, ADR-0019). Si prefieres
+usar `AIS_CANAL_BOUND_ENABLED=true`, apaga antes `AIS_COLLECT_ENABLED=false`.
 
 ## Apagarlo
 

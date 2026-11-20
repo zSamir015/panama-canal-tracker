@@ -94,4 +94,4 @@ launchctl bootstrap "$DOMAIN" "$PLIST_PATH"
 
 echo "LaunchAgent instalado y arrancado: $PLIST_PATH"
 echo "Logs: $LOG_DIR/worker.out.log y $LOG_DIR/worker.err.log"
-echo "Recuerda no ejecutar a la vez AIS_COLLECT_ENABLED=true en GitHub Actions con la misma AISSTREAM_API_KEY."
+echo "El worker arranca con AIS_CANAL_BOUND_ENABLED=false (puede correr a la vez que collect-ais.yml, ADR-0019)."
