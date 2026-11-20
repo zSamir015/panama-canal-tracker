@@ -59,7 +59,13 @@ from app.workers.transit_tracker import TransitStats, TransitTracker
 CANAL_BOUNDING_BOXES: tuple[tuple[tuple[float, float], tuple[float, float]], ...] = (
     ((8.4, -80.2), (9.7, -79.2)),
 )
-MESSAGE_TYPES = ("PositionReport", "ShipStaticData")
+MESSAGE_TYPES = (
+    "PositionReport",
+    "ShipStaticData",
+    "StandardClassBPositionReport",
+    "ExtendedClassBPositionReport",
+    "StaticDataReport",
+)
 # Segunda conexión (#59, ADR-0009): datos estáticos de todo el mundo para encontrar los buques que
 # declaran como destino el Canal. Sin posiciones: serían cientos de mensajes por segundo.
 GLOBAL_BOUNDING_BOXES: tuple[tuple[tuple[float, float], tuple[float, float]], ...] = (

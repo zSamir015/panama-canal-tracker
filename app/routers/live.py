@@ -50,7 +50,7 @@ from app.services.live import (
 )
 
 AUTH_TIMEOUT_SECONDS = 5.0
-FLUSH_INTERVAL_SECONDS = 1.0
+FLUSH_INTERVAL_SECONDS = 0.5
 # Si un envío tarda más que esto, el cliente no está leyendo: se cierra en vez de esperarle.
 SEND_TIMEOUT_SECONDS = 10.0
 HEARTBEAT_SECONDS = 30.0

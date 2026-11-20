@@ -4,10 +4,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.91525,
-        "lat": 9.416533,
-        "cog": 189.5,
-        "sog": 6.0,
+        "lon": -79.87,
+        "lat": 9.42,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:00Z"
@@ -24,10 +24,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.59584,
-        "lat": 9.001103,
-        "cog": 133.8,
-        "sog": 2.0,
+        "lon": -79.81105,
+        "lat": 9.142255,
+        "cog": 165.7,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:00Z"
@@ -64,22 +64,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.81105,
-        "lat": 9.142255,
-        "cog": 165.7,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:00Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.640398,
-        "lat": 9.036036,
-        "cog": 307.7,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.920296,
+        "lat": 9.293006,
+        "cog": 187.0,
+        "sog": 6.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.921999,
+        "lat": 9.278876,
+        "cog": 186.4,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.92488,
+        "lat": 9.23577,
+        "cog": 184.3,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.680304,
+        "lat": 9.088705,
+        "cog": 330.8,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.771231,
+        "lat": 9.112607,
+        "cog": 69.0,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.553635,
+        "lat": 8.923443,
+        "cog": 352.0,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.920587,
+        "lat": 9.379361,
+        "cog": 186.9,
+        "sog": 7.5,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:00Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:00Z"
       }
     ]
@@ -89,10 +189,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.91553,
-        "lat": 9.41489,
-        "cog": 189.5,
-        "sog": 6.0,
+        "lon": -79.871546,
+        "lat": 9.419931,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:01Z"
@@ -109,10 +209,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.595434,
-        "lat": 9.000719,
-        "cog": 133.8,
-        "sog": 2.0,
+        "lon": -79.810355,
+        "lat": 9.139566,
+        "cog": 165.7,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:01Z"
@@ -149,22 +249,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.810355,
-        "lat": 9.139566,
-        "cog": 165.7,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:01Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.641859,
-        "lat": 9.037715,
-        "cog": 321.2,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.920501,
+        "lat": 9.291353,
+        "cog": 187.0,
+        "sog": 6.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.922062,
+        "lat": 9.278325,
+        "cog": 186.4,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.92509,
+        "lat": 9.233002,
+        "cog": 184.3,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.6814,
+        "lat": 9.090644,
+        "cog": 330.8,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.768606,
+        "lat": 9.113602,
+        "cog": 69.0,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.553949,
+        "lat": 8.925642,
+        "cog": 352.0,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.920841,
+        "lat": 9.377295,
+        "cog": 186.9,
+        "sog": 7.5,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:01Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:01Z"
       }
     ]
@@ -174,10 +374,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.91581,
-        "lat": 9.413248,
-        "cog": 189.5,
-        "sog": 6.0,
+        "lon": -79.873092,
+        "lat": 9.419863,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:02Z"
@@ -194,10 +394,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.595028,
-        "lat": 9.000335,
-        "cog": 133.8,
-        "sog": 2.0,
+        "lon": -79.80966,
+        "lat": 9.136876,
+        "cog": 165.7,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:02Z"
@@ -234,22 +434,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.80966,
-        "lat": 9.136876,
-        "cog": 165.7,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:02Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.643269,
-        "lat": 9.039445,
-        "cog": 321.2,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.920707,
+        "lat": 9.2897,
+        "cog": 187.0,
+        "sog": 6.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.922125,
+        "lat": 9.277773,
+        "cog": 186.4,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.9253,
+        "lat": 9.230234,
+        "cog": 184.3,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.682497,
+        "lat": 9.092583,
+        "cog": 330.8,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.765981,
+        "lat": 9.114596,
+        "cog": 69.0,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.555,
+        "lat": 8.927575,
+        "cog": 327.9,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.921096,
+        "lat": 9.375228,
+        "cog": 186.9,
+        "sog": 7.5,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:02Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:02Z"
       }
     ]
@@ -259,10 +559,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.91609,
-        "lat": 9.411605,
-        "cog": 189.5,
-        "sog": 6.0,
+        "lon": -79.874638,
+        "lat": 9.419794,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:03Z"
@@ -279,10 +579,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.594622,
-        "lat": 8.999951,
-        "cog": 133.8,
-        "sog": 2.0,
+        "lon": -79.808698,
+        "lat": 9.134271,
+        "cog": 158.4,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:03Z"
@@ -319,22 +619,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.808698,
-        "lat": 9.134271,
-        "cog": 158.4,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:03Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.644678,
-        "lat": 9.041175,
-        "cog": 321.2,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.920912,
+        "lat": 9.288046,
+        "cog": 187.0,
+        "sog": 6.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.922188,
+        "lat": 9.277221,
+        "cog": 186.4,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.925511,
+        "lat": 9.227466,
+        "cog": 184.3,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.683593,
+        "lat": 9.094522,
+        "cog": 330.8,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.763356,
+        "lat": 9.11559,
+        "cog": 69.0,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.556194,
+        "lat": 8.929456,
+        "cog": 327.9,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.92135,
+        "lat": 9.373161,
+        "cog": 186.9,
+        "sog": 7.5,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:03Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:03Z"
       }
     ]
@@ -344,10 +744,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.91637,
-        "lat": 9.409963,
-        "cog": 189.5,
-        "sog": 6.0,
+        "lon": -79.876184,
+        "lat": 9.419725,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:04Z"
@@ -364,10 +764,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.594216,
-        "lat": 8.999567,
-        "cog": 133.8,
-        "sog": 2.0,
+        "lon": -79.807662,
+        "lat": 9.131691,
+        "cog": 158.4,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:04Z"
@@ -404,22 +804,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.807662,
-        "lat": 9.131691,
-        "cog": 158.4,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:04Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.646088,
-        "lat": 9.042906,
-        "cog": 321.2,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.921117,
+        "lat": 9.286393,
+        "cog": 187.0,
+        "sog": 6.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.922251,
+        "lat": 9.27667,
+        "cog": 186.4,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.925721,
+        "lat": 9.224698,
+        "cog": 184.3,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.68469,
+        "lat": 9.09646,
+        "cog": 330.8,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.760731,
+        "lat": 9.116585,
+        "cog": 69.0,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.557388,
+        "lat": 8.931338,
+        "cog": 327.9,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.921604,
+        "lat": 9.371093,
+        "cog": 186.3,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:04Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:04Z"
       }
     ]
@@ -429,10 +929,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.916649,
-        "lat": 9.40832,
-        "cog": 189.5,
-        "sog": 6.0,
+        "lon": -79.87773,
+        "lat": 9.419656,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:05Z"
@@ -449,10 +949,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.59381,
-        "lat": 8.999183,
-        "cog": 133.8,
-        "sog": 2.0,
+        "lon": -79.806626,
+        "lat": 9.12911,
+        "cog": 158.4,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:05Z"
@@ -489,22 +989,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.806626,
-        "lat": 9.12911,
-        "cog": 158.4,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:05Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.647497,
-        "lat": 9.044636,
-        "cog": 321.2,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.921322,
+        "lat": 9.28474,
+        "cog": 187.0,
+        "sog": 6.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.922315,
+        "lat": 9.276118,
+        "cog": 186.4,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.925931,
+        "lat": 9.221929,
+        "cog": 184.3,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.685786,
+        "lat": 9.098399,
+        "cog": 330.8,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.758106,
+        "lat": 9.117579,
+        "cog": 69.0,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.558583,
+        "lat": 8.933219,
+        "cog": 327.9,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.921853,
+        "lat": 9.368886,
+        "cog": 186.3,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:05Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:05Z"
       }
     ]
@@ -514,10 +1114,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.916929,
-        "lat": 9.406678,
-        "cog": 189.5,
-        "sog": 6.0,
+        "lon": -79.879276,
+        "lat": 9.419588,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:06Z"
@@ -534,10 +1134,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.593421,
-        "lat": 8.998783,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.80559,
+        "lat": 9.12653,
+        "cog": 158.4,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:06Z"
@@ -574,22 +1174,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.80559,
-        "lat": 9.12653,
-        "cog": 158.4,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:06Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.648907,
-        "lat": 9.046366,
-        "cog": 321.2,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.92143,
+        "lat": 9.283841,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.922378,
+        "lat": 9.275566,
+        "cog": 186.4,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.925588,
+        "lat": 9.219274,
+        "cog": 152.3,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.686943,
+        "lat": 9.100294,
+        "cog": 315.7,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.755481,
+        "lat": 9.118573,
+        "cog": 69.0,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.559777,
+        "lat": 8.935101,
+        "cog": 327.9,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.922101,
+        "lat": 9.366679,
+        "cog": 186.3,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:06Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:06Z"
       }
     ]
@@ -599,10 +1299,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.917209,
-        "lat": 9.405035,
-        "cog": 189.5,
-        "sog": 6.0,
+        "lon": -79.880822,
+        "lat": 9.419519,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:07Z"
@@ -619,10 +1319,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.593036,
-        "lat": 8.998378,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.804553,
+        "lat": 9.123949,
+        "cog": 158.4,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:07Z"
@@ -659,22 +1359,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.804553,
-        "lat": 9.123949,
-        "cog": 158.4,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:07Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.650316,
-        "lat": 9.048097,
-        "cog": 321.2,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.921493,
+        "lat": 9.28329,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.922454,
+        "lat": 9.275016,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.924281,
+        "lat": 9.216817,
+        "cog": 152.3,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.688513,
+        "lat": 9.101884,
+        "cog": 315.7,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.752856,
+        "lat": 9.119567,
+        "cog": 69.0,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.560971,
+        "lat": 8.936982,
+        "cog": 327.9,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.92235,
+        "lat": 9.364472,
+        "cog": 186.3,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:07Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:07Z"
       }
     ]
@@ -684,10 +1484,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.917489,
-        "lat": 9.403393,
-        "cog": 189.5,
-        "sog": 6.0,
+        "lon": -79.882368,
+        "lat": 9.41945,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:08Z"
@@ -704,10 +1504,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.592651,
-        "lat": 8.997974,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.803493,
+        "lat": 9.121394,
+        "cog": 109.4,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:08Z"
@@ -744,22 +1544,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.803493,
-        "lat": 9.121394,
-        "cog": 109.4,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:08Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.651726,
-        "lat": 9.049827,
-        "cog": 321.2,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.921557,
+        "lat": 9.282738,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.922542,
+        "lat": 9.274468,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.922974,
+        "lat": 9.214359,
+        "cog": 152.3,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.690083,
+        "lat": 9.103474,
+        "cog": 315.7,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.750232,
+        "lat": 9.120562,
+        "cog": 69.0,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.562165,
+        "lat": 8.938864,
+        "cog": 327.9,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.922598,
+        "lat": 9.362265,
+        "cog": 186.3,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:08Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:08Z"
       }
     ]
@@ -769,10 +1669,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.917769,
-        "lat": 9.40175,
-        "cog": 189.5,
-        "sog": 6.0,
+        "lon": -79.883914,
+        "lat": 9.419382,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:09Z"
@@ -789,10 +1689,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.592266,
-        "lat": 8.99757,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.80084,
+        "lat": 9.120474,
+        "cog": 109.4,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:09Z"
@@ -829,22 +1729,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.80084,
-        "lat": 9.120474,
-        "cog": 109.4,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:09Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.653145,
-        "lat": 9.051548,
-        "cog": 314.0,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.92162,
+        "lat": 9.282186,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.92263,
+        "lat": 9.27392,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.921667,
+        "lat": 9.211901,
+        "cog": 152.3,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.691652,
+        "lat": 9.105065,
+        "cog": 315.7,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.747507,
+        "lat": 9.12094,
+        "cog": 92.8,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.56336,
+        "lat": 8.940745,
+        "cog": 327.9,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.922847,
+        "lat": 9.360057,
+        "cog": 186.3,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:09Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:09Z"
       }
     ]
@@ -854,10 +1854,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.918044,
-        "lat": 9.400029,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.88546,
+        "lat": 9.419313,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:10Z"
@@ -874,10 +1874,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.59188,
-        "lat": 8.997165,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.798188,
+        "lat": 9.119553,
+        "cog": 109.4,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:10Z"
@@ -914,22 +1914,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.798188,
-        "lat": 9.119553,
-        "cog": 109.4,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:10Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.654764,
-        "lat": 9.05309,
-        "cog": 314.0,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.921683,
+        "lat": 9.281635,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.922718,
+        "lat": 9.273371,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.920359,
+        "lat": 9.209443,
+        "cog": 152.3,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.693222,
+        "lat": 9.106655,
+        "cog": 315.7,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.744699,
+        "lat": 9.120803,
+        "cog": 92.8,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.564554,
+        "lat": 8.942626,
+        "cog": 327.9,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923095,
+        "lat": 9.35785,
+        "cog": 186.3,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:10Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:10Z"
       }
     ]
@@ -939,10 +2039,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.918298,
-        "lat": 9.397962,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.887006,
+        "lat": 9.419244,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:11Z"
@@ -959,10 +2059,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.591495,
-        "lat": 8.996761,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.795536,
+        "lat": 9.118633,
+        "cog": 109.4,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:11Z"
@@ -999,22 +2099,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.795536,
-        "lat": 9.118633,
-        "cog": 109.4,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:11Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.656383,
-        "lat": 9.054631,
-        "cog": 314.0,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.921746,
+        "lat": 9.281083,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.922807,
+        "lat": 9.272823,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.919052,
+        "lat": 9.206986,
+        "cog": 152.3,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.694792,
+        "lat": 9.108245,
+        "cog": 315.7,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.741897,
+        "lat": 9.120605,
+        "cog": 98.5,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.565877,
+        "lat": 8.944421,
+        "cog": 323.4,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923344,
+        "lat": 9.355643,
+        "cog": 186.3,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:11Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:11Z"
       }
     ]
@@ -1024,10 +2224,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.918553,
-        "lat": 9.395895,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.888553,
+        "lat": 9.419175,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:12Z"
@@ -1044,10 +2244,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.59111,
-        "lat": 8.996357,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.792883,
+        "lat": 9.117712,
+        "cog": 109.4,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:12Z"
@@ -1084,22 +2284,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.792883,
-        "lat": 9.117712,
-        "cog": 109.4,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:12Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.658002,
-        "lat": 9.056172,
-        "cog": 314.0,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.921809,
+        "lat": 9.280531,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.922895,
+        "lat": 9.272275,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.916762,
+        "lat": 9.20548,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.696362,
+        "lat": 9.109835,
+        "cog": 315.7,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.739117,
+        "lat": 9.120194,
+        "cog": 98.5,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.567216,
+        "lat": 8.946204,
+        "cog": 323.4,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923592,
+        "lat": 9.353436,
+        "cog": 186.3,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:12Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:12Z"
       }
     ]
@@ -1109,10 +2409,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.918807,
-        "lat": 9.393829,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.890099,
+        "lat": 9.419107,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:13Z"
@@ -1129,10 +2429,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.590725,
-        "lat": 8.995953,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.790231,
+        "lat": 9.116792,
+        "cog": 109.4,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:13Z"
@@ -1169,22 +2469,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.790231,
-        "lat": 9.116792,
-        "cog": 109.4,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:13Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.659621,
-        "lat": 9.057713,
-        "cog": 314.0,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.921872,
+        "lat": 9.27998,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.922983,
+        "lat": 9.271726,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.914298,
+        "lat": 9.204143,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.698048,
+        "lat": 9.11133,
+        "cog": 292.5,
+        "sog": 9.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.736336,
+        "lat": 9.119783,
+        "cog": 98.5,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.568556,
+        "lat": 8.947988,
+        "cog": 323.4,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923841,
+        "lat": 9.351229,
+        "cog": 186.3,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:13Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:13Z"
       }
     ]
@@ -1194,10 +2594,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.919061,
-        "lat": 9.391762,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.891645,
+        "lat": 9.419038,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:14Z"
@@ -1214,10 +2614,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.590339,
-        "lat": 8.995548,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.787579,
+        "lat": 9.115872,
+        "cog": 109.4,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:14Z"
@@ -1254,22 +2654,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.787579,
-        "lat": 9.115872,
-        "cog": 109.4,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:14Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.66124,
-        "lat": 9.059255,
-        "cog": 314.0,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.921936,
+        "lat": 9.279428,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.923071,
+        "lat": 9.271178,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.911833,
+        "lat": 9.202807,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.700385,
+        "lat": 9.112287,
+        "cog": 292.5,
+        "sog": 9.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.733556,
+        "lat": 9.119371,
+        "cog": 98.5,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.569469,
+        "lat": 8.950009,
+        "cog": 337.7,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923991,
+        "lat": 9.349017,
+        "cog": 178.9,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:14Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:14Z"
       }
     ]
@@ -1279,10 +2779,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.919316,
-        "lat": 9.389695,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.893191,
+        "lat": 9.418969,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:15Z"
@@ -1299,10 +2799,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.589954,
-        "lat": 8.995144,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.78488,
+        "lat": 9.115107,
+        "cog": 103.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:15Z"
@@ -1339,22 +2839,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.78488,
-        "lat": 9.115107,
-        "cog": 103.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:15Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.662859,
-        "lat": 9.060796,
-        "cog": 314.0,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.921999,
+        "lat": 9.278876,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.923159,
+        "lat": 9.27063,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.909368,
+        "lat": 9.20147,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.702723,
+        "lat": 9.113243,
+        "cog": 292.5,
+        "sog": 9.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.730776,
+        "lat": 9.11896,
+        "cog": 98.5,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.570323,
+        "lat": 8.952063,
+        "cog": 337.7,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923949,
+        "lat": 9.346797,
+        "cog": 178.9,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:15Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:15Z"
       }
     ]
@@ -1364,10 +2964,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.91957,
-        "lat": 9.387628,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.894737,
+        "lat": 9.418901,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:16Z"
@@ -1384,10 +2984,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.589569,
-        "lat": 8.99474,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.782141,
+        "lat": 9.11448,
+        "cog": 103.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:16Z"
@@ -1424,22 +3024,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.782141,
-        "lat": 9.11448,
-        "cog": 103.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:16Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.664421,
-        "lat": 9.062392,
-        "cog": 317.4,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.922062,
+        "lat": 9.278325,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.923248,
+        "lat": 9.270081,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.906904,
+        "lat": 9.200133,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.70506,
+        "lat": 9.1142,
+        "cog": 292.5,
+        "sog": 9.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.727995,
+        "lat": 9.118548,
+        "cog": 98.5,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.571177,
+        "lat": 8.954118,
+        "cog": 337.7,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923906,
+        "lat": 9.344577,
+        "cog": 178.9,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:16Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:16Z"
       }
     ]
@@ -1449,10 +3149,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.919824,
-        "lat": 9.385562,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.896283,
+        "lat": 9.418832,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:17Z"
@@ -1469,10 +3169,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.589184,
-        "lat": 8.994335,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.779403,
+        "lat": 9.113854,
+        "cog": 103.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:17Z"
@@ -1509,22 +3209,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.779403,
-        "lat": 9.113854,
-        "cog": 103.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:17Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.665943,
-        "lat": 9.064027,
-        "cog": 317.4,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.922125,
+        "lat": 9.277773,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.923336,
+        "lat": 9.269533,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.904439,
+        "lat": 9.198797,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.707397,
+        "lat": 9.115156,
+        "cog": 292.5,
+        "sog": 9.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.725215,
+        "lat": 9.118137,
+        "cog": 98.5,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.572032,
+        "lat": 8.956172,
+        "cog": 337.7,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923864,
+        "lat": 9.342356,
+        "cog": 178.9,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:17Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:17Z"
       }
     ]
@@ -1534,10 +3334,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.920078,
-        "lat": 9.383495,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.897829,
+        "lat": 9.418763,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:18Z"
@@ -1554,10 +3354,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.588799,
-        "lat": 8.993931,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.776664,
+        "lat": 9.113227,
+        "cog": 103.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:18Z"
@@ -1594,22 +3394,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.776664,
-        "lat": 9.113227,
-        "cog": 103.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:18Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.667466,
-        "lat": 9.065661,
-        "cog": 317.4,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.922188,
+        "lat": 9.277221,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.923424,
+        "lat": 9.268985,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.901975,
+        "lat": 9.19746,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.71009,
+        "lat": 9.11571,
+        "cog": 279.6,
+        "sog": 10.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.722434,
+        "lat": 9.117726,
+        "cog": 98.5,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.572886,
+        "lat": 8.958226,
+        "cog": 337.7,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923822,
+        "lat": 9.340136,
+        "cog": 178.9,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:18Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:18Z"
       }
     ]
@@ -1619,10 +3519,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.920333,
-        "lat": 9.381428,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.899375,
+        "lat": 9.418694,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:19Z"
@@ -1639,10 +3539,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.588413,
-        "lat": 8.993527,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.773925,
+        "lat": 9.112601,
+        "cog": 103.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:19Z"
@@ -1679,22 +3579,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.773925,
-        "lat": 9.112601,
-        "cog": 103.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:19Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.668988,
-        "lat": 9.067296,
-        "cog": 317.4,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.922251,
+        "lat": 9.27667,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.923512,
+        "lat": 9.268436,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.89951,
+        "lat": 9.196123,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.712862,
+        "lat": 9.116173,
+        "cog": 279.6,
+        "sog": 10.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.719655,
+        "lat": 9.117308,
+        "cog": 99.6,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.573741,
+        "lat": 8.96028,
+        "cog": 337.7,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.92378,
+        "lat": 9.337916,
+        "cog": 178.9,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:19Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:19Z"
       }
     ]
@@ -1704,10 +3704,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.920587,
-        "lat": 9.379361,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.900921,
+        "lat": 9.418626,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:20Z"
@@ -1724,10 +3724,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.588028,
-        "lat": 8.993123,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.771231,
+        "lat": 9.112607,
+        "cog": 69.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:20Z"
@@ -1764,22 +3764,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.771231,
-        "lat": 9.112607,
-        "cog": 69.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:20Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.67051,
-        "lat": 9.06893,
-        "cog": 317.4,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.922315,
+        "lat": 9.276118,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.9236,
+        "lat": 9.267888,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.897045,
+        "lat": 9.194787,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.715634,
+        "lat": 9.116636,
+        "cog": 279.6,
+        "sog": 10.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.716883,
+        "lat": 9.116845,
+        "cog": 99.6,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.574595,
+        "lat": 8.962334,
+        "cog": 337.7,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923738,
+        "lat": 9.335695,
+        "cog": 178.9,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:20Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:20Z"
       }
     ]
@@ -1789,10 +3889,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.920841,
-        "lat": 9.377295,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.902467,
+        "lat": 9.418557,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:21Z"
@@ -1809,10 +3909,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.587643,
-        "lat": 8.992718,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.768606,
+        "lat": 9.113602,
+        "cog": 69.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:21Z"
@@ -1849,22 +3949,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.768606,
-        "lat": 9.113602,
-        "cog": 69.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:21Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.672033,
-        "lat": 9.070565,
-        "cog": 317.4,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.922378,
+        "lat": 9.275566,
+        "cog": 186.4,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.923689,
+        "lat": 9.26734,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.894581,
+        "lat": 9.19345,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.718406,
+        "lat": 9.117099,
+        "cog": 279.6,
+        "sog": 10.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.714111,
+        "lat": 9.116382,
+        "cog": 99.6,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.575449,
+        "lat": 8.964388,
+        "cog": 337.7,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923696,
+        "lat": 9.333475,
+        "cog": 178.9,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:21Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:21Z"
       }
     ]
@@ -1874,10 +4074,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.921096,
-        "lat": 9.375228,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.904013,
+        "lat": 9.418488,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:22Z"
@@ -1894,10 +4094,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.587258,
-        "lat": 8.992314,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.765981,
+        "lat": 9.114596,
+        "cog": 69.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:22Z"
@@ -1934,22 +4134,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.765981,
-        "lat": 9.114596,
-        "cog": 69.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:22Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.673177,
-        "lat": 9.072431,
-        "cog": 338.9,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.922454,
+        "lat": 9.275016,
+        "cog": 189.0,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.923777,
+        "lat": 9.266792,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.892116,
+        "lat": 9.192114,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.721182,
+        "lat": 9.11754,
+        "cog": 278.5,
+        "sog": 10.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.711339,
+        "lat": 9.115918,
+        "cog": 99.6,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.576304,
+        "lat": 8.966442,
+        "cog": 337.7,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923616,
+        "lat": 9.331257,
+        "cog": 173.6,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:22Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:22Z"
       }
     ]
@@ -1959,10 +4259,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.92135,
-        "lat": 9.373161,
-        "cog": 186.9,
-        "sog": 7.5,
+        "lon": -79.905559,
+        "lat": 9.41842,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:23Z"
@@ -1979,10 +4279,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.586872,
-        "lat": 8.99191,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.763356,
+        "lat": 9.11559,
+        "cog": 69.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:23Z"
@@ -2019,22 +4319,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.763356,
-        "lat": 9.11559,
-        "cog": 69.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:23Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.673987,
-        "lat": 9.074503,
-        "cog": 338.9,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.922542,
+        "lat": 9.274468,
+        "cog": 189.0,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.923865,
+        "lat": 9.266243,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.889652,
+        "lat": 9.190777,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.723962,
+        "lat": 9.117952,
+        "cog": 278.5,
+        "sog": 10.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.708567,
+        "lat": 9.115455,
+        "cog": 99.6,
+        "sog": 10.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.576999,
+        "lat": 8.968552,
+        "cog": 343.6,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923365,
+        "lat": 9.32905,
+        "cog": 173.6,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:23Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:23Z"
       }
     ]
@@ -2044,10 +4444,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.921604,
-        "lat": 9.371093,
-        "cog": 186.3,
-        "sog": 8.0,
+        "lon": -79.907105,
+        "lat": 9.418351,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:24Z"
@@ -2064,10 +4464,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.586487,
-        "lat": 8.991505,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.760731,
+        "lat": 9.116585,
+        "cog": 69.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:24Z"
@@ -2104,22 +4504,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.760731,
-        "lat": 9.116585,
-        "cog": 69.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:24Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.674796,
-        "lat": 9.076575,
-        "cog": 338.9,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.92263,
+        "lat": 9.27392,
+        "cog": 189.0,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.923953,
+        "lat": 9.265695,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.887187,
+        "lat": 9.18944,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.726742,
+        "lat": 9.118363,
+        "cog": 278.5,
+        "sog": 10.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.706113,
+        "lat": 9.114631,
+        "cog": 112.5,
+        "sog": 9.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.577632,
+        "lat": 8.970682,
+        "cog": 343.6,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.923113,
+        "lat": 9.326844,
+        "cog": 173.6,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:24Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:24Z"
       }
     ]
@@ -2129,10 +4629,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.921853,
-        "lat": 9.368886,
-        "cog": 186.3,
-        "sog": 8.0,
+        "lon": -79.908651,
+        "lat": 9.418282,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:25Z"
@@ -2149,10 +4649,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.586102,
-        "lat": 8.991101,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.758106,
+        "lat": 9.117579,
+        "cog": 69.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:25Z"
@@ -2189,22 +4689,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.758106,
-        "lat": 9.117579,
-        "cog": 69.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:25Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.675606,
-        "lat": 9.078647,
-        "cog": 338.9,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.922718,
+        "lat": 9.273371,
+        "cog": 189.0,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.924041,
+        "lat": 9.265147,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.884723,
+        "lat": 9.188104,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.729523,
+        "lat": 9.118774,
+        "cog": 278.5,
+        "sog": 10.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.703776,
+        "lat": 9.113674,
+        "cog": 112.5,
+        "sog": 9.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.578266,
+        "lat": 8.972813,
+        "cog": 343.6,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.922861,
+        "lat": 9.324637,
+        "cog": 173.6,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:25Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:25Z"
       }
     ]
@@ -2214,10 +4814,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.922101,
-        "lat": 9.366679,
-        "cog": 186.3,
-        "sog": 8.0,
+        "lon": -79.910197,
+        "lat": 9.418213,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:26Z"
@@ -2234,10 +4834,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.585717,
-        "lat": 8.990697,
-        "cog": 136.7,
-        "sog": 2.0,
+        "lon": -79.755481,
+        "lat": 9.118573,
+        "cog": 69.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:26Z"
@@ -2274,22 +4874,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.755481,
-        "lat": 9.118573,
-        "cog": 69.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:26Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.676416,
-        "lat": 9.080718,
-        "cog": 338.9,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.922807,
+        "lat": 9.272823,
+        "cog": 189.0,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.92413,
+        "lat": 9.264598,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.882258,
+        "lat": 9.186767,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.732303,
+        "lat": 9.119186,
+        "cog": 278.5,
+        "sog": 10.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.701438,
+        "lat": 9.112718,
+        "cog": 112.5,
+        "sog": 9.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.578899,
+        "lat": 8.974944,
+        "cog": 343.6,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.922609,
+        "lat": 9.32243,
+        "cog": 173.6,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:26Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:26Z"
       }
     ]
@@ -2299,10 +4999,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.92235,
-        "lat": 9.364472,
-        "cog": 186.3,
-        "sog": 8.0,
+        "lon": -79.911743,
+        "lat": 9.418145,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:27Z"
@@ -2319,10 +5019,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.585268,
-        "lat": 8.990149,
-        "cog": 151.7,
-        "sog": 8.0,
+        "lon": -79.752856,
+        "lat": 9.119567,
+        "cog": 69.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:27Z"
@@ -2359,22 +5059,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.752856,
-        "lat": 9.119567,
-        "cog": 69.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:27Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.677226,
-        "lat": 9.08279,
-        "cog": 338.9,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.922895,
+        "lat": 9.272275,
+        "cog": 189.0,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.924218,
+        "lat": 9.26405,
+        "cog": 189.0,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.879793,
+        "lat": 9.18543,
+        "cog": 118.8,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.735084,
+        "lat": 9.119597,
+        "cog": 278.5,
+        "sog": 10.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.699101,
+        "lat": 9.111761,
+        "cog": 112.5,
+        "sog": 9.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.579532,
+        "lat": 8.977075,
+        "cog": 343.6,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.922357,
+        "lat": 9.320223,
+        "cog": 173.6,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:27Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:27Z"
       }
     ]
@@ -2384,10 +5184,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.922598,
-        "lat": 9.362265,
-        "cog": 186.3,
-        "sog": 8.0,
+        "lon": -79.913289,
+        "lat": 9.418076,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:28Z"
@@ -2404,10 +5204,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.584202,
-        "lat": 8.988195,
-        "cog": 151.7,
-        "sog": 8.0,
+        "lon": -79.750232,
+        "lat": 9.120562,
+        "cog": 69.0,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:28Z"
@@ -2444,22 +5244,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.750232,
-        "lat": 9.120562,
-        "cog": 69.0,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:28Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.678111,
-        "lat": 9.084827,
-        "cog": 330.8,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.922983,
+        "lat": 9.271726,
+        "cog": 189.0,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.92427,
+        "lat": 9.263498,
+        "cog": 182.6,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.8772,
+        "lat": 9.184406,
+        "cog": 105.5,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.737864,
+        "lat": 9.120009,
+        "cog": 278.5,
+        "sog": 10.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.69707,
+        "lat": 9.110552,
+        "cog": 135.7,
+        "sog": 8.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.580166,
+        "lat": 8.979205,
+        "cog": 343.6,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.922105,
+        "lat": 9.318016,
+        "cog": 173.6,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:28Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:28Z"
       }
     ]
@@ -2469,10 +5369,10 @@
     "vessels": [
       {
         "mmsi": 352000001,
-        "lon": -79.922847,
-        "lat": 9.360057,
-        "cog": 186.3,
-        "sog": 8.0,
+        "lon": -79.914835,
+        "lat": 9.418007,
+        "cog": 267.4,
+        "sog": 5.5,
         "ship_type": 70,
         "name": "PACIFIC STAR",
         "ts": "2026-10-25T12:00:29Z"
@@ -2489,10 +5389,10 @@
       },
       {
         "mmsi": 538000003,
-        "lon": -79.583135,
-        "lat": 8.98624,
-        "cog": 151.7,
-        "sog": 8.0,
+        "lon": -79.747507,
+        "lat": 9.12094,
+        "cog": 92.8,
+        "sog": 10.0,
         "ship_type": 70,
         "name": "GATUN TRADER",
         "ts": "2026-10-25T12:00:29Z"
@@ -2529,22 +5429,122 @@
       },
       {
         "mmsi": 477000007,
-        "lon": -79.747507,
-        "lat": 9.12094,
-        "cog": 92.8,
-        "sog": 10.0,
-        "ship_type": 60,
-        "name": "MIRAFLORES SUN",
+        "lon": -79.523416,
+        "lat": 8.871799,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "MIRAFLORES SEA",
         "ts": "2026-10-25T12:00:29Z"
       },
       {
-        "mmsi": 256000008,
-        "lon": -79.679207,
-        "lat": 9.086766,
-        "cog": 330.8,
-        "sog": 8.0,
+        "mmsi": 357000008,
+        "lon": -79.923071,
+        "lat": 9.271178,
+        "cog": 189.0,
+        "sog": 2.0,
         "ship_type": 70,
-        "name": "CANAL VOYAGER",
+        "name": "SILENT ROVER",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 352000009,
+        "lon": -79.924295,
+        "lat": 9.262943,
+        "cog": 182.6,
+        "sog": 2.0,
+        "ship_type": 70,
+        "name": "ISTHMUS PIONEER",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 538000010,
+        "lon": -79.87449,
+        "lat": 9.183666,
+        "cog": 105.5,
+        "sog": 10.0,
+        "ship_type": 80,
+        "name": "CHAGRES CARRIER",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 311000011,
+        "lon": -79.740644,
+        "lat": 9.12042,
+        "cog": 278.5,
+        "sog": 10.0,
+        "ship_type": 60,
+        "name": "PANAMA HORIZON",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 351000012,
+        "lon": -79.6955,
+        "lat": 9.108961,
+        "cog": 135.7,
+        "sog": 8.0,
+        "ship_type": 52,
+        "name": "ACP CERRO LUISA",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 351000013,
+        "lon": -79.580799,
+        "lat": 8.981336,
+        "cog": 343.6,
+        "sog": 8.0,
+        "ship_type": 50,
+        "name": "PILOTO LIMON",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 352000014,
+        "lon": -79.921853,
+        "lat": 9.31581,
+        "cog": 173.6,
+        "sog": 8.0,
+        "ship_type": 60,
+        "name": "PEDRO MIGUEL QUEEN",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 354000015,
+        "lon": -79.512295,
+        "lat": 8.871169,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 30,
+        "name": "BAHIA DORADA",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 355000016,
+        "lon": -79.528198,
+        "lat": 8.871465,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 37,
+        "name": "ISLA PERICO",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 372000017,
+        "lon": -79.863824,
+        "lat": 9.415709,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 90,
+        "name": "CARIBBEAN SURVEYOR",
+        "ts": "2026-10-25T12:00:29Z"
+      },
+      {
+        "mmsi": 636000018,
+        "lon": -79.877466,
+        "lat": 9.410913,
+        "cog": null,
+        "sog": 0.0,
+        "ship_type": 70,
+        "name": "SAN BLAS SPIRIT",
         "ts": "2026-10-25T12:00:29Z"
       }
     ]

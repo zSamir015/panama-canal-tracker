@@ -33,7 +33,7 @@ from app.services.ais_parser import PositionUpdate, VesselStatic
 from app.workers.common import AisRecord, backoff_delay, collect_batch
 
 DEFAULT_BATCH_SIZE = 500
-DEFAULT_FLUSH_SECONDS = 2.0
+DEFAULT_FLUSH_SECONDS = 0.5
 MAX_ATTEMPTS = 5
 # Con 5 intentos y un techo de 10 s, un lote con la base caída se abandona en unos 20 s.
 RETRY_MAX_SECONDS = 10.0
