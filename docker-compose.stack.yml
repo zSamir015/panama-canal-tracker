@@ -105,7 +105,7 @@ services:
     image: panama-canal-tracker/worker:local
     profiles: ["simulator"]
     command:
-      ["python", "scripts/ais_simulator.py", "serve", "--host", "0.0.0.0", "--port", "8765", "--speed", "60"]
+      ["python", "scripts/ais_simulator.py", "serve", "--host", "0.0.0.0", "--port", "8765", "--speed", "2"]
     healthcheck:
       test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 8765), 2)"]
       interval: 5s

@@ -4,8 +4,8 @@ import type { LiveStatus } from '../live/useLiveVessels';
 import { applyServerMessage, EMPTY_STATE, type VesselState } from '../live/vesselStore';
 import recording from './recording.json';
 
-/** Intervalo entre frames de la grabación (1 Hz, como el batching real de `/ws/live`). */
-const FRAME_INTERVAL_MS = 1_000;
+/** Intervalo entre frames de la grabación para un avance suave acorde a velocidad real (~2.6x). */
+const FRAME_INTERVAL_MS = 1_500;
 
 const frames = recording as unknown as ServerMessage[];
 

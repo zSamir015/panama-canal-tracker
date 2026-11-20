@@ -22,6 +22,40 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   resto como requisito previo a cualquier despliegue.
 
 ### Changed
+- Ingesta AIS en tiempo real más densa y fluida: `app/services/ais_parser.py` y
+  `app/workers/ais_consumer.py` incorporan mensajes AIS Clase B (`StandardClassBPositionReport`,
+  `ExtendedClassBPositionReport` y `StaticDataReport`), el volcado por lotes (`AIS_BATCH_FLUSH_SECONDS`)
+  y el envío de `/ws/live` (`FLUSH_INTERVAL_SECONDS`) bajan a `0,5 s`, y `scripts/ais_simulator.py`
+  amplía la flota por defecto de 8 a 18 buques (cadencia cada 15 s) con `web/src/demo/recording.json`
+  regenerado.
+- Mejoras integrales de UX/UI en `web/` (18 puntos sobre el tablero operativo, issue #161):
+  - Buscador rápido global en cabecera (`/`, `⌘K`/`Ctrl+K`) por nombre, MMSI o IMO con centrado de mapa.
+  - Sincronización bidireccional en URL (`?mmsi=...&view=stats`) compatible con recarga y botón atrás.
+  - Tooltip flotante de escritorio sobre el buque en el mapa con nombre, categoría, velocidad y frescura de señal.
+  - Barra de progreso estimada (`role="progressbar"`) e indicadores `↓`/`↑` en `TransitsPanel`; sección de
+    tránsito activo, botón «Copiar MMSI» y tooltip de hora de Panamá (`America/Panama`) en `VesselPanel`.
+  - Avisos honestos de cobertura AIS terrestre parcial en estado vacío de tránsitos y en `StatsView`, más
+    tarjetas KPI superiores con comparativa frente al periodo anterior.
+  - Leyenda interactiva para filtrar por tipo de buque y «Solo en tránsito», atenuación de buques con
+    señal antigua (> 15 min) y escala de iconos dependiente del zoom más compacta en fondeaderos.
+  - Errores claros en español con botón «Reintentar» en tránsitos, ficha y estadísticas.
+  - Ajustes de accesibilidad y diseño: `100dvh`, `prefers-color-scheme: dark` en `tokens.css` y `theme.ts`,
+    foco automático al título de la ficha (y retorno al origen al cerrar), pestañas WAI-ARIA `tablist`/`tab`
+    con flechas, conmutador para ver/ocultar contraseña y acceso «Ver demo sin cuenta» en `LoginForm`,
+    marca y `favicon.svg` de esclusa/buque, tipografía monoespaciada tabular (`--font-mono`) y hojas
+    inferiores móviles arrastrables con gestos (`useSheetDrag`).
+- Pulido integral de UI/UX en `web/` (issue #161): `LoginForm` permite alternar entre "Iniciar
+  sesión" y "Crear cuenta" (`POST /api/v1/auth/register` con entrada automática) y la cabecera
+  incorpora el botón para cerrar sesión (`POST /api/v1/auth/logout`). Barra lateral operativa en
+  escritorio (colapsable) con buscador por nombre o MMSI, filtros por tipo de buque, pestaña
+  «En tránsito» y ficha del buque sin tapar las entradas del Canal; selector de mapa base
+  **Estándar / Satélite** (Esri World Imagery sin API key, ADR-0018, con permiso explícito en CSP)
+  y conmutador de tema claro / oscuro (`OpenFreeMap dark`) persistido en `localStorage`.
+  Actualizada la ruta del simulador AIS (`scripts/ais_simulator.py`) y `web/src/demo/recording.json`
+  siguiendo el canal navegable real de OpenStreetMap para evitar cruces por tierra en Bahía Limón,
+  Lago Gatún y Corte Culebra. Se añaden estados `hover`/`focus-visible` uniformes, iconos SVG
+  direccionales en `TransitsPanel`, vista de Estadísticas centrada con rejilla de 2 columnas desde
+  761 px, splash de carga y ajuste compacto móvil.
 - Los tests pasan `mypy --strict` y el CI los comprueba (`mypy app tests`, issue #145). Se
   quitaron 21 `type: ignore` que ya sobraban (el plugin de pydantic entiende `Settings(...)`) y
   se tiparon los demás casos (`Any` devueltos, `None` sin comprobar, nombres importados de

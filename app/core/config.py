@@ -77,7 +77,7 @@ class Settings(BaseSettings):
     ais_queue_max_size: int = Field(default=10_000, ge=100, le=1_000_000)
     # Writer (3.4): un lote se escribe al llegar a este tamaño o tras estos segundos.
     ais_batch_size: int = Field(default=500, ge=1, le=5_000)
-    ais_batch_flush_seconds: float = Field(default=2.0, gt=0, le=60)
+    ais_batch_flush_seconds: float = Field(default=0.5, gt=0, le=60)
     # Segunda conexión con datos estáticos de todo el mundo para los buques con destino al Canal
     # (#59, ADR-0009). Con la cuenta gratuita de AISStream quedan 3 conexiones: usamos 2.
     ais_canal_bound_enabled: bool = True

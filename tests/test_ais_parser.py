@@ -432,3 +432,74 @@ def test_static_missing_or_invalid_metadata_position_becomes_none(
     assert isinstance(result, VesselStatic)
     assert (result.lat, result.lon) == (None, None)
     assert result.destination == "USHOU>PABLB"
+
+
+@pytest.mark.parametrize(
+    "message_type", ["StandardClassBPositionReport", "ExtendedClassBPositionReport"]
+)
+def test_class_b_position_reports_are_parsed(message_type: str) -> None:
+    payload = json.dumps(
+        {
+            "MessageType": message_type,
+            "MetaData": {"MMSI": 351123456, "ShipName": "ACP TUG 1"},
+            "Message": {
+                message_type: {
+                    "UserID": 351123456,
+                    "Valid": True,
+                    "Latitude": 9.18,
+                    "Longitude": -79.85,
+                    "Sog": 6.5,
+                    "Cog": 122.0,
+                    "TrueHeading": 120,
+                }
+            },
+        }
+    )
+
+    result = parse_message(payload, received_at=RECEIVED_AT)
+
+    assert result == PositionUpdate(
+        mmsi=351123456,
+        received_at=RECEIVED_AT,
+        lat=9.18,
+        lon=-79.85,
+        sog=6.5,
+        cog=122.0,
+        heading=120,
+        nav_status=None,
+    )
+
+
+def test_static_data_report_class_b_is_parsed() -> None:
+    payload = json.dumps(
+        {
+            "MessageType": "StaticDataReport",
+            "MetaData": {"MMSI": 351123456, "latitude": 9.18, "longitude": -79.85},
+            "Message": {
+                "StaticDataReport": {
+                    "UserID": 351123456,
+                    "Valid": True,
+                    "PartNumber": False,
+                    "ReportA": {"Name": "PILOT BOAT@@@@"},
+                    "ReportB": {
+                        "ShipType": 50,
+                        "Dimension": {"A": 9, "B": 11, "C": 3, "D": 3},
+                    },
+                }
+            },
+        }
+    )
+
+    result = parse_message(payload, received_at=RECEIVED_AT)
+
+    assert result == VesselStatic(
+        mmsi=351123456,
+        name="PILOT BOAT",
+        imo=None,
+        ship_type=50,
+        length_m=20,
+        beam_m=6,
+        lat=9.18,
+        lon=-79.85,
+        received_at=RECEIVED_AT,
+    )

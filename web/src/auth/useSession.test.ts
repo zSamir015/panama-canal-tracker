@@ -120,4 +120,18 @@ describe('useSession', () => {
 
     expect(result.current).toMatchObject({ status: 'signedOut', token: null, expired: true });
   });
+
+  it('al cerrar sesión llama a logout con el token actual y limpia el estado', async () => {
+    const refresh = vi.fn<() => Promise<Session | null>>(() => Promise.resolve(session('activo')));
+    const logout = vi.fn(() => Promise.resolve());
+    const { result } = renderHook(() => useSession(refresh, logout));
+    await advance(0);
+
+    act(() => {
+      result.current.signOut();
+    });
+
+    expect(logout).toHaveBeenCalledWith('activo');
+    expect(result.current).toMatchObject({ status: 'signedOut', token: null, expired: false });
+  });
 });

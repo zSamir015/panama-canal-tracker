@@ -15,8 +15,17 @@ MAX_NAME_LENGTH = 128
 # El protocolo AIS admite 20 caracteres de destino; el margen cubre el relleno de AISStream.
 MAX_DESTINATION_LENGTH = 64
 _POSITION_REPORT = "PositionReport"
+_STANDARD_CLASS_B_REPORT = "StandardClassBPositionReport"
+_EXTENDED_CLASS_B_REPORT = "ExtendedClassBPositionReport"
 _STATIC_REPORT = "ShipStaticData"
-_INTERESTING_MESSAGE_TYPES = {_POSITION_REPORT, _STATIC_REPORT}
+_CLASS_B_STATIC_REPORT = "StaticDataReport"
+_INTERESTING_MESSAGE_TYPES = {
+    _POSITION_REPORT,
+    _STANDARD_CLASS_B_REPORT,
+    _EXTENDED_CLASS_B_REPORT,
+    _STATIC_REPORT,
+    _CLASS_B_STATIC_REPORT,
+}
 FiniteIntOrNone = StrictInt | None
 
 AisRejectionReason = Literal[
@@ -141,11 +150,57 @@ class _ShipStaticData(BaseModel):
     eta: _Eta | None = Field(default=None, alias="Eta")
 
 
+class _ClassBPositionReport(BaseModel):
+    """Mensajes 18 y 19 de AISStream (Clase B estándar y extendido)."""
+
+    model_config = ConfigDict(extra="ignore", strict=True)
+
+    user_id: StrictInt = Field(alias="UserID")
+    valid: StrictBool | None = Field(default=None, alias="Valid")
+    latitude: FiniteFloat = Field(alias="Latitude")
+    longitude: FiniteFloat = Field(alias="Longitude")
+    sog: FiniteFloat | None = Field(default=None, alias="Sog")
+    cog: FiniteFloat | None = Field(default=None, alias="Cog")
+    true_heading: FiniteIntOrNone = Field(default=None, alias="TrueHeading")
+
+
+class _StaticDataReportA(BaseModel):
+    model_config = ConfigDict(extra="ignore", strict=True)
+
+    name: StrictStr | None = Field(default=None, alias="Name")
+
+
+class _StaticDataReportB(BaseModel):
+    model_config = ConfigDict(extra="ignore", strict=True)
+
+    ship_type: StrictInt | None = Field(default=None, alias="ShipType")
+    dimension: _Dimension | None = Field(default=None, alias="Dimension")
+
+
+class _StaticDataReport(BaseModel):
+    """Mensaje 24 de AISStream (datos estáticos de transpondedores Clase B)."""
+
+    model_config = ConfigDict(extra="ignore", strict=True)
+
+    user_id: StrictInt = Field(alias="UserID")
+    valid: StrictBool | None = Field(default=None, alias="Valid")
+    part_number: StrictBool | StrictInt | None = Field(default=None, alias="PartNumber")
+    report_a: _StaticDataReportA | None = Field(default=None, alias="ReportA")
+    report_b: _StaticDataReportB | None = Field(default=None, alias="ReportB")
+
+
 class _Message(BaseModel):
     model_config = ConfigDict(extra="ignore", strict=True)
 
     position_report: _PositionReport | None = Field(default=None, alias="PositionReport")
+    standard_class_b: _ClassBPositionReport | None = Field(
+        default=None, alias="StandardClassBPositionReport"
+    )
+    extended_class_b: _ClassBPositionReport | None = Field(
+        default=None, alias="ExtendedClassBPositionReport"
+    )
     ship_static_data: _ShipStaticData | None = Field(default=None, alias="ShipStaticData")
+    static_data_report: _StaticDataReport | None = Field(default=None, alias="StaticDataReport")
 
 
 class _Envelope(BaseModel):
@@ -189,17 +244,44 @@ def parse_message(
         report = envelope.message.position_report
         if report is None:
             raise AisMessageRejected("missing_position_report")
-        _validate_common(envelope.metadata.mmsi, report.user_id, report.valid)
-        _validate_coordinates(report.latitude, report.longitude)
-        return PositionUpdate(
-            mmsi=report.user_id,
+        return _build_position(envelope.metadata, report, report.navigational_status, received_at)
+
+    if envelope.message_type in (_STANDARD_CLASS_B_REPORT, _EXTENDED_CLASS_B_REPORT):
+        class_b = (
+            envelope.message.standard_class_b
+            if envelope.message_type == _STANDARD_CLASS_B_REPORT
+            else envelope.message.extended_class_b
+        )
+        if class_b is None:
+            raise AisMessageRejected("missing_position_report")
+        return _build_position(envelope.metadata, class_b, None, received_at)
+
+    if envelope.message_type == _CLASS_B_STATIC_REPORT:
+        static_b = envelope.message.static_data_report
+        if static_b is None:
+            raise AisMessageRejected("missing_static_data")
+        _validate_common(envelope.metadata.mmsi, static_b.user_id, static_b.valid)
+        report_a = static_b.report_a
+        report_b = static_b.report_b
+        name = (
+            _normalize_name(report_a.name)
+            if report_a is not None
+            else _normalize_name(envelope.metadata.ship_name)
+        )
+        ship_type = _normalize_ship_type(report_b.ship_type) if report_b is not None else None
+        length_m = _dimension_sum(report_b.dimension, "a", "b") if report_b is not None else None
+        beam_m = _dimension_sum(report_b.dimension, "c", "d") if report_b is not None else None
+        lat, lon = _metadata_position(envelope.metadata)
+        return VesselStatic(
+            mmsi=static_b.user_id,
+            name=name,
+            imo=None,
+            ship_type=ship_type,
+            length_m=length_m,
+            beam_m=beam_m,
+            lat=lat,
+            lon=lon,
             received_at=received_at,
-            lat=report.latitude,
-            lon=report.longitude,
-            sog=_normalize_sog(report.sog),
-            cog=_normalize_cog(report.cog),
-            heading=_normalize_heading(report.true_heading),
-            nav_status=_normalize_nav_status(report.navigational_status),
         )
 
     static = envelope.message.ship_static_data
@@ -222,6 +304,26 @@ def parse_message(
         lat=lat,
         lon=lon,
         received_at=received_at,
+    )
+
+
+def _build_position(
+    metadata: _MetaData,
+    report: _PositionReport | _ClassBPositionReport,
+    nav_status: int | None,
+    received_at: datetime,
+) -> PositionUpdate:
+    _validate_common(metadata.mmsi, report.user_id, report.valid)
+    _validate_coordinates(report.latitude, report.longitude)
+    return PositionUpdate(
+        mmsi=report.user_id,
+        received_at=received_at,
+        lat=report.latitude,
+        lon=report.longitude,
+        sog=_normalize_sog(report.sog),
+        cog=_normalize_cog(report.cog),
+        heading=_normalize_heading(report.true_heading),
+        nav_status=_normalize_nav_status(nav_status),
     )
 
 

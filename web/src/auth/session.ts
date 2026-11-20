@@ -76,3 +76,22 @@ async function requestRefresh(fetchImpl: typeof fetch): Promise<Session | null> 
   }
   return session;
 }
+
+/**
+ * `POST /api/v1/auth/logout`. Revoca la familia del refresh token actual y borra la cookie.
+ * Ignora fallos de red o 401: el estado en memoria se limpia igualmente.
+ */
+export async function logoutSession(
+  accessToken: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<void> {
+  try {
+    await fetchImpl(`${config.apiUrl}/api/v1/auth/logout`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}` },
+      credentials: 'include',
+    });
+  } catch {
+    // Si la API no responde, al cerrar en cliente la sesión queda revocada localmente.
+  }
+}
