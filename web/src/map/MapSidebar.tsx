@@ -1,7 +1,7 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useDeferredValue, useMemo, useState, type ReactNode } from 'react';
 import type { LiveVessel } from '../live/protocol';
 import type { VesselState } from '../live/vesselStore';
-import { speedText } from '../vessels/format';
+import { courseText } from '../vessels/format';
 import {
   CATEGORY_COLORS,
   CATEGORY_LABELS,
@@ -27,8 +27,8 @@ interface MapSidebarProps {
 const ALL_CATEGORIES = Object.keys(CATEGORY_LABELS) as ShipCategory[];
 
 /**
- * Panel lateral operativo de escritorio: agrupa búsqueda y filtro de buques en vivo, los tránsitos
- * en curso y la ficha del buque seleccionado sin tapar las entradas ni los lagos del Canal. En
+ * Panel lateral operativo de escritorio: KPIs en tiempo real, búsqueda y filtro de buques,
+ * tránsitos en curso y ficha del buque sin tapar las entradas ni los lagos del Canal. En
  * pantallas pequeñas el CSS libera la ficha y los tránsitos como hojas inferiores.
  */
 export function MapSidebar({
@@ -45,6 +45,7 @@ export function MapSidebar({
 }: MapSidebarProps) {
   const [tab, setTab] = useState<SidebarTab>('vessels');
   const [query, setQuery] = useState('');
+  const deferredQuery = useDeferredValue(query);
   const [category, setCategory] = useState<ShipCategory | 'all'>('all');
 
   const vesselList = useMemo(() => {
@@ -60,6 +61,24 @@ export function MapSidebar({
     return items;
   }, [vessels]);
 
+  const metrics = useMemo(() => {
+    let moving = 0;
+    let speedSum = 0;
+    let speedCount = 0;
+    for (const vessel of vesselList) {
+      if ((vessel.sog ?? 0) > 0.5) {
+        moving += 1;
+        if (vessel.sog !== null) {
+          speedSum += vessel.sog;
+          speedCount += 1;
+        }
+      }
+    }
+    const anchored = vesselList.length - moving;
+    const avgKn = speedCount > 0 ? `${(speedSum / speedCount).toFixed(1)} kn` : '—';
+    return { moving, anchored, avgKn };
+  }, [vesselList]);
+
   const categoryCounts = useMemo(() => {
     const counts = new Map<ShipCategory, number>();
     for (const vessel of vesselList) {
@@ -69,13 +88,18 @@ export function MapSidebar({
     return counts;
   }, [vesselList]);
 
+  const activeCategories = useMemo(
+    () => ALL_CATEGORIES.filter((cat) => (categoryCounts.get(cat) ?? 0) > 0),
+    [categoryCounts],
+  );
+
   const effectiveTab: SidebarTab = demo ? 'vessels' : tab;
   const effectiveCategory: ShipCategory | 'all' =
     category === 'all' || (categoryCounts.get(category) ?? 0) > 0 ? category : 'all';
   const showDetail = !demo && selectedMmsi !== null;
 
   const filtered = useMemo(() => {
-    const needle = query.trim().toLowerCase();
+    const needle = deferredQuery.trim().toLowerCase();
     return vesselList.filter((vessel) => {
       if (effectiveCategory !== 'all' && shipCategory(vessel.ship_type) !== effectiveCategory) {
         return false;
@@ -86,12 +110,7 @@ export function MapSidebar({
       const name = (vessel.name ?? '').toLowerCase();
       return name.includes(needle) || String(vessel.mmsi).includes(needle);
     });
-  }, [vesselList, query, effectiveCategory]);
-
-  const activeCategories = useMemo(
-    () => ALL_CATEGORIES.filter((cat) => (categoryCounts.get(cat) ?? 0) > 0),
-    [categoryCounts],
-  );
+  }, [vesselList, deferredQuery, effectiveCategory]);
 
   return (
     <aside
@@ -141,12 +160,12 @@ export function MapSidebar({
             title={collapsed ? 'Mostrar panel lateral' : 'Ocultar panel lateral'}
             onClick={onToggleCollapse}
           >
-            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
               <path
                 d="M10 3.5 5.5 8l4.5 4.5"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="1.75"
+                strokeWidth="1.6"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
@@ -160,7 +179,17 @@ export function MapSidebar({
           <div className="sidebar__detail-wrap">
             <div className="sidebar__back-row">
               <button type="button" className="sidebar__back" onClick={onClearSelection}>
-                ← Volver al listado
+                <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                  <path
+                    d="M10 3.5 5.5 8l4.5 4.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                Volver al listado
               </button>
             </div>
             {detailSlot}
@@ -181,14 +210,29 @@ export function MapSidebar({
 
         {!showDetail && effectiveTab === 'vessels' && (
           <div className="sidebar__vessels" aria-label="Flota en el mapa">
+            <div className="sidebar__kpis" aria-label="Resumen operativo">
+              <div className="sidebar__kpi">
+                <span className="sidebar__kpi-label">En marcha</span>
+                <strong className="sidebar__kpi-value">{metrics.moving}</strong>
+              </div>
+              <div className="sidebar__kpi">
+                <span className="sidebar__kpi-label">Fondeados</span>
+                <strong className="sidebar__kpi-value">{metrics.anchored}</strong>
+              </div>
+              <div className="sidebar__kpi">
+                <span className="sidebar__kpi-label">Vel. media</span>
+                <strong className="sidebar__kpi-value">{metrics.avgKn}</strong>
+              </div>
+            </div>
+
             <div className="sidebar__search-box">
               <label className="sidebar__search-label">
                 <span className="sr-only">Buscar buques por nombre o MMSI</span>
                 <svg
                   className="sidebar__search-icon"
                   viewBox="0 0 16 16"
-                  width="14"
-                  height="14"
+                  width="15"
+                  height="15"
                   aria-hidden="true"
                 >
                   <circle
@@ -217,6 +261,26 @@ export function MapSidebar({
                     setQuery(event.target.value);
                   }}
                 />
+                {query.length > 0 && (
+                  <button
+                    type="button"
+                    className="sidebar__search-clear"
+                    aria-label="Limpiar búsqueda"
+                    onClick={() => {
+                      setQuery('');
+                    }}
+                  >
+                    <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+                      <path
+                        d="M4.5 4.5l7 7M11.5 4.5l-7 7"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </button>
+                )}
               </label>
               {activeCategories.length > 1 && (
                 <div className="sidebar__chips" role="group" aria-label="Filtrar por tipo de buque">
@@ -304,7 +368,9 @@ export function MapSidebar({
                               : 'sidebar__item-speed is-anchored'
                           }
                         >
-                          {moving ? speedText(vessel.sog) : 'Fondeado'}
+                          {moving && vessel.sog !== null
+                            ? `${vessel.sog.toFixed(1)} kn · ${courseText(vessel.cog)}`
+                            : 'Fondeado'}
                         </span>
                       </button>
                     </li>

@@ -67,13 +67,18 @@ describe('MapSidebar', () => {
     expect(screen.getByText('PACIFIC STAR')).toBeVisible();
     expect(screen.getByText('ATLANTIC DAWN')).toBeVisible();
     expect(screen.getByText('Fondeado')).toBeVisible();
+    // Resumen KPI en cabecera del listado (2 en marcha, 1 fondeado).
+    const kpis = screen.getByLabelText('Resumen operativo');
+    expect(kpis).toHaveTextContent('En marcha2');
+    expect(kpis).toHaveTextContent('Fondeados1');
 
     const search = screen.getByRole('searchbox', { name: 'Buscar buques por nombre o MMSI' });
     await userEvent.type(search, '636000002');
     expect(screen.getByText('ATLANTIC DAWN')).toBeVisible();
     expect(screen.queryByText('PACIFIC STAR')).not.toBeInTheDocument();
 
-    await userEvent.clear(search);
+    await userEvent.click(screen.getByRole('button', { name: 'Limpiar búsqueda' }));
+    expect(screen.getByText('PACIFIC STAR')).toBeVisible();
     await userEvent.click(screen.getByRole('button', { name: /Tanquero \(1\)/ }));
     expect(screen.getByText('ATLANTIC DAWN')).toBeVisible();
     expect(screen.queryByText('COLON BREEZE')).not.toBeInTheDocument();

@@ -1,44 +1,93 @@
 /**
- * Iconos de los buques generados en código como SDF (signed distance field): una sola imagen
- * monocroma que MapLibre colorea con `icon-color`, así no hace falta una imagen por categoría ni
- * descargar sprites de otro origen.
+ * Iconos de los buques generados en código (sin sprites externos):
+ * - Casco y fondeo en SDF monocromo para que MapLibre los tiña por categoría (`icon-color`) con
+ *   halo adaptable al fondo claro/oscuro/satélite.
+ * - Superestructura de puente en RGBA @2x para dar lectura inmediata de buque real vista desde
+ *   arriba, orientada con el rumbo (`cog`).
  */
 
-export interface SdfImage {
+export interface IconImage {
   width: number;
   height: number;
   data: Uint8Array;
 }
 
+export type SdfImage = IconImage;
+
 type Point = readonly [number, number];
 
 export const ICON_SIZE = 32;
+export const CABIN_SCALE = 2;
+export const CABIN_SIZE = ICON_SIZE * CABIN_SCALE;
 
-// Los mismos parámetros que usa MapLibre al generar sus SDF (`@mapbox/tiny-sdf`): el borde de la
-// figura queda en alfa 0.75 y cada píxel de distancia resta 1/8.
+// Parámetros estándar de MapLibre (`@mapbox/tiny-sdf`): borde en alfa 0.75 y caída 1/8 por px.
 const SDF_CUTOFF = 0.25;
 const SDF_RADIUS = 8;
 
-/** Flecha que apunta al norte; `icon-rotate` la gira según el rumbo. */
-const ARROW: readonly Point[] = [
-  [16, 3],
-  [26, 28],
-  [16, 22],
-  [6, 28],
+/** Silueta naval vista desde arriba (proa afilada al norte, manga paralela y popa estrechada). */
+const SHIP_HULL: readonly Point[] = [
+  [16, 2.4],
+  [18.8, 6.4],
+  [21.5, 10.6],
+  [22, 14],
+  [22, 24.8],
+  [20.4, 28.4],
+  [18.4, 29.2],
+  [13.6, 29.2],
+  [11.6, 28.4],
+  [10, 24.8],
+  [10, 14],
+  [10.5, 10.6],
+  [13.2, 6.4],
 ];
 
-export function arrowIcon(): SdfImage {
-  return sdfImage((x, y) => polygonDistance([x, y], ARROW));
+export function arrowIcon(): IconImage {
+  return sdfImage((x, y) => polygonDistance([x, y], SHIP_HULL));
 }
 
-/** Punto para los buques sin rumbo (fondeados o sin dato). */
-export function dotIcon(): SdfImage {
+/** Baliza concéntrica para buques fondeados o sin rumbo válido. */
+export function dotIcon(): IconImage {
   const center = ICON_SIZE / 2;
-  return sdfImage((x, y) => Math.hypot(x - center, y - center) - 6);
+  return sdfImage((x, y) => {
+    const radius = Math.hypot(x - center, y - center);
+    const core = radius - 3.4;
+    const ring = Math.abs(radius - 7.8) - 1.35;
+    return Math.min(core, ring);
+  });
+}
+
+/**
+ * Puente de mando blanco y línea de cubierta (@2x) que se superponen al casco en movimiento.
+ */
+export function cabinIcon(): IconImage {
+  const data = new Uint8Array(CABIN_SIZE * CABIN_SIZE * 4);
+  const paintRect = (x0: number, y0: number, x1: number, y1: number, alpha: number) => {
+    const startX = Math.max(0, Math.round(x0 * CABIN_SCALE));
+    const endX = Math.min(CABIN_SIZE, Math.round(x1 * CABIN_SCALE));
+    const startY = Math.max(0, Math.round(y0 * CABIN_SCALE));
+    const endY = Math.min(CABIN_SIZE, Math.round(y1 * CABIN_SCALE));
+    for (let py = startY; py < endY; py++) {
+      for (let px = startX; px < endX; px++) {
+        const offset = (py * CABIN_SIZE + px) * 4;
+        data[offset] = 255;
+        data[offset + 1] = 255;
+        data[offset + 2] = 255;
+        data[offset + 3] = Math.max(data[offset + 3] ?? 0, alpha);
+      }
+    }
+  };
+
+  // Línea sutil de escotillas/crujía en proa y centro.
+  paintRect(15.2, 9.0, 16.8, 19.6, 115);
+  // Caseta del puente cerca de popa con alerones estrechos.
+  paintRect(12.2, 20.6, 19.8, 25.0, 235);
+  paintRect(11.1, 21.8, 20.9, 23.4, 235);
+
+  return { width: CABIN_SIZE, height: CABIN_SIZE, data };
 }
 
 /** `distance` devuelve la distancia firmada al borde: negativa dentro de la figura. */
-function sdfImage(distance: (x: number, y: number) => number): SdfImage {
+function sdfImage(distance: (x: number, y: number) => number): IconImage {
   const data = new Uint8Array(ICON_SIZE * ICON_SIZE * 4);
   for (let y = 0; y < ICON_SIZE; y++) {
     for (let x = 0; x < ICON_SIZE; x++) {

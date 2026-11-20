@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { LiveVessel } from '../live/protocol';
 import { shipCategory, toFeatureCollection } from './vesselGeoJson';
-import { arrowIcon, dotIcon, ICON_SIZE } from './vesselIcons';
+import { arrowIcon, CABIN_SIZE, cabinIcon, dotIcon, ICON_SIZE } from './vesselIcons';
 
 const vessel: LiveVessel = {
   mmsi: 352001234,
@@ -78,5 +78,14 @@ describe('iconos SDF', () => {
 
     expect(alphaAt(dot, 16, 16)).toBeGreaterThan(191);
     expect(alphaAt(dot, 16, 2)).toBeLessThan(191);
+  });
+
+  it('el puente del casco tiene textura blanca centrada cerca de popa', () => {
+    const cabin = cabinIcon();
+
+    expect(cabin.data).toHaveLength(CABIN_SIZE * CABIN_SIZE * 4);
+    const centerBridgeOffset = (45 * CABIN_SIZE + 32) * 4;
+    expect(cabin.data[centerBridgeOffset + 3]).toBeGreaterThan(200);
+    expect(cabin.data[3]).toBe(0);
   });
 });

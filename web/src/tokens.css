@@ -1,109 +1,114 @@
 /*
- * Variables de diseño (issue #123): los colores, radios y sombras de la interfaz, en un solo
- * sitio. Los colores por tipo de buque y de las gráficas se quedan en TypeScript
- * (`map/vesselGeoJson.ts`, `stats/colors.ts`) porque MapLibre y el SVG los necesitan como valores
- * de JavaScript.
+ * Design tokens (light + dark operational console): todos los colores, sombras, radios y escala
+ * de capas viven aquí. Los colores de categoría de buque y gráficas permanecen en TypeScript
+ * (`map/vesselGeoJson.ts`, `stats/colors.ts`) porque MapLibre y los SVG los consumen en JS.
  */
 :root {
-  /* Marca y fondo */
-  --color-brand: #0b3d5c;
-  --color-brand-hover: #082e46;
-  --color-on-brand: #f4f7fa;
-  --color-page: #f4f7fa;
-  --color-surface: #fff;
-  --color-surface-glass: rgb(255 255 255 / 93%);
-  --color-surface-muted: #e8eef3;
+  /* Marca y superficies (Maritime Slate & Ocean Sapphire) */
+  --color-brand: #0b192c;
+  --color-brand-hover: #152b47;
+  --color-on-brand: #f8fafc;
+  --color-page: #f1f5f9;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #f8fafc;
+  --color-surface-glass: rgb(255 255 255 / 92%);
+  --color-surface-muted: #e2e8f0;
 
-  /* Texto, de más a menos contraste */
-  --color-text: #1c2a35;
-  --color-text-strong: #263238;
-  --color-text-secondary: #3b4b58;
-  /* #546e7a y no #607d8b: 5,4:1 sobre blanco y 4,6:1 sobre surface-muted (WCAG AA, texto pequeño). */
-  --color-text-muted: #546e7a;
+  /* Jerarquía tipográfica con contraste AA/AAA */
+  --color-text: #0f172a;
+  --color-text-strong: #020617;
+  --color-text-secondary: #334155;
+  --color-text-muted: #475569;
 
-  /* Bordes */
-  --color-border: #b0bec5;
-  --color-border-subtle: #cfd8dc;
-  --color-divider: #eceff1;
+  /* Bordes y divisores */
+  --color-border: #cbd5e1;
+  --color-border-subtle: #e2e8f0;
+  --color-divider: #eef2f6;
 
-  /* Acción, error y avisos */
-  --color-accent: #1565c0;
-  --color-accent-hover: #0d50a0;
-  --color-accent-text: #1565c0;
-  --color-accent-soft: #e8f1fb;
-  --color-on-accent: #fff;
-  --color-danger: #b71c1c;
-  --color-danger-bg: #ffebee;
-  --color-danger-border: #ef9a9a;
-  --color-notice: #794d00;
-  --color-notice-bg: #fff8e1;
-  --color-notice-border: #ffe082;
-  --color-warning-bg: #fff3cd;
-  --color-warning-border: #ffc107;
-  --color-warning-text: #5d4037;
+  /* Acento y estados semánticos */
+  --color-accent: #1d4ed8;
+  --color-accent-hover: #1e40af;
+  --color-accent-text: #1d4ed8;
+  --color-accent-soft: #eff6ff;
+  --color-on-accent: #ffffff;
+  --color-danger: #b91c1c;
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fca5a5;
+  --color-notice: #92400e;
+  --color-notice-bg: #fffbeb;
+  --color-notice-border: #fcd34d;
+  --color-warning-bg: #fef3c7;
+  --color-warning-border: #f59e0b;
+  --color-warning-text: #78350f;
 
-  /* Estado de la conexión, sobre la cabecera (--color-brand): más de 3:1 cada uno (WCAG 1.4.11) */
-  --color-status-ok: #66bb6a;
-  --color-status-pending: #ffca28;
-  --color-status-down: #ff8a80;
+  /* Estado de la conexión sobre cabecera oscura (contraste >= 3:1 WCAG 1.4.11) */
+  --color-status-ok: #4ade80;
+  --color-status-pending: #fbbf24;
+  --color-status-down: #f87171;
 
   /* Esqueletos de carga */
-  --color-skeleton: #dfe6ec;
+  --color-skeleton: #e2e8f0;
 
   /* Radios */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
-  --radius-sheet: 12px;
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-sheet: 16px;
   --radius-pill: 999px;
 
-  /* Sombras */
-  --shadow-panel: 0 4px 14px rgb(15 23 42 / 14%), 0 1px 3px rgb(15 23 42 / 10%);
-  --shadow-card: 0 1px 3px rgb(15 23 42 / 8%), 0 1px 2px rgb(15 23 42 / 6%);
-  --shadow-sheet: 0 -2px 12px rgb(15 23 42 / 18%);
+  /* Elevación */
+  --shadow-panel: 0 8px 24px rgb(2 6 23 / 12%), 0 2px 6px rgb(2 6 23 / 8%);
+  --shadow-card: 0 1px 3px rgb(2 6 23 / 7%), 0 1px 2px rgb(2 6 23 / 5%);
+  --shadow-sheet: 0 -6px 24px rgb(2 6 23 / 18%);
+
+  /* Escala z-index controlada */
+  --z-overlay: 10;
+  --z-sidebar: 20;
+  --z-sheet: 30;
 
   /* Movimiento */
-  --transition-fast: 150ms ease-out;
+  --transition-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Tema oscuro con contraste AA en textos, superficies y botones. */
+/* Tema oscuro OLED / Consola nocturna de operaciones con contraste AA verificado. */
 [data-theme='dark'] {
-  --color-brand: #082336;
-  --color-brand-hover: #0e3550;
-  --color-on-brand: #eef4f8;
-  --color-page: #0c141d;
-  --color-surface: #131f2b;
-  --color-surface-glass: rgb(19 31 43 / 92%);
-  --color-surface-muted: #1b2a38;
+  --color-brand: #050a12;
+  --color-brand-hover: #0e1929;
+  --color-on-brand: #f1f5f9;
+  --color-page: #070d16;
+  --color-surface: #0f172a;
+  --color-surface-elevated: #162238;
+  --color-surface-glass: rgb(15 23 42 / 90%);
+  --color-surface-muted: #1e293b;
 
-  --color-text: #e2ebf2;
+  --color-text: #e2e8f0;
   --color-text-strong: #f8fafc;
-  --color-text-secondary: #b7c6d4;
-  --color-text-muted: #8da2b5;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
 
-  --color-border: #33485c;
-  --color-border-subtle: #243647;
-  --color-divider: #1e2e3d;
+  --color-border: #334155;
+  --color-border-subtle: #1e293b;
+  --color-divider: #192436;
 
-  --color-accent: #1d70b8;
-  --color-accent-hover: #155892;
-  --color-accent-text: #7dd3fc;
-  --color-accent-soft: rgb(56 189 248 / 16%);
-  --color-on-accent: #fff;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-text: #60a5fa;
+  --color-accent-soft: rgb(37 99 235 / 18%);
+  --color-on-accent: #ffffff;
   --color-danger: #f87171;
-  --color-danger-bg: rgb(239 68 68 / 16%);
-  --color-danger-border: rgb(248 113 113 / 45%);
+  --color-danger-bg: rgb(239 68 68 / 15%);
+  --color-danger-border: rgb(248 113 113 / 40%);
   --color-notice: #fbbf24;
   --color-notice-bg: rgb(251 191 36 / 14%);
-  --color-notice-border: rgb(251 191 36 / 40%);
-  --color-warning-bg: #3b2e0f;
-  --color-warning-border: #b45309;
+  --color-notice-border: rgb(251 191 36 / 38%);
+  --color-warning-bg: #2e2007;
+  --color-warning-border: #d97706;
   --color-warning-text: #fde68a;
 
-  --color-skeleton: #223242;
+  --color-skeleton: #1e293b;
 
-  --shadow-panel: 0 6px 20px rgb(0 0 0 / 45%), 0 1px 4px rgb(0 0 0 / 32%);
-  --shadow-card: 0 2px 8px rgb(0 0 0 / 36%), 0 1px 2px rgb(0 0 0 / 24%);
-  --shadow-sheet: 0 -4px 18px rgb(0 0 0 / 48%);
+  --shadow-panel: 0 10px 28px rgb(0 0 0 / 50%), 0 2px 8px rgb(0 0 0 / 36%);
+  --shadow-card: 0 2px 8px rgb(0 0 0 / 38%), 0 1px 2px rgb(0 0 0 / 26%);
+  --shadow-sheet: 0 -8px 28px rgb(0 0 0 / 55%);
 }

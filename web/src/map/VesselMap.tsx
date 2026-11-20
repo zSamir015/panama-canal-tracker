@@ -23,7 +23,7 @@ import {
   styleIdentityKey,
   type OverlayPalette,
 } from './mapStyles';
-import { arrowIcon, dotIcon } from './vesselIcons';
+import { arrowIcon, CABIN_SCALE, cabinIcon, dotIcon } from './vesselIcons';
 import {
   boundsToBbox,
   CANAL_BBOX,
@@ -40,8 +40,20 @@ const ZONES = canalZones as unknown as FeatureCollection;
 
 const SOURCE_ID = 'vessels';
 const LAYER_ID = 'vessels';
+const CABIN_LAYER_ID = 'vessels-cabin';
 const TRAIL_SOURCE_ID = 'trail';
 const SELECTED_LAYER_ID = 'vessel-selected';
+const VESSEL_SIZE_EXPRESSION = [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  9,
+  0.76,
+  12,
+  0.96,
+  15,
+  1.18,
+] as unknown as ExpressionSpecification;
 const EMPTY_TRAIL: Feature<MultiLineString> = {
   type: 'Feature',
   geometry: { type: 'MultiLineString', coordinates: [] },
@@ -139,6 +151,9 @@ export function VesselMap({
       if (!map.hasImage('vessel-dot')) {
         map.addImage('vessel-dot', dotIcon(), { sdf: true });
       }
+      if (!map.hasImage('vessel-cabin')) {
+        map.addImage('vessel-cabin', cabinIcon(), { pixelRatio: CABIN_SCALE });
+      }
       // Zonas de entrada, debajo de la estela y de los buques para no taparlos.
       if (!map.getSource(ZONES_SOURCE_ID)) {
         map.addSource(ZONES_SOURCE_ID, { type: 'geojson', data: ZONES });
@@ -208,8 +223,8 @@ export function VesselMap({
           source: SOURCE_ID,
           layout: {
             'icon-image': ['case', ['get', 'hasCourse'], 'vessel-arrow', 'vessel-dot'],
-            'icon-size': 0.75,
-            // Rumbo sobre el fondo, en grados desde el norte; la flecha gira con el mapa.
+            'icon-size': VESSEL_SIZE_EXPRESSION,
+            // Rumbo sobre el fondo, en grados desde el norte; la silueta gira con el mapa.
             'icon-rotate': ['get', 'cog'],
             'icon-rotation-alignment': 'map',
             'icon-allow-overlap': true,
@@ -218,7 +233,21 @@ export function VesselMap({
           paint: {
             'icon-color': COLOR_BY_CATEGORY,
             'icon-halo-color': palette.iconHalo,
-            'icon-halo-width': 1.25,
+            'icon-halo-width': 1.35,
+          },
+        });
+        map.addLayer({
+          id: CABIN_LAYER_ID,
+          type: 'symbol',
+          source: SOURCE_ID,
+          filter: ['==', ['get', 'hasCourse'], true],
+          layout: {
+            'icon-image': 'vessel-cabin',
+            'icon-size': VESSEL_SIZE_EXPRESSION,
+            'icon-rotate': ['get', 'cog'],
+            'icon-rotation-alignment': 'map',
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true,
           },
         });
       }
