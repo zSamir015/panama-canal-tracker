@@ -76,9 +76,11 @@ volví a leer el código línea a línea.
    cabecera.
 3. **Copias de seguridad sin programar** (`docs/BACKUP.md`): no hay dónde. Y nunca se ha
    restaurado una copia con datos reales.
-4. **Validación con datos reales sin hacer (tarea 5.7)**: la precisión de los polígonos, los
-   umbrales de los tránsitos (timeout de 30 min), de los fondeaderos (15 min, 1 nudo) y del enlace
-   de esperas (24 h) no están contrastados. No es un fallo de seguridad pero sí de corrección, y
+4. **Validación con datos reales sin cobertura suficiente (tarea 5.7 cerrada en `docs/VALIDATION.md`)**:
+   tras 12,5 días de recolección en AISStream, el interior del Canal carece de señal suficiente,
+   por lo que la precisión de los polígonos, los umbrales de los tránsitos (timeout de 30 min),
+   de los fondeaderos (15 min, 1 nudo) y del enlace de esperas (24 h) siguen siendo estimaciones
+   sin calibrar frente a la ACP. No es un fallo de seguridad pero sí una limitación operativa, y
    quien lea las estadísticas debe saberlo.
 5. **Zona gris en los términos de GitHub** para el recolector de AIS (ADR-0012): ya documentada;
    se apaga cambiando una variable.

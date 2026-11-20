@@ -62,12 +62,14 @@ conexión a AISStream. Detalle en [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 | 2 | Base de datos y autenticación | ✅ |
 | 3 | Worker de ingesta AIS | ✅ |
 | 4 | Mapa en tiempo real y demo | ✅ |
-| 5 | Detección de tránsitos y validación | ⏳ |
+| 5 | Detección de tránsitos y validación | ✅ |
 | 6 | Esperas en fondeo y estadísticas | ✅ |
 | 7 | Endurecimiento para producción | ⏳ |
 
-La fase 6 se cierra con datos sintéticos. La fase 5 sigue abierta hasta validar el detector con
-tráfico real (tarea 5.7), así que los umbrales de las estadísticas siguen siendo estimaciones.
+Las fases 5 y 6 están cerradas. La validación con 12,5 días de datos reales en
+[docs/VALIDATION.md](docs/VALIDATION.md) muestra que la cobertura gratuita de AISStream dentro del
+Canal es insuficiente para validar precisión frente a la ACP, así que los umbrales y polígonos
+siguen siendo estimaciones verificadas con trayectorias sintéticas.
 
 Plan completo: [docs/ROADMAP.md](docs/ROADMAP.md).
 
@@ -121,14 +123,14 @@ historia se puede leer en orden:
 - **El trabajo**: cada tarea es un pull request con lo que cambia, por qué, cómo se probó y una
   lista de comprobación de seguridad: [pull requests fusionados](https://github.com/zSamir015/panama-canal-tracker/pulls?q=is%3Apr+is%3Amerged),
   [issues](https://github.com/zSamir015/panama-canal-tracker/issues).
-- **Las versiones**: una etiqueta anotada por fase cerrada, de `v0.1.0` a `v0.4.0` por ahora
+- **Las versiones**: una etiqueta anotada por fase cerrada, de `v0.1.0` a `v0.6.0`
   ([etiquetas](https://github.com/zSamir015/panama-canal-tracker/tags)). El registro de cambios
   está en [CHANGELOG.md](CHANGELOG.md).
-- **Lo que sigue abierto**: los resultados de validar el detector con tráfico real (tarea 5.7)
-  todavía no están publicados, porque hacen falta días de datos AIS grabados; hasta entonces, los
-  umbrales y los polígonos son estimaciones. Tampoco existe el despliegue de producción (proxy
-  inverso, copias programadas); [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) lista lo que
-  falta.
+- **Lo que sigue abierto**: [docs/VALIDATION.md](docs/VALIDATION.md) documenta la validación de
+  12,5 días y acepta la limitación de cobertura de AISStream dentro del Canal (sin una fuente de
+  pago, los umbrales y polígonos siguen siendo estimaciones). Queda pendiente el despliegue de
+  producción (proxy inverso, copias programadas); [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md)
+  lista lo que falta.
 
 ## Licencia
 
