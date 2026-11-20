@@ -59,18 +59,30 @@ comprimidos, las políticas y los permisos de `canal_app`. Además comprueba que
 Borra las dos bases y los temporales al terminar (`KEEP_DATABASES=1` las conserva para
 inspeccionarlas). No toca `canal_tracker`.
 
+## Retención
+
+Con `BACKUP_KEEP_DAYS=N`, después de una copia buena el script borra del mismo directorio las
+copias (`canal-*.dump.gpg` y su `.sha256`) con más de N días. Nunca borra la copia recién hecha ni
+ficheros con otro nombre, y si la copia falla no borra nada: un fallo no se come las copias
+anteriores. Sin la variable no borra nada. `scripts/db_backup_check.sh` lo prueba (paso 6).
+
+```bash
+BACKUP_KEEP_DAYS=14 scripts/db_backup.sh /var/backups/canal
+```
+
 ## Programarlas
 
-Las copias **no se programan solas**: no hay todavía un servidor desplegado (ADR-0011, ADR-0012),
-y programarlas es cosa del entorno donde viva la base. En un servidor Linux, con `cron` (cada
-noche a las 03:00, quedándose con las de los últimos 14 días):
+No hay servidor desplegado (ADR-0011) y `v1.0.0` se entrega sin él (ADR-0017): las copias están
+listas para programarse, pero **no están programadas en ningún sitio**. El día que haya un
+servidor Linux, con `cron` (cada noche a las 03:00, quedándose con las de los últimos 14 días):
 
 ```cron
-0 3 * * * cd /opt/panama-canal-tracker && BACKUP_PASSPHRASE="$(cat /etc/canal/backup-passphrase)" scripts/db_backup.sh /var/backups/canal && find /var/backups/canal -name 'canal-*.dump.gpg*' -mtime +14 -delete
+0 3 * * * cd /opt/panama-canal-tracker && BACKUP_PASSPHRASE="$(cat /etc/canal/backup-passphrase)" BACKUP_KEEP_DAYS=14 scripts/db_backup.sh /var/backups/canal
 ```
 
 El fichero de la contraseña con permisos `600`, fuera del repositorio y de las copias. Conviene
 llevar las copias a otro disco o a otro sitio: una copia en la misma máquina no protege de perderla.
+Tras instalarlo, ejecutar `scripts/db_backup_check.sh` en ese servidor y restaurar una copia real.
 
 ## Límites
 
@@ -81,7 +93,8 @@ llevar las copias a otro disco o a otro sitio: una copia en la misma máquina no
 - **Probado solo contra el contenedor de desarrollo** y bases temporales, con datos sintéticos.
   No se ha restaurado nunca una copia de una base de producción (no existe) ni con volumen real.
   Con datos reales conviene medir cuánto tarda la copia y la restauración.
-- **Programación y copias fuera de la máquina: sin hacer ni probar.**
+- **Programación y copias fuera de la máquina: sin hacer ni probar** (ADR-0017). La retención sí
+  está probada, contra el contenedor de desarrollo.
 - El volcado de `pg_dump` avisa de claves foráneas circulares en el catálogo de TimescaleDB; la
   restauración funciona (está en la prueba) porque se hace con el superusuario y con las funciones
   `pre_restore` y `post_restore`.

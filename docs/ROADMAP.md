@@ -164,15 +164,14 @@ objetivo sin degradar la ingesta.
 ## Fase 7 — Producción y pulido de portafolio `[ ]`
 
 - [x] 7.1 `/metrics` Prometheus y `/ready`; alerta si el worker lleva > 5 min sin mensajes
-- [ ] 7.2 Backups automáticos de la DB y procedimiento de restauración probado
-      (hecho: copias cifradas y restauración probada, `docs/BACKUP.md` y ADR-0015; falta
-      programarlas en el entorno de despliegue, que aún no existe)
+- [x] 7.2 Backups automáticos de la DB y procedimiento de restauración probado
+      (copias cifradas, restauración y retención probadas, `docs/BACKUP.md`, ADR-0015; sin
+      servidor, la programación queda documentada y sin instalar, ADR-0017)
 - [x] 7.3 OpenAPI completo (descripciones y ejemplos en todos los endpoints)
 - [ ] 7.4 README final: GIFs, diagramas, decisiones técnicas, resultados de validación y carga
 - [x] 7.5 Sección "How it was built" enlazando roadmap, ADRs, issues y releases
 - [ ] 7.6 Revisión de seguridad final (dependencias, headers, CORS, secretos, capturas)
-      (hecha una primera pasada en `docs/SECURITY_REVIEW.md`, con hallazgos abiertos: falta el
-      entorno de producción)
+      (hecha una primera pasada en `docs/SECURITY_REVIEW.md`; alcance sin producción, ADR-0017)
 
 **Release**: `v1.0.0`.
 
