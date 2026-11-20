@@ -1,3 +1,4 @@
+import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CATEGORY_COLORS } from '../map/vesselGeoJson';
@@ -105,5 +106,64 @@ describe('VesselPanel', () => {
 
     expect(await screen.findByRole('heading', { name: hostile })).toBeVisible();
     expect(container.querySelector('img')).toBeNull();
+  });
+
+  it('mueve el foco al título al abrirse, restaura al cerrar y permite copiar el MMSI', async () => {
+    stubDetail(detail);
+    const opener = document.createElement('button');
+    opener.textContent = 'origen';
+    document.body.appendChild(opener);
+    opener.focus();
+
+    const writeText = vi.fn(() => Promise.resolve());
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    });
+
+    const onClose = vi.fn();
+    renderWithQuery(
+      <VesselPanel
+        mmsi={detail.mmsi}
+        token="abc"
+        live={undefined}
+        currentTransit={{
+          id: 't-1',
+          mmsi: detail.mmsi,
+          vessel_name: detail.name,
+          ship_type: detail.ship_type,
+          direction: 'southbound',
+          entered_at: '2026-10-23T15:00:00Z',
+        }}
+        onClose={onClose}
+      />,
+    );
+
+    const heading = await screen.findByRole('heading', { name: 'EXAMPLE' });
+    expect(heading).toHaveAttribute('tabindex', '-1');
+    expect(document.activeElement).toBe(heading);
+
+    expect(screen.getByRole('group', { name: 'Tránsito en curso' })).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: 'Copiar MMSI' }));
+    expect(writeText).toHaveBeenCalledWith('352001234');
+    expect(screen.getByRole('button', { name: 'MMSI copiado' })).toBeVisible();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Cerrar la ficha' }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(document.activeElement).toBe(opener);
+    opener.remove();
+  });
+
+  it('permite reintentar cuando falla la carga de la ficha', async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(Response.json({}, { status: 500 }))
+      .mockResolvedValueOnce(Response.json(detail));
+    vi.stubGlobal('fetch', fetchMock);
+    renderPanel();
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('La API no respondió bien');
+    await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
+    expect(await screen.findByRole('heading', { name: 'EXAMPLE' })).toBeVisible();
   });
 });

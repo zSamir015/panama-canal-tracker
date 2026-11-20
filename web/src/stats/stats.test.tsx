@@ -452,4 +452,41 @@ describe('StatsView: leyenda y filtros (issue #129)', () => {
     expect(chart).not.toHaveAccessibleName(/de tipo/);
     expect(screen.queryByRole('button', { name: 'Quitar filtros' })).not.toBeInTheDocument();
   });
+
+  it('muestra cifras clave arriba, aviso de cobertura AIS y permite reintentar', async () => {
+    let fail = true;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn<(url: string) => Promise<Response>>((url) => {
+        if (fail) {
+          return Promise.resolve(Response.json({}, { status: 500 }));
+        }
+        if (url.includes('/stats/daily')) {
+          return Promise.resolve(
+            Response.json({
+              ...daily,
+              items: [...daily.items, item('2026-10-01', 'southbound', 3, 'cargo')],
+            }),
+          );
+        }
+        if (url.includes('/stats/transit-durations')) {
+          return Promise.resolve(Response.json(durations));
+        }
+        return Promise.resolve(Response.json(waiting));
+      }),
+    );
+    renderWithQuery(<StatsView token="abc" onUnauthorized={vi.fn()} now={() => NOW} />);
+
+    const retryButtons = await screen.findAllByRole('button', { name: 'Reintentar' });
+    expect(retryButtons).toHaveLength(3);
+    fail = false;
+    for (const button of retryButtons) {
+      await userEvent.click(button);
+    }
+
+    const summary = await screen.findByRole('region', { name: 'Resumen del periodo' });
+    expect(summary).toHaveTextContent('6');
+    expect(summary).toHaveTextContent('+3 (+100 %)');
+    expect(screen.getByText(/Cobertura AIS terrestre parcial/)).toBeVisible();
+  });
 });

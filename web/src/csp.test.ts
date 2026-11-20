@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildCsp, DEFAULT_TILES_ORIGIN } from '../csp';
+import { buildCsp, DEFAULT_TILES_ORIGIN, SATELLITE_TILES_ORIGIN } from '../csp';
 import { DEFAULT_MAP_STYLE_URL } from './config';
 
 function directive(csp: string, name: string): string[] {
@@ -12,11 +12,16 @@ describe('buildCsp', () => {
     expect(DEFAULT_TILES_ORIGIN).toBe(new URL(DEFAULT_MAP_STYLE_URL).origin);
   });
 
-  it('por defecto: el mismo origen y OpenFreeMap', () => {
+  it('por defecto: el mismo origen, OpenFreeMap y Esri World Imagery', () => {
     const csp = buildCsp({});
 
-    expect(directive(csp, 'connect-src')).toEqual(["'self'", 'https://tiles.openfreemap.org']);
+    expect(directive(csp, 'connect-src')).toEqual([
+      "'self'",
+      'https://tiles.openfreemap.org',
+      SATELLITE_TILES_ORIGIN,
+    ]);
     expect(directive(csp, 'img-src')).toContain('https://tiles.openfreemap.org');
+    expect(directive(csp, 'img-src')).toContain(SATELLITE_TILES_ORIGIN);
   });
 
   it('los scripts solo del propio origen, sin unsafe-inline ni unsafe-eval', () => {
@@ -43,6 +48,7 @@ describe('buildCsp', () => {
     expect(directive(csp, 'connect-src')).toEqual([
       "'self'",
       'https://tiles.openfreemap.org',
+      SATELLITE_TILES_ORIGIN,
       'https://api.example.com',
       'wss://api.example.com',
     ]);

@@ -27,6 +27,23 @@ export interface VesselTrack {
   truncated: boolean;
 }
 
+export interface VesselSummary {
+  mmsi: number;
+  name: string | null;
+  imo: number | null;
+  ship_type: number | null;
+  last_seen_at: string | null;
+  lat: number | null;
+  lon: number | null;
+}
+
+export function fetchVesselDirectory(
+  token: string,
+  fetchImpl?: typeof fetch,
+): Promise<VesselSummary[]> {
+  return apiGet('/vessels?size=200', token, parseVesselDirectory, fetchImpl);
+}
+
 export function fetchVesselDetail(
   mmsi: number,
   token: string,
@@ -42,6 +59,35 @@ export function fetchVesselTrack(
   fetchImpl?: typeof fetch,
 ): Promise<VesselTrack> {
   return apiGet(`/vessels/${String(mmsi)}/history`, token, parseVesselTrack, fetchImpl);
+}
+
+export function parseVesselDirectory(body: unknown): VesselSummary[] | null {
+  if (!isRecord(body) || !Array.isArray(body.items)) {
+    return null;
+  }
+  const items: VesselSummary[] = [];
+  for (const raw of body.items) {
+    if (
+      !isRecord(raw) ||
+      !Number.isInteger(raw.mmsi) ||
+      !isNullable(raw.name, isString) ||
+      !isNullable(raw.imo, isNumber) ||
+      !isNullable(raw.ship_type, isNumber) ||
+      !isNullable(raw.last_seen_at, isString)
+    ) {
+      return null;
+    }
+    items.push({
+      mmsi: raw.mmsi as number,
+      name: (raw.name as string | null) ?? null,
+      imo: (raw.imo as number | null) ?? null,
+      ship_type: (raw.ship_type as number | null) ?? null,
+      last_seen_at: (raw.last_seen_at as string | null) ?? null,
+      lat: null,
+      lon: null,
+    });
+  }
+  return items;
 }
 
 export function parseVesselDetail(body: unknown): VesselDetail | null {

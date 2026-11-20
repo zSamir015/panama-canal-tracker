@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { MapLegend } from './MapLegend';
 
 // Plegar solo tiene efecto en móvil: el CSS oculta el botón en escritorio y allí la lista se ve
@@ -34,5 +34,29 @@ describe('MapLegend', () => {
     render(<MapLegend />);
 
     expect(screen.getAllByRole('listitem')).toHaveLength(8);
+  });
+
+  it('filtra por categoría y por solo en tránsito cuando es interactiva', async () => {
+    const onToggleCategory = vi.fn();
+    const onToggleTransitOnly = vi.fn();
+    render(
+      <MapLegend
+        hiddenCategories={new Set(['tanker'])}
+        onToggleCategory={onToggleCategory}
+        transitOnly
+        onToggleTransitOnly={onToggleTransitOnly}
+        showTransitFilter
+      />,
+    );
+
+    const tankerBtn = screen.getByRole('button', { name: 'Tanquero' });
+    expect(tankerBtn).toHaveAttribute('aria-pressed', 'false');
+    await userEvent.click(tankerBtn);
+    expect(onToggleCategory).toHaveBeenCalledWith('tanker');
+
+    const transitBtn = screen.getByRole('button', { name: 'Solo en tránsito' });
+    expect(transitBtn).toHaveAttribute('aria-pressed', 'true');
+    await userEvent.click(transitBtn);
+    expect(onToggleTransitOnly).toHaveBeenCalledTimes(1);
   });
 });

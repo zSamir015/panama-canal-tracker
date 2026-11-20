@@ -55,34 +55,68 @@ export const CATEGORY_COLORS: Readonly<Record<ShipCategory, string>> = {
   unknown: '#90a4ae',
 };
 
+/** Tras esto sin señal AIS nueva, el buque se atenúa visualmente en el mapa. */
+export const STALE_VESSEL_MS = 15 * 60_000;
+
+export interface VesselMapFilter {
+  hiddenCategories?: ReadonlySet<ShipCategory>;
+  transitOnly?: boolean;
+  transitMmsis?: ReadonlySet<number>;
+  now?: number;
+}
+
 export interface VesselProperties {
   mmsi: number;
   category: ShipCategory;
-  /** Rumbo sobre el fondo en grados; sin rumbo se pinta un punto en vez de una flecha. */
+  /** Rumbo sobre el fondo en grados; sin rumbo se pinta una baliza en vez de una silueta. */
   cog: number;
   hasCourse: boolean;
+  stale: boolean;
 }
 
 export function toFeatureCollection(
   state: VesselState,
+  filter?: VesselMapFilter,
 ): FeatureCollection<Point, VesselProperties> {
+  const now = filter?.now ?? Date.now();
+  const hidden = filter?.hiddenCategories;
+  const transitOnly = filter?.transitOnly ?? false;
+  const transitMmsis = filter?.transitMmsis;
+  const features: FeatureCollection<Point, VesselProperties>['features'] = [];
+  for (const vessel of state.values()) {
+    const category = shipCategory(vessel.ship_type);
+    if (hidden?.has(category)) {
+      continue;
+    }
+    if (transitOnly && !transitMmsis?.has(vessel.mmsi)) {
+      continue;
+    }
+    features.push(toFeature(vessel, category, now));
+  }
   return {
     type: 'FeatureCollection',
-    features: Array.from(state.values(), toFeature),
+    features,
   };
 }
 
-function toFeature(vessel: LiveVessel): FeatureCollection<Point, VesselProperties>['features'][0] {
+function toFeature(
+  vessel: LiveVessel,
+  category: ShipCategory,
+  now: number,
+): FeatureCollection<Point, VesselProperties>['features'][0] {
+  const ts = Date.parse(vessel.ts);
+  const stale = !Number.isNaN(ts) && now - ts > STALE_VESSEL_MS;
   return {
     type: 'Feature',
     id: vessel.mmsi,
     geometry: { type: 'Point', coordinates: [vessel.lon, vessel.lat] },
-    // El nombre no va en la capa: se mostrará como texto en la ficha (4.4), nunca como HTML.
+    // El nombre no va en la capa: se pinta como texto en React (ficha y tooltip), nunca HTML.
     properties: {
       mmsi: vessel.mmsi,
-      category: shipCategory(vessel.ship_type),
+      category,
       cog: vessel.cog ?? 0,
       hasCourse: vessel.cog !== null,
+      stale,
     },
   };
 }

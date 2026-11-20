@@ -95,6 +95,23 @@ function stubApi({
         }),
       );
     }
+    if (url.endsWith('/vessels?size=200')) {
+      return Promise.resolve(
+        json(200, {
+          items: [
+            {
+              mmsi: 352001234,
+              name: 'PACIFIC STAR',
+              imo: 9301234,
+              ship_type: 70,
+              last_seen_at: '2026-10-23T17:00:00Z',
+              last_position: { lat: 9.0, lon: -79.5 },
+            },
+          ],
+          total: 1,
+        }),
+      );
+    }
     return Promise.resolve(json(200, { ...detail, name: detailName }));
   });
   vi.stubGlobal('fetch', fetchMock);
@@ -118,6 +135,7 @@ async function signIn() {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  window.history.replaceState(null, '', '/');
 });
 
 describe('App', () => {
@@ -246,28 +264,64 @@ describe('App', () => {
     expect(document.querySelector('img')).toBeNull();
   });
 
-  it('cambia entre el mapa y las estadísticas con las pestañas', async () => {
+  it('cambia entre el mapa y las estadísticas con las pestañas y las flechas', async () => {
+    window.localStorage.setItem('panama-canal-tracker:guide-seen', '1');
     stubApi({ refreshStatuses: [200] });
     renderWithQuery(<App />);
 
     expect(await screen.findByRole('button', { name: 'buque de prueba' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Mapa' })).toHaveAttribute('aria-pressed', 'true');
+    const mapTab = screen.getByRole('tab', { name: 'Mapa' });
+    const statsTab = screen.getByRole('tab', { name: 'Estadísticas' });
+    expect(mapTab).toHaveAttribute('aria-selected', 'true');
+    expect(statsTab).toHaveAttribute('aria-selected', 'false');
     expect(screen.queryByRole('region', { name: 'Estadísticas' })).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Estadísticas' }));
+    mapTab.focus();
+    await userEvent.keyboard('{ArrowRight}');
 
     expect(await screen.findByRole('region', { name: 'Estadísticas' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Estadísticas' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    expect(statsTab).toHaveAttribute('aria-selected', 'true');
+    expect(window.location.search).toContain('view=stats');
     expect(screen.queryByRole('region', { name: 'Mapa en vivo' })).not.toBeInTheDocument();
     expect(await screen.findByText('No hay tránsitos completados en este periodo.')).toBeVisible();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Mapa' }));
+    await userEvent.click(mapTab);
 
     expect(await screen.findByRole('button', { name: 'buque de prueba' })).toBeVisible();
+    expect(window.location.search).toBe('');
     expect(screen.queryByRole('region', { name: 'Estadísticas' })).not.toBeInTheDocument();
+  });
+
+  it('sincroniza el MMSI seleccionado con la URL y responde al buscador global con /', async () => {
+    window.localStorage.setItem('panama-canal-tracker:guide-seen', '1');
+    stubApi({ refreshStatuses: [200] });
+    renderWithQuery(<App />);
+
+    await screen.findByRole('button', { name: 'buque de prueba' });
+    await userEvent.keyboard('/');
+    const search = screen.getByRole('combobox', { name: 'Buscar buque por nombre, MMSI o IMO' });
+    await userEvent.type(search, '9301234');
+    await userEvent.keyboard('{Enter}');
+
+    expect(window.location.search).toBe('?mmsi=352001234');
+    expect(
+      await screen.findByRole('heading', { name: '<img src=x onerror=alert(1)>' }),
+    ).toBeVisible();
+  });
+
+  it('permite entrar a la demo simulada sin cuenta desde el login', async () => {
+    window.localStorage.setItem('panama-canal-tracker:guide-seen', '1');
+    stubApi();
+    renderWithQuery(<App />);
+
+    await screen.findByRole('heading', { name: 'Iniciar sesión' });
+    await userEvent.click(screen.getByRole('button', { name: 'Ver demo sin cuenta' }));
+
+    expect(await screen.findByText(/Datos simulados/)).toBeVisible();
+    expect(screen.getByRole('button', { name: 'buque de prueba' })).toBeVisible();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Volver al inicio de sesión' }));
+    expect(await screen.findByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
   });
 
   it('no enseña las pestañas antes de iniciar sesión', async () => {
@@ -277,6 +331,52 @@ describe('App', () => {
     await screen.findByRole('heading', { name: 'Iniciar sesión' });
 
     expect(screen.queryByRole('navigation', { name: 'Vista' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Cerrar sesión' })).not.toBeInTheDocument();
+  });
+
+  it('cierra la sesión desde la cabecera y vuelve al login sin aviso de caducidad', async () => {
+    const fetchMock = stubApi({ refreshStatuses: [200] });
+    renderWithQuery(<App />);
+
+    const logoutBtn = await screen.findByRole('button', { name: 'Cerrar sesión' });
+    await userEvent.click(logoutBtn);
+
+    expect(await screen.findByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
+    expect(screen.queryByText(/caducó/)).not.toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([url]) => url.endsWith('/auth/logout'))).toBe(true);
+  });
+  it('alterna tema oscuro/claro, capa satelital y colapso del panel lateral', async () => {
+    window.localStorage.setItem('panama-canal-tracker:guide-seen', '1');
+    stubApi({ refreshStatuses: [200] });
+    renderWithQuery(<App />);
+
+    await screen.findByRole('button', { name: 'buque de prueba' });
+
+    const themeBtn = screen.getByRole('button', { name: 'Cambiar a tema oscuro' });
+    await userEvent.click(themeBtn);
+    expect(document.documentElement.dataset.theme).toBe('dark');
+    expect(screen.getByRole('button', { name: 'Cambiar a tema claro' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+
+    const satBtn = screen.getByRole('button', { name: 'Satélite' });
+    await userEvent.click(satBtn);
+    expect(satBtn).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Estándar' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Ocultar panel lateral' }));
+    const expandBtn = screen.getByRole('button', { name: 'Mostrar panel lateral' });
+    expect(expandBtn).toBeVisible();
+    await userEvent.click(expandBtn);
+    expect(screen.queryByRole('button', { name: 'Mostrar panel lateral' })).not.toBeInTheDocument();
+
+    // Restaurar estado limpio para otros tests.
+    await userEvent.click(screen.getByRole('button', { name: 'Cambiar a tema claro' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Estándar' }));
   });
 });
 

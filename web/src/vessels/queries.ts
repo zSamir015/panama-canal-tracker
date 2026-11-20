@@ -1,8 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchVesselDetail, fetchVesselTrack } from './api';
+import { fetchVesselDetail, fetchVesselDirectory, fetchVesselTrack } from './api';
 
 /** Cada cuánto se recarga la estela mientras la ficha está abierta. */
 export const TRACK_REFRESH_MS = 15_000;
+
+export function useVesselDirectory(token: string | null) {
+  return useQuery({
+    queryKey: ['vessels', 'directory', token],
+    queryFn: () => {
+      if (token === null) {
+        throw new Error('Sin sesión');
+      }
+      return fetchVesselDirectory(token);
+    },
+    enabled: token !== null,
+    staleTime: 60_000,
+  });
+}
 
 export function useVesselDetail(mmsi: number, token: string) {
   return useQuery({

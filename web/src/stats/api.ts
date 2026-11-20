@@ -35,9 +35,14 @@ export interface WaitingTimes {
 
 /** `from` y `to` de la API: los últimos `days` días hasta `now` (el reloj se inyecta). */
 export function windowParams(days: number, now: number): string {
+  return rangeParams(now - days * 86_400_000, now);
+}
+
+/** `from` y `to` de un rango explícito en milisegundos UTC. */
+export function rangeParams(fromMs: number, toMs: number): string {
   const params = new URLSearchParams({
-    from: new Date(now - days * 86_400_000).toISOString(),
-    to: new Date(now).toISOString(),
+    from: new Date(fromMs).toISOString(),
+    to: new Date(toMs).toISOString(),
   });
   return params.toString();
 }
@@ -65,6 +70,22 @@ export function fetchTransitDurations(
   );
 }
 
+export function fetchPreviousTransitDurations(
+  token: string,
+  days: number,
+  now: number = Date.now(),
+  fetchImpl?: typeof fetch,
+): Promise<TransitDurations> {
+  const to = now - days * 86_400_000;
+  const from = to - days * 86_400_000;
+  return apiGet(
+    `/stats/transit-durations?${rangeParams(from, to)}`,
+    token,
+    parseTransitDurations,
+    fetchImpl,
+  );
+}
+
 export function fetchWaitingTimes(
   token: string,
   days: number,
@@ -73,6 +94,22 @@ export function fetchWaitingTimes(
 ): Promise<WaitingTimes> {
   return apiGet(
     `/stats/waiting-times?${windowParams(days, now)}`,
+    token,
+    parseWaitingTimes,
+    fetchImpl,
+  );
+}
+
+export function fetchPreviousWaitingTimes(
+  token: string,
+  days: number,
+  now: number = Date.now(),
+  fetchImpl?: typeof fetch,
+): Promise<WaitingTimes> {
+  const to = now - days * 86_400_000;
+  const from = to - days * 86_400_000;
+  return apiGet(
+    `/stats/waiting-times?${rangeParams(from, to)}`,
     token,
     parseWaitingTimes,
     fetchImpl,

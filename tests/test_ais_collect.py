@@ -9,6 +9,7 @@ import pytest
 from websockets.asyncio.server import ServerConnection, serve
 
 from app.services.ais_parser import PositionUpdate, VesselStatic
+from app.workers.ais_consumer import MESSAGE_TYPES
 from tests.scripts_loader import load_script
 
 collect_script = load_script("ais_collect")
@@ -112,7 +113,7 @@ def test_subscription_uses_the_canal_boxes_and_the_worker_message_types() -> Non
 
     assert message["APIKey"] == API_KEY
     assert message["BoundingBoxes"]
-    assert message["FilterMessageTypes"] == ["PositionReport", "ShipStaticData"]
+    assert message["FilterMessageTypes"] == list(MESSAGE_TYPES)
 
 
 async def test_collects_from_the_simulator_and_reconnects_when_the_stream_ends() -> None:

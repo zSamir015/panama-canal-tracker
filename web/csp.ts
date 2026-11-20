@@ -15,6 +15,9 @@
 /** OpenFreeMap (ADR-0010): el origen de los tiles si no se configura otro. */
 export const DEFAULT_TILES_ORIGIN = 'https://tiles.openfreemap.org';
 
+/** Esri World Imagery (ADR-0018): tiles satelitales gratuitos sin API key. */
+export const SATELLITE_TILES_ORIGIN = 'https://server.arcgisonline.com';
+
 /** El origen de una URL de la configuración; falla si no es http(s), como `readConfig`. */
 function origin(value: string | undefined): string | null {
   const trimmed = value?.trim();
@@ -30,7 +33,7 @@ function origin(value: string | undefined): string | null {
 
 export function buildCsp(env: Record<string, string | undefined>): string {
   const tiles = origin(env.VITE_MAP_STYLE_URL) ?? DEFAULT_TILES_ORIGIN;
-  const connect = ["'self'", tiles];
+  const connect = ["'self'", tiles, SATELLITE_TILES_ORIGIN];
   const apiOrigin = origin(env.VITE_API_URL);
   if (apiOrigin !== null) {
     const api = new URL(apiOrigin);
@@ -42,7 +45,7 @@ export function buildCsp(env: Record<string, string | undefined>): string {
     "default-src 'self'",
     "script-src 'self'",
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: ${tiles}`,
+    `img-src 'self' data: blob: ${tiles} ${SATELLITE_TILES_ORIGIN}`,
     `font-src 'self' ${tiles}`,
     `connect-src ${connect.join(' ')}`,
     "worker-src 'self' blob:",

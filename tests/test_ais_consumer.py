@@ -129,7 +129,7 @@ async def test_subscribes_to_the_canal_bounding_box_right_after_connecting() -> 
     assert subscription == {
         "APIKey": API_KEY,
         "BoundingBoxes": [[[8.4, -80.2], [9.7, -79.2]]],  # [lat, lon], como pide AISStream
-        "FilterMessageTypes": ["PositionReport", "ShipStaticData"],
+        "FilterMessageTypes": list(ais_consumer.MESSAGE_TYPES),
     }
 
 
@@ -654,7 +654,7 @@ async def test_worker_opens_a_second_connection_for_global_static_data() -> None
     assert len(subscriptions) == 2  # nunca más de dos: AISStream admite 3 por cuenta
     by_types = {tuple(s["FilterMessageTypes"]): s["BoundingBoxes"] for s in subscriptions}
     assert by_types == {
-        ("PositionReport", "ShipStaticData"): [[[8.4, -80.2], [9.7, -79.2]]],
+        ais_consumer.MESSAGE_TYPES: [[[8.4, -80.2], [9.7, -79.2]]],
         ("ShipStaticData",): [[[-90.0, -180.0], [90.0, 180.0]]],
     }
 
@@ -664,9 +664,7 @@ async def test_second_connection_can_be_disabled() -> None:
         worker_settings(ais_canal_bound_enabled=False)
     )
 
-    assert [s["FilterMessageTypes"] for s in subscriptions] == [
-        ["PositionReport", "ShipStaticData"]
-    ]
+    assert [s["FilterMessageTypes"] for s in subscriptions] == [list(ais_consumer.MESSAGE_TYPES)]
 
 
 async def test_connection_logs_say_which_connection_they_belong_to() -> None:
