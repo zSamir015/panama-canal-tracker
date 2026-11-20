@@ -90,7 +90,7 @@ conexión AIS aguas arriba. Detalles en [docs/ARCHITECTURE.md](docs/ARCHITECTURE
 | Datos y Geo | PostgreSQL 16, PostGIS, TimescaleDB, SQLAlchemy 2.0 async, Alembic |
 | Tiempo real | Worker WebSocket AIS Clase A/B (`0,5 s`), Redis pub/sub, `/ws/live` |
 | Frontend | React 19, TypeScript estricto, Vite, MapLibre GL JS (WebGL), TanStack Query |
-| Calidad | **788** tests unitarios backend (`pytest -m "not integration"`), **247** tests frontend (`Vitest`), `mypy --strict`, `ruff`, `eslint --max-warnings=0`, `pip-audit`, `gitleaks` |
+| Calidad | **797** tests unitarios backend (`pytest -m "not integration"`), **247** tests frontend (`Vitest`), `mypy --strict`, `ruff`, `eslint --max-warnings=0`, `pip-audit`, `gitleaks` |
 | Operación | Docker Compose endurecido (no-root), GitHub Actions (7 checks CI), métricas Prometheus |
 
 ## Estado del proyecto
@@ -104,14 +104,47 @@ conexión AIS aguas arriba. Detalles en [docs/ARCHITECTURE.md](docs/ARCHITECTURE
 | 4 | Mapa en tiempo real y demo | ✅ |
 | 5 | Detección de tránsitos y validación | ✅ |
 | 6 | Esperas en fondeo y estadísticas | ✅ |
-| 7 | Endurecimiento para producción y mejoras UI/UX | ✅ / ⏳ (sin despliegue productivo gestionado según [ADR-0017](docs/adr/0017-v1-sin-entorno-de-produccion.md)) |
+| 7 | Endurecimiento para producción y mejoras UI/UX | ✅ (listo para `v1.0.0`; sin despliegue productivo gestionado según [ADR-0017](docs/adr/0017-v1-sin-entorno-de-produccion.md)) |
 
-Las fases 5 y 6 están cerradas. La validación con 12,5 días de datos reales en
-[docs/VALIDATION.md](docs/VALIDATION.md) confirma que la cobertura gratuita de AISStream dentro del
-Canal es parcial, por lo que los umbrales y polígonos siguen calibrados sobre trayectorias
-sintéticas alineadas con OpenStreetMap.
+Las fases 0 a 7 están completas y listas para `v1.0.0`.
 
-Plan completo: [docs/ROADMAP.md](docs/ROADMAP.md).
+## Resultados de validación y carga
+
+- **Validación con AIS real ([docs/VALIDATION.md](docs/VALIDATION.md))**: durante **12,5 días**
+  (`2026-11-07` al `2026-11-19`, `29` ejecuciones del recolector equivalentes a `156,3 h / 299,4 h`,
+  el `52,2 %`), se registraron **8.286 posiciones** de **500 buques**, **304 visitas a fondeo**
+  (`267` en Pacífico, `37` en Atlántico) y **2 tránsitos completos** (`18 h 48 min` y `10 h 08 min` en
+  sentido sur) frente a `~437` esperados (`~35/día` de media ACP). Solo `84` posiciones (`1,0 %`)
+  cayeron en las entradas y `25` en Culebra / Miraflores, confirmando que la cobertura terrestre
+  gratuita de AISStream dentro del Canal es parcial mientras `2.578` posiciones paradas quedan fuera de
+  los polígonos iniciales de fondeo. Los umbrales siguen calibrados sobre trayectorias sintéticas
+  sobre OSM, mientras `ADR-0019` y `scripts/ais_coverage.py` (`#165`, `#169`) amplían las horas de
+  escucha y miden la recepción Tipo 27 / caja ampliada.
+- **Prueba de carga WebSocket `/ws/live` ([docs/LOAD_TEST.md](docs/LOAD_TEST.md))**: con **500 clientes
+  WebSocket simultáneos** frente a FastAPI + Redis + TimescaleDB (Apple M5 10 núcleos, simulador a
+  `--speed 60`), conectaron **500/500** y recibieron el snapshot inicial con **0 fallos** (`9 ms` p50 /
+  `11 ms` p95 / `37 ms` máx.), `17.466` mensajes entregados (cadencia p50 de `2,00 s`), **7,8 % media /
+  10,9 % pico** de CPU en la API, **153 MB** de memoria máxima y sin degradación en ingesta
+  (`10,63 filas/s` sin carga frente a `9,52 filas/s` con 500 clientes).
+
+## Cómo se construyó
+
+Construido estrictamente fase por fase (`un issue = una rama = un PR`) con decisiones de arquitectura
+documentadas en ADRs:
+
+- **Hoja de ruta e hitos**: [docs/ROADMAP.md](docs/ROADMAP.md) (Fases `0`–`7` y criterios de aceptación)
+- **Decisiones técnicas clave (`docs/adr/`)**: worker AIS separado + Redis pub/sub (`ADR-0004`),
+  hipertablas TimescaleDB + PostGIS (`ADR-0005`), renderizado WebGL GeoJSON (`ADR-0006`), Argon2id +
+  PyJWT (`ADR-0003`), demo estática en GitHub Pages (`ADR-0011`), analítica SQL en TimescaleDB
+  (`ADR-0013`), copias cifradas con GPG (`ADR-0015`), capa satelital Esri World Imagery (`ADR-0018`), y
+  recolector continuo encadenado junto al worker `launchd` en macOS dentro del límite de 2 sockets
+  (`ADR-0012`, `ADR-0019`). Índice completo:
+  [0001](docs/adr/0001-stack-tecnico.md)–[0019](docs/adr/0019-recolector-continuo-y-worker-a-la-vez.md).
+- **Línea base de seguridad**: [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) y [SECURITY.md](SECURITY.md)
+- **Historial en GitHub**: [Issues](https://github.com/zSamir015/panama-canal-tracker/issues) ·
+  [PRs fusionados](https://github.com/zSamir015/panama-canal-tracker/pulls?q=is%3Apr+is%3Amerged) ·
+  [Releases (`v0.1.0`–`v0.6.0`)](https://github.com/zSamir015/panama-canal-tracker/releases) ·
+  [CHANGELOG.md](CHANGELOG.md)
 
 ## Inicio rápido
 
@@ -141,7 +174,9 @@ variables y el perfil `--profile simulator`. Para desarrollo local con `--reload
 | [docs/LOAD_TEST.md](docs/LOAD_TEST.md) | Prueba de carga WebSocket (500 clientes) |
 | [docs/VALIDATION.md](docs/VALIDATION.md) | Estudio de 12,5 días de cobertura AIS real |
 | [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Revisión de seguridad y requisitos previos a producción |
-| [docs/adr/](docs/adr/) | Architecture Decision Records ([0001](docs/adr/0001-stack-tecnico.md)–[0018](docs/adr/0018-satelite-esri-world-imagery.md)) |
+| [docs/AIS_COLLECTOR.md](docs/AIS_COLLECTOR.md) | Flujo continuo del recolector AIS en GitHub Actions |
+| [docs/LOCAL_WORKER_MAC.md](docs/LOCAL_WORKER_MAC.md) | Worker estable en macOS con `launchd` y `caffeinate` |
+| [docs/adr/](docs/adr/) | Architecture Decision Records ([0001](docs/adr/0001-stack-tecnico.md)–[0019](docs/adr/0019-recolector-continuo-y-worker-a-la-vez.md)) |
 | [AGENTS.md](AGENTS.md) | Convenciones de ingeniería y seguridad |
 | [SECURITY.md](SECURITY.md) | Cómo reportar una vulnerabilidad |
 

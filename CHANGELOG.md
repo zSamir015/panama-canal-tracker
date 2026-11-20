@@ -6,6 +6,11 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Changed
+- Cierre de la tarea **7.4** y de la **Fase 7** (`docs/ROADMAP.md`, `AGENTS.md §9`, issue #170):
+  `README.md` y `README.es.md` incorporan las secciones de resultados de validación AIS real y carga
+  WebSocket (`docs/VALIDATION.md`, `docs/LOAD_TEST.md`), «How it was built / Cómo se construyó» con
+  el mapa de ADRs (`0001`–`0019`), enlace al historial de GitHub y conteos actualizados de tests
+  (`797` unitarios backend, `247` frontend).
 - Licencia: de MIT a **todos los derechos reservados** (issue #166). El código sigue siendo público
   para verlo y evaluarlo, pero usarlo, copiarlo o modificarlo requiere permiso escrito. Las
   versiones hasta `cd0bc3d` se publicaron bajo MIT y siguen bajo MIT. Actualizados `LICENSE`, los

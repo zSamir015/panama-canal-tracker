@@ -89,7 +89,7 @@ keeping a single upstream AIS connection. Full details in [docs/ARCHITECTURE.md]
 | Data & Geo | PostgreSQL 16, PostGIS, TimescaleDB, SQLAlchemy 2.0 async, Alembic |
 | Real Time | AIS Class A/B WebSocket worker (`0.5 s`), Redis pub/sub, `/ws/live` fan-out |
 | Frontend | React 19, TypeScript (strict), Vite, MapLibre GL JS (WebGL), TanStack Query |
-| Quality | **788** backend unit tests (`pytest -m "not integration"`), **247** frontend tests (`Vitest`), `mypy --strict`, `ruff`, `eslint --max-warnings=0`, `pip-audit`, `gitleaks` |
+| Quality | **797** backend unit tests (`pytest -m "not integration"`), **247** frontend tests (`Vitest`), `mypy --strict`, `ruff`, `eslint --max-warnings=0`, `pip-audit`, `gitleaks` |
 | Ops | Docker Compose (non-root hardened containers), GitHub Actions (7 CI checks), Prometheus `/metrics` |
 
 ## Project Status
@@ -103,14 +103,44 @@ keeping a single upstream AIS connection. Full details in [docs/ARCHITECTURE.md]
 | 4 | Real-time map and live demo | ✅ |
 | 5 | Transit detection and validation | ✅ |
 | 6 | Anchorage waits and statistics | ✅ |
-| 7 | Production hardening & UI/UX overhaul | ✅ / ⏳ (no managed prod deploy per [ADR-0017](docs/adr/0017-v1-sin-entorno-de-produccion.md)) |
+| 7 | Production hardening & UI/UX overhaul | ✅ (ready for `v1.0.0`; no managed prod deploy per [ADR-0017](docs/adr/0017-v1-sin-entorno-de-produccion.md)) |
 
-Phases 5 and 6 are closed. The real-data validation in [docs/VALIDATION.md](docs/VALIDATION.md)
-(12.5 days of recorded AISStream feeds) shows that free terrestrial AISStream coverage inside the
-Canal is partial, so transit thresholds and anchorage zones remain calibrated against synthetic
-OSM-aligned trajectories.
+Phases 0–7 are complete and ready for `v1.0.0`.
 
-Full plan: [docs/ROADMAP.md](docs/ROADMAP.md).
+## Validation & Load Test Results
+
+- **Real AIS Validation ([docs/VALIDATION.md](docs/VALIDATION.md))**: across **12.5 days** (`2026-11-07`
+  to `2026-11-19`, `29` collector runs covering `156.3 h / 299.4 h` or `52.2%`), the tracker
+  recorded **8,286 positions** from **500 vessels**, **304 anchorage visits** (`267` Pacific, `37`
+  Atlantic), and **2 full transits** (`18 h 48 min` and `10 h 08 min` southbound) vs `~437` expected
+  (`~35/day` ACP average). Only `84` positions (`1.0%`) fell in entrance zones and `25` inside Culebra
+  / Miraflores, confirming free terrestrial AISStream coverage inside the Canal is partial while
+  `2,578` stopped positions fall outside the initial anchorage boxes. Transit thresholds remain
+  calibrated on OSM-aligned synthetic tracks, while `ADR-0019` and `scripts/ais_coverage.py`
+  (`#165`, `#169`) improve collection uptime and measure Type 27 / wide-bbox reception.
+- **WebSocket `/ws/live` Load Test ([docs/LOAD_TEST.md](docs/LOAD_TEST.md))**: with **500 concurrent
+  WebSocket clients** against FastAPI + Redis + TimescaleDB (Apple M5 10-core, simulator `--speed 60`),
+  all **500/500** connected and received an initial snapshot with **0 failures** (`9 ms` p50 /
+  `11 ms` p95 / `37 ms` max latency), `17,466` pushed updates (`2.00 s` p50 interval), **7.8% avg /
+  10.9% max** API CPU, **153 MB** peak API memory, and no ingestion degradation (`10.63 rows/s`
+  baseline vs `9.52 rows/s` under load).
+
+## How It Was Built
+
+Built strictly phase-by-phase (`un issue = una rama = un PR`) with architecture decisions locked in ADRs:
+
+- **Roadmap & Milestones**: [docs/ROADMAP.md](docs/ROADMAP.md) (Phases `0`–`7`, acceptance criteria)
+- **Key Technical Decisions (`docs/adr/`)**: separated AIS worker + Redis pub/sub (`ADR-0004`),
+  TimescaleDB hypertables + PostGIS (`ADR-0005`), WebGL GeoJSON rendering (`ADR-0006`), Argon2id +
+  PyJWT (`ADR-0003`), static GitHub Pages demo (`ADR-0011`), SQL/TimescaleDB stats (`ADR-0013`),
+  GPG encrypted DB backups (`ADR-0015`), Esri World Imagery (`ADR-0018`), and continuous collector
+  chaining with macOS `launchd` worker within the 2-socket limit (`ADR-0012`, `ADR-0019`). Full index:
+  [0001](docs/adr/0001-stack-tecnico.md)–[0019](docs/adr/0019-recolector-continuo-y-worker-a-la-vez.md).
+- **Security Baseline**: [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) & [SECURITY.md](SECURITY.md)
+- **GitHub History**: [Issues](https://github.com/zSamir015/panama-canal-tracker/issues) ·
+  [Merged PRs](https://github.com/zSamir015/panama-canal-tracker/pulls?q=is%3Apr+is%3Amerged) ·
+  [Releases (`v0.1.0`–`v0.6.0`)](https://github.com/zSamir015/panama-canal-tracker/releases) ·
+  [CHANGELOG.md](CHANGELOG.md)
 
 ## Quick Start
 
@@ -139,7 +169,9 @@ and profile. For local host development (`--reload`), see [AGENTS.md](AGENTS.md#
 | [docs/LOAD_TEST.md](docs/LOAD_TEST.md) | WebSocket load test: 500 clients, results and method |
 | [docs/VALIDATION.md](docs/VALIDATION.md) | 12.5-day real AIS coverage study & precision findings |
 | [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Security checklist & production hardening baseline |
-| [docs/adr/](docs/adr/) | Architecture Decision Records ([0001](docs/adr/0001-stack-tecnico.md)–[0018](docs/adr/0018-satelite-esri-world-imagery.md)) |
+| [docs/AIS_COLLECTOR.md](docs/AIS_COLLECTOR.md) | Continuous GitHub Actions AIS collector workflow |
+| [docs/LOCAL_WORKER_MAC.md](docs/LOCAL_WORKER_MAC.md) | Stable macOS local worker setup (`launchd` + `caffeinate`) |
+| [docs/adr/](docs/adr/) | Architecture Decision Records ([0001](docs/adr/0001-stack-tecnico.md)–[0019](docs/adr/0019-recolector-continuo-y-worker-a-la-vez.md)) |
 | [AGENTS.md](AGENTS.md) | Engineering and security conventions for this repository |
 | [SECURITY.md](SECURITY.md) | How to report a vulnerability |
 
