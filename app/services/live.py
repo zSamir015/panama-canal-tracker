@@ -58,8 +58,15 @@ class LiveUnavailableError(Exception):
     """La base no respondió (al autenticar o al preparar el snapshot)."""
 
 
-async def authenticate(token: str, settings: Settings, sessions: SessionFactory) -> str:
-    """Id del usuario dueño de un access token válido (mismas reglas que `get_current_user`)."""
+@dataclass(frozen=True, slots=True)
+class LiveSession:
+    user_id: str
+    # Cuando caduca el access token con el que se abrió la conexión: ahí se cierra con 4401.
+    expires_at: datetime
+
+
+async def authenticate(token: str, settings: Settings, sessions: SessionFactory) -> LiveSession:
+    """Usuario dueño de un access token válido (mismas reglas que `get_current_user`)."""
     try:
         claims = decode_access_token(token, settings)
     except InvalidTokenError as error:
@@ -72,7 +79,7 @@ async def authenticate(token: str, settings: Settings, sessions: SessionFactory)
         raise LiveUnavailableError from None
     if user is None:
         raise LiveAuthError("unknown_user")
-    return str(user.id)
+    return LiveSession(user_id=str(user.id), expires_at=claims.expires_at)
 
 
 class ClientView:

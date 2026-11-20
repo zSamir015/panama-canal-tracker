@@ -5,6 +5,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Security
+- `/ws/live` se cierra con `4401` cuando caduca el access token con el que se abrió (issue #157,
+  hallazgo de la revisión de seguridad 7.6). Antes, un token validado una vez mantenía el flujo en
+  vivo para siempre, aunque caducara o el usuario cerrara sesión. El frontend ya trataba el `4401`
+  renovando el token y reconectando, así que el usuario no nota nada.
+
 ### Added
 - Retención de copias de la base (tarea 7.2, issue #154): con `BACKUP_KEEP_DAYS=N`,
   `scripts/db_backup.sh` borra, después de una copia buena, las copias del mismo directorio con

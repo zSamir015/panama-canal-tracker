@@ -43,6 +43,7 @@ from app.services.live import (
     ConnectionLimiter,
     LiveAuthError,
     LiveHub,
+    LiveSession,
     LiveUnavailableError,
     authenticate,
     snapshot,
@@ -100,13 +101,14 @@ async def live(websocket: WebSocket) -> None:
     user_id: str | None = None
     acquired = False
     try:
-        user_id = await _authenticate(websocket, settings, websocket.app.state.session_factory)
+        session = await _authenticate(websocket, settings, websocket.app.state.session_factory)
+        user_id = session.user_id
         log = log.bind(user_id=user_id)
         acquired = await limiter.acquire(user_id, connection_id)
         if not acquired:
             raise _Close(CLOSE_TOO_MANY, "too_many_connections")
         log.info("ws_connected")
-        await _serve(websocket, user_id, connection_id, limiter)
+        await _serve(websocket, session, connection_id, limiter)
     except _Close as close:
         log.info("ws_closed", code=close.code, reason=close.reason)
         await _close(websocket, close.code)
@@ -117,7 +119,9 @@ async def live(websocket: WebSocket) -> None:
             await limiter.release(user_id, connection_id)
 
 
-async def _authenticate(websocket: WebSocket, settings: Settings, sessions: SessionFactory) -> str:
+async def _authenticate(
+    websocket: WebSocket, settings: Settings, sessions: SessionFactory
+) -> LiveSession:
     try:
         text = await asyncio.wait_for(_receive_text(websocket), timeout=AUTH_TIMEOUT_SECONDS)
     except TimeoutError:
@@ -137,7 +141,7 @@ async def _authenticate(websocket: WebSocket, settings: Settings, sessions: Sess
 
 
 async def _serve(
-    websocket: WebSocket, user_id: str, connection_id: str, limiter: ConnectionLimiter
+    websocket: WebSocket, session: LiveSession, connection_id: str, limiter: ConnectionLimiter
 ) -> None:
     hub: LiveHub = websocket.app.state.live_hub
     view = ClientView()
@@ -146,7 +150,8 @@ async def _serve(
     tasks = [
         asyncio.create_task(_read(websocket, view, send_lock)),
         asyncio.create_task(_flush(websocket, view, send_lock)),
-        asyncio.create_task(_heartbeat(limiter, user_id, connection_id)),
+        asyncio.create_task(_heartbeat(limiter, session.user_id, connection_id)),
+        asyncio.create_task(_expire(session.expires_at)),
     ]
     try:
         # La primera que termine (desconexión, cierre o error) acaba con la conexión.
@@ -199,6 +204,16 @@ async def _flush(websocket: WebSocket, view: ClientView, send_lock: asyncio.Lock
                 await _send(websocket, LiveUpdate(vessels=list(chunk)))
             if removes:
                 await _send(websocket, LiveRemove(mmsi=removes))
+
+
+async def _expire(expires_at: datetime) -> None:
+    """Cierra con 4401 cuando caduca el access token: el cliente lo renueva y vuelve a entrar.
+
+    Sin esto, un token validado una vez mantendría el flujo en vivo para siempre, aunque caduque
+    o el usuario cierre sesión (AGENTS.md §8.4).
+    """
+    await asyncio.sleep(max(0.0, (expires_at - datetime.now(UTC)).total_seconds()))
+    raise _Close(CLOSE_UNAUTHORIZED, "token_expired")
 
 
 async def _heartbeat(limiter: ConnectionLimiter, user_id: str, connection_id: str) -> None:
