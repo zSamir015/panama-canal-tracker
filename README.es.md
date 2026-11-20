@@ -6,7 +6,7 @@
 [English](README.md)
 
 [![CI](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml)
-[![Licencia: MIT](https://img.shields.io/badge/Licencia-MIT-yellow.svg)](LICENSE)
+[![Licencia: todos los derechos reservados](https://img.shields.io/badge/Licencia-Todos%20los%20derechos%20reservados-red.svg)](LICENSE)
 
 **[Demo en vivo](https://zsamir015.github.io/panama-canal-tracker/)**: corre directo en el navegador
 con trayectorias simuladas sobre el eje real del Canal (también accesible desde «Ver demo sin
@@ -147,4 +147,4 @@ variables y el perfil `--profile simulator`. Para desarrollo local con `--reload
 
 ## Licencia
 
-[MIT](LICENSE)
+Todos los derechos reservados. El código es público para que se pueda ver y evaluar; usarlo, copiarlo o modificarlo requiere permiso por escrito. Ver [LICENSE](LICENSE).
