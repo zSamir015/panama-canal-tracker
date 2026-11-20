@@ -171,7 +171,9 @@ rol `user` → 403. No hay endpoint para crear admins (se crean con `scripts/cre
    rechaza el handshake si el header `Origin` no está en `CORS_ORIGINS` (CORS no cubre
    WebSockets). Máximo 5 conexiones simultáneas por usuario y mensajes de cliente ≤ 4 KB.
 2. Primer mensaje del cliente, en menos de 5 s:
-   `{"type": "auth", "token": "<access_token>"}` → si falla, se cierra con código `4401`.
+   `{"type": "auth", "token": "<access_token>"}` → si falla, se cierra con código `4401`. La
+   conexión dura lo que el token: cuando caduca, el servidor la cierra con `4401` y el cliente
+   renueva el token y vuelve a entrar.
 3. El cliente envía su viewport y lo actualiza al mover el mapa:
    `{"type": "subscribe", "bbox": [min_lon, min_lat, max_lon, max_lat]}`
 4. El servidor responde con un snapshot y luego con lotes de cambios (≤ 1 por segundo):
@@ -205,7 +207,7 @@ Detalles (tarea 4.2, `app/routers/live.py`):
 | `1011` | la base no responde (auth o snapshot) |
 | `1013` | el cliente no lee: un envío tarda más de 10 s |
 | `4400` | mensaje inválido, binario o un segundo `auth` |
-| `4401` | sin `auth` en 5 s, token inválido o caducado, o usuario inexistente |
+| `4401` | sin `auth` en 5 s, token inválido o caducado, usuario inexistente, o el token de la conexión acaba de caducar |
 | `4429` | más de 5 conexiones del mismo usuario o demasiados mensajes |
 
 ## Documentación interactiva

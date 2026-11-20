@@ -262,6 +262,21 @@ async def test_token_of_a_deleted_user_closes_with_4401(
         assert await closed_with(ws) == 4401
 
 
+async def test_the_connection_closes_with_4401_when_the_token_expires(
+    url: str, app: FastAPI
+) -> None:
+    # Un token emitido hace casi 15 minutos: vale para entrar y caduca un segundo después.
+    settings = app.state.settings
+    user = await make_user(app)
+    issued = datetime.now(UTC) - timedelta(minutes=settings.access_token_expire_minutes, seconds=-1)
+    access, _ = create_access_token(user.id, settings, now=issued)
+
+    async with await authenticated(url, access) as ws:
+        await ws.send(json.dumps({"type": "subscribe", "bbox": CANAL}))
+        assert (await receive(ws))["type"] == "snapshot"  # dentro: el token aún valía
+        assert await closed_with(ws) == 4401
+
+
 # --- Snapshot y tiempo real -----------------------------------------------------------------
 
 
