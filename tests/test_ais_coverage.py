@@ -111,3 +111,43 @@ def test_counts_by_type_and_wide_bbox_preset(monkeypatch: pytest.MonkeyPatch) ->
     monkeypatch.setattr(coverage, "collect", fake_collect)
     assert coverage.main(["--minutes", "1", "--bbox", "wide"]) == 0
     assert recorded_boxes == [coverage.BOUNDING_BOX_PRESETS["wide"]]
+
+
+def test_worker_does_not_subscribe_type27_but_coverage_probe_does() -> None:
+    # El Tipo 27 da la velocidad en nudos enteros: en el worker podría cerrar visitas a fondeo
+    # (umbrales 0,5/1,0 nudos). Solo se mide con el script hasta decidirlo (issue #168).
+    from app.workers.ais_consumer import MESSAGE_TYPES
+
+    assert "LongRangeAisBroadcastMessage" not in MESSAGE_TYPES
+    assert coverage.COVERAGE_MESSAGE_TYPES == (*MESSAGE_TYPES, "LongRangeAisBroadcastMessage")
+
+
+def test_collect_subscribes_with_coverage_message_types(monkeypatch: pytest.MonkeyPatch) -> None:
+    import asyncio
+
+    sent: list[str] = []
+
+    class _FakeConnection:
+        async def send(self, message: str) -> None:
+            sent.append(message)
+
+        async def recv(self) -> str:
+            await asyncio.sleep(3600)
+            return ""
+
+    class _FakeConnect:
+        def __init__(self, *args: object, **kwargs: object) -> None:
+            pass
+
+        async def __aenter__(self) -> _FakeConnection:
+            return _FakeConnection()
+
+        async def __aexit__(self, *exc: object) -> None:
+            return None
+
+    monkeypatch.setattr(coverage, "connect", _FakeConnect)
+    boxes = coverage.BOUNDING_BOX_PRESETS["wide"]
+    assert asyncio.run(coverage.collect("ws://x", "key", 0.01, boxes=boxes)) == []
+    subscription = json.loads(sent[0])
+    assert subscription["FilterMessageTypes"] == list(coverage.COVERAGE_MESSAGE_TYPES)
+    assert subscription["BoundingBoxes"] == [[[7.8, -80.6], [10.2, -78.8]]]

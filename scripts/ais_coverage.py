@@ -26,15 +26,20 @@ from websockets.asyncio.client import connect
 
 from app.core.config import get_settings
 from app.services.ais_parser import AisMessageRejected, PositionUpdate, VesselStatic, parse_message
-from app.workers.ais_consumer import (
-    BOUNDING_BOX_PRESETS,
-    CANAL_BOUNDING_BOXES,
-    MAX_FRAME_BYTES,
-    MESSAGE_TYPES,
-)
+from app.workers.ais_consumer import CANAL_BOUNDING_BOXES, MAX_FRAME_BYTES, MESSAGE_TYPES
 
 MAX_MINUTES = 30
 BoundingBoxes = tuple[tuple[tuple[float, float], tuple[float, float]], ...]
+# Caja ampliada al Golfo de Panamá y los accesos del Caribe para medir llegadas tempranas.
+WIDE_CANAL_BOUNDING_BOXES: BoundingBoxes = (((7.8, -80.6), (10.2, -78.8)),)
+BOUNDING_BOX_PRESETS: dict[str, BoundingBoxes] = {
+    "canal": CANAL_BOUNDING_BOXES,
+    "wide": WIDE_CANAL_BOUNDING_BOXES,
+}
+# El worker no se suscribe al Tipo 27 (velocidad en nudos enteros, posición a ~185 m): aquí sí, para
+# medir con `by_type` cuántos llegan antes de decidir si merece entrar en el worker (issue #168).
+LONG_RANGE_MESSAGE_TYPE = "LongRangeAisBroadcastMessage"
+COVERAGE_MESSAGE_TYPES = (*MESSAGE_TYPES, LONG_RANGE_MESSAGE_TYPE)
 
 
 @dataclass
@@ -110,7 +115,7 @@ async def collect(
     subscription = {
         "APIKey": api_key,
         "BoundingBoxes": [[list(corner) for corner in box] for box in boxes],
-        "FilterMessageTypes": list(MESSAGE_TYPES),
+        "FilterMessageTypes": list(COVERAGE_MESSAGE_TYPES),
     }
     async with connect(url, max_size=MAX_FRAME_BYTES, compression="deflate") as connection:
         await connection.send(json.dumps(subscription))
