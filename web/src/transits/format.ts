@@ -28,6 +28,47 @@ export function elapsedText(enteredAt: string, now: number): string {
   return rest === 0 ? `lleva ${hours} h` : `lleva ${hours} h ${String(rest)} min`;
 }
 
+export interface TransitProgress {
+  percent: number;
+  label: string;
+}
+
+const DEFAULT_MEDIAN_TRANSIT_MINUTES = 540;
+
+/**
+ * Estima el avance porcentual del tránsito y el tiempo restante a partir de la duración mediana
+ * reciente (o ~9 h si aún no hay suficientes tránsitos históricos).
+ */
+export function transitProgress(
+  enteredAt: string,
+  now: number,
+  medianMinutes: number | null | undefined,
+): TransitProgress | null {
+  const baseline =
+    medianMinutes !== null && medianMinutes !== undefined && medianMinutes > 0
+      ? medianMinutes
+      : DEFAULT_MEDIAN_TRANSIT_MINUTES;
+  const elapsedMin = (now - Date.parse(enteredAt)) / 60_000;
+  if (Number.isNaN(elapsedMin)) {
+    return null;
+  }
+  const safeElapsed = Math.max(0, elapsedMin);
+  const percent = Math.min(98, Math.max(2, Math.round((safeElapsed / baseline) * 100)));
+  const remainingMin = Math.round(baseline - safeElapsed);
+  if (remainingMin <= 15) {
+    return { percent, label: `≈ ${String(percent)} %, por salir` };
+  }
+  if (remainingMin < 60) {
+    return {
+      percent,
+      label: `≈ ${String(percent)} %, sale en ~${String(remainingMin)} min`,
+    };
+  }
+  const hours = Math.max(1, Math.round(remainingMin / 60));
+  const unit = hours === 1 ? 'una 1 h' : `unas ${String(hours)} h`;
+  return { percent, label: `≈ ${String(percent)} %, sale en ${unit}` };
+}
+
 export function transitName(name: string | null, mmsi: number): string {
   const trimmed = name?.trim();
   // AIS rellena con espacios: un nombre en blanco es lo mismo que no tenerlo.

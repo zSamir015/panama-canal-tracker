@@ -10,12 +10,19 @@ import {
 // MapLibre busca su worker junto a su propio `.mjs`, que Vite empaqueta: hay que darle la URL
 // del archivo que Vite publica (en desarrollo y en el build, siempre en el mismo origen).
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { config } from '../config';
 import type { Bbox } from '../live/protocol';
 import type { VesselState } from '../live/vesselStore';
 import type { BasemapMode, ThemeMode } from '../theme';
-import { CATEGORY_COLORS, toFeatureCollection } from './vesselGeoJson';
+import { speedText } from '../vessels/format';
+import {
+  CATEGORY_COLORS,
+  CATEGORY_LABELS,
+  shipCategory,
+  toFeatureCollection,
+  type VesselMapFilter,
+} from './vesselGeoJson';
 import canalZones from './canalZones.json';
 import {
   overlayPalette,
@@ -43,16 +50,36 @@ const LAYER_ID = 'vessels';
 const CABIN_LAYER_ID = 'vessels-cabin';
 const TRAIL_SOURCE_ID = 'trail';
 const SELECTED_LAYER_ID = 'vessel-selected';
+// Los buques fondeados sin rumbo se reducen un ~28 % respecto a los que navegan para evitar
+// solapamiento denso en los fondeaderos; `interpolate` con `zoom` siempre va en el nivel superior
+// porque MapLibre v5 exige que `["zoom"]` sea entrada directa de `interpolate`/`step`.
 const VESSEL_SIZE_EXPRESSION = [
   'interpolate',
   ['linear'],
   ['zoom'],
   9,
-  0.76,
+  ['case', ['get', 'hasCourse'], 0.78, 0.56],
+  12,
+  ['case', ['get', 'hasCourse'], 0.96, 0.69],
+  15,
+  ['case', ['get', 'hasCourse'], 1.18, 0.85],
+] as unknown as ExpressionSpecification;
+const CABIN_SIZE_EXPRESSION = [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  9,
+  0.78,
   12,
   0.96,
   15,
   1.18,
+] as unknown as ExpressionSpecification;
+const STALE_OPACITY_EXPRESSION = [
+  'case',
+  ['get', 'stale'],
+  0.42,
+  1.0,
 ] as unknown as ExpressionSpecification;
 const EMPTY_TRAIL: Feature<MultiLineString> = {
   type: 'Feature',
@@ -85,6 +112,14 @@ interface VesselMapProps {
   basemap?: BasemapMode;
   theme?: ThemeMode;
   focusTarget?: MapFocusTarget | null;
+  mapFilter?: VesselMapFilter;
+}
+
+interface HoverTooltip {
+  x: number;
+  y: number;
+  mmsi: number;
+  stale: boolean;
 }
 
 /** Mapa MapLibre con los buques como una sola capa GeoJSON (WebGL), sin markers DOM (ADR-0006). */
@@ -97,11 +132,14 @@ export function VesselMap({
   basemap = 'map',
   theme = 'light',
   focusTarget = null,
+  mapFilter,
 }: VesselMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
+  const [hover, setHover] = useState<HoverTooltip | null>(null);
   // Lo último que se quiere pintar: si el mapa aún no ha cargado, se aplica en el `style.load`.
   const vesselsRef = useRef(vessels);
+  const filterRef = useRef(mapFilter);
   const trailRef = useRef(trail);
   const selectedRef = useRef(selectedMmsi);
   const onViewportChangeRef = useRef(onViewportChange);
@@ -201,7 +239,7 @@ export function VesselMap({
       if (!map.getSource(SOURCE_ID)) {
         map.addSource(SOURCE_ID, {
           type: 'geojson',
-          data: toFeatureCollection(vesselsRef.current),
+          data: toFeatureCollection(vesselsRef.current, filterRef.current),
         });
         // Aro bajo el buque seleccionado.
         map.addLayer({
@@ -234,6 +272,7 @@ export function VesselMap({
             'icon-color': COLOR_BY_CATEGORY,
             'icon-halo-color': palette.iconHalo,
             'icon-halo-width': 1.35,
+            'icon-opacity': STALE_OPACITY_EXPRESSION,
           },
         });
         map.addLayer({
@@ -243,11 +282,14 @@ export function VesselMap({
           filter: ['==', ['get', 'hasCourse'], true],
           layout: {
             'icon-image': 'vessel-cabin',
-            'icon-size': VESSEL_SIZE_EXPRESSION,
+            'icon-size': CABIN_SIZE_EXPRESSION,
             'icon-rotate': ['get', 'cog'],
             'icon-rotation-alignment': 'map',
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
+          },
+          paint: {
+            'icon-opacity': STALE_OPACITY_EXPRESSION,
           },
         });
       }
@@ -270,8 +312,23 @@ export function VesselMap({
     map.on('mouseenter', LAYER_ID, () => {
       map.getCanvas().style.cursor = 'pointer';
     });
+    map.on('mousemove', LAYER_ID, (event) => {
+      if (matches(MOBILE_MEDIA_QUERY)) {
+        return;
+      }
+      const feature = event.features?.[0];
+      const mmsi: unknown = feature?.properties.mmsi;
+      const stale = feature?.properties.stale === true;
+      if (typeof mmsi === 'number') {
+        setHover({ x: event.point.x, y: event.point.y, mmsi, stale });
+      }
+    });
     map.on('mouseleave', LAYER_ID, () => {
       map.getCanvas().style.cursor = '';
+      setHover(null);
+    });
+    map.on('movestart', () => {
+      setHover(null);
     });
 
     const observer =
@@ -305,8 +362,11 @@ export function VesselMap({
 
   useEffect(() => {
     vesselsRef.current = vessels;
-    void mapRef.current?.getSource<GeoJSONSource>(SOURCE_ID)?.setData(toFeatureCollection(vessels));
-  }, [vessels]);
+    filterRef.current = mapFilter;
+    void mapRef.current
+      ?.getSource<GeoJSONSource>(SOURCE_ID)
+      ?.setData(toFeatureCollection(vessels, mapFilter));
+  }, [vessels, mapFilter]);
 
   useEffect(() => {
     trailRef.current = trail;
@@ -336,7 +396,35 @@ export function VesselMap({
     });
   }, [focusTarget]);
 
-  return <div ref={containerRef} className="vessel-map" />;
+  const hoveredVessel = hover === null ? undefined : vessels.get(hover.mmsi);
+  const hoveredStale = hover?.stale ?? false;
+  const hoveredCategory =
+    hoveredVessel !== undefined ? shipCategory(hoveredVessel.ship_type) : 'unknown';
+
+  return (
+    <div ref={containerRef} className="vessel-map">
+      {hover !== null && hoveredVessel !== undefined && (
+        <div className="map-tooltip" role="tooltip" style={{ left: hover.x, top: hover.y }}>
+          <p className="map-tooltip__title">
+            <span
+              className="map-tooltip__dot"
+              style={{ backgroundColor: CATEGORY_COLORS[hoveredCategory] }}
+              aria-hidden="true"
+            />
+            {hoveredVessel.name?.trim()
+              ? hoveredVessel.name.trim()
+              : `MMSI ${String(hoveredVessel.mmsi)}`}
+          </p>
+          <p className="map-tooltip__meta">
+            {CATEGORY_LABELS[hoveredCategory]}
+            {' · '}
+            {(hoveredVessel.sog ?? 0) > 0.5 ? speedText(hoveredVessel.sog) : 'Fondeado'}
+            {hoveredStale ? ' · Señal antigua' : ''}
+          </p>
+        </div>
+      )}
+    </div>
+  );
 }
 
 /**

@@ -23,7 +23,18 @@ export function writeStorage(key: string, value: string): void {
 }
 
 export function readStoredTheme(): ThemeMode {
-  return readStorage(THEME_STORAGE_KEY) === 'dark' ? 'dark' : 'light';
+  const stored = readStorage(THEME_STORAGE_KEY);
+  if (stored === 'dark' || stored === 'light') {
+    return stored;
+  }
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  ) {
+    return 'dark';
+  }
+  return 'light';
 }
 
 export function readStoredBasemap(): BasemapMode {

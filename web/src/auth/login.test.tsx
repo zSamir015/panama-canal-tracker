@@ -130,4 +130,20 @@ describe('LoginForm', () => {
     expect(registerImpl).toHaveBeenCalledWith('nuevo@example.com', 'una-frase-larga-123');
     expect(onLogin).toHaveBeenCalledWith(session);
   });
+
+  it('permite mostrar u ocultar la contraseña y abrir la demo sin cuenta', async () => {
+    const onTryDemo = vi.fn();
+    render(<LoginForm onLogin={vi.fn()} onTryDemo={onTryDemo} />);
+
+    const passwordInput = screen.getByLabelText('Contraseña');
+    expect(passwordInput).toHaveAttribute('type', 'password');
+
+    const toggle = screen.getByRole('button', { name: 'Mostrar contraseña' });
+    await userEvent.click(toggle);
+    expect(passwordInput).toHaveAttribute('type', 'text');
+    expect(screen.getByRole('button', { name: 'Ocultar contraseña' })).toBeVisible();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Ver demo sin cuenta' }));
+    expect(onTryDemo).toHaveBeenCalledTimes(1);
+  });
 });

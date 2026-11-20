@@ -1,5 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchDailyStats, fetchTransitDurations, fetchWaitingTimes } from './api';
+import {
+  fetchDailyStats,
+  fetchPreviousTransitDurations,
+  fetchPreviousWaitingTimes,
+  fetchTransitDurations,
+  fetchWaitingTimes,
+} from './api';
 
 /** Cada cuánto se recargan las estadísticas: cambian con cada tránsito, que dura horas. */
 export const STATS_REFRESH_MS = 5 * 60_000;
@@ -38,11 +44,29 @@ export function useTransitDurations(token: string | null, days: number) {
   });
 }
 
+export function usePreviousTransitDurations(token: string | null, days: number) {
+  const { key, ...rest } = options(token, days);
+  return useQuery({
+    queryKey: ['stats', 'durations', 'prev', ...key],
+    queryFn: () => fetchPreviousTransitDurations(needToken(token), days),
+    ...rest,
+  });
+}
+
 export function useWaitingTimes(token: string | null, days: number) {
   const { key, ...rest } = options(token, days);
   return useQuery({
     queryKey: ['stats', 'waiting', ...key],
     queryFn: () => fetchWaitingTimes(needToken(token), days),
+    ...rest,
+  });
+}
+
+export function usePreviousWaitingTimes(token: string | null, days: number) {
+  const { key, ...rest } = options(token, days);
+  return useQuery({
+    queryKey: ['stats', 'waiting', 'prev', ...key],
+    queryFn: () => fetchPreviousWaitingTimes(needToken(token), days),
     ...rest,
   });
 }

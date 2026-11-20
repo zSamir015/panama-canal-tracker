@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from '../api/client';
 import { renderWithQuery } from '../test/render';
 import { fetchCurrentTransits, parseCurrentTransits } from './api';
-import { directionText, elapsedText, transitName } from './format';
+import { directionText, elapsedText, transitName, transitProgress } from './format';
 import { TransitsPanel } from './TransitsPanel';
 
 const item = {
@@ -100,6 +100,16 @@ describe('formatos', () => {
     expect(elapsedText('2026-11-06T09:15:00Z', now)).toBe('lleva 3 h');
     expect(elapsedText('2026-11-06T13:00:00Z', now)).toBe('acaba de entrar'); // reloj adelantado
     expect(elapsedText('no es una fecha', now)).toBe('—');
+  });
+
+  it('estima avance porcentual y tiempo restante según la mediana', () => {
+    const now = Date.parse('2026-11-06T13:00:00Z');
+    // 3 horas transcurridas sobre una mediana de 5 horas (300 min) => 60 % y faltan 2 h.
+    expect(transitProgress('2026-11-06T10:00:00Z', now, 300)).toEqual({
+      percent: 60,
+      label: '≈ 60 %, sale en unas 2 h',
+    });
+    expect(transitProgress('no es fecha', now, 300)).toBeNull();
   });
 
   it('usa el MMSI cuando el nombre falta o es solo espacios', () => {
@@ -222,5 +232,27 @@ describe('TransitsPanel', () => {
 
     expect(await screen.findByText('<img src=x onerror=alert(1)>')).toBeVisible();
     expect(container.querySelector('img')).toBeNull();
+  });
+
+  it('muestra la barra de progreso, aviso honesto de cobertura y botón reintentar', async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(Response.json({}, { status: 500 }))
+      .mockResolvedValueOnce(Response.json(body))
+      .mockResolvedValueOnce(Response.json({ items: [], total: 0 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const { unmount } = renderWithQuery(
+      <TransitsPanel token="abc" selectedMmsi={null} onSelect={vi.fn()} medianMinutes={300} />,
+    );
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('La API no respondió bien');
+    await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
+    expect(await screen.findByRole('progressbar')).toBeVisible();
+
+    unmount();
+    renderWithQuery(
+      <TransitsPanel token="t2" selectedMmsi={null} onSelect={vi.fn()} medianMinutes={300} />,
+    );
+    expect(await screen.findByText(/cobertura AIS terrestre/i)).toBeVisible();
   });
 });

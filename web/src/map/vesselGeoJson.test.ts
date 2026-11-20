@@ -32,29 +32,65 @@ describe('shipCategory', () => {
 });
 
 describe('toFeatureCollection', () => {
-  it('convierte cada buque en un punto con su categoría y rumbo', () => {
-    const collection = toFeatureCollection(new Map([[vessel.mmsi, vessel]]));
+  it('convierte cada buque en un punto con su categoría, rumbo y frescura de señal', () => {
+    const now = Date.parse('2026-10-16T14:35:00Z');
+    const collection = toFeatureCollection(new Map([[vessel.mmsi, vessel]]), { now });
 
     expect(collection.features).toEqual([
       {
         type: 'Feature',
         id: vessel.mmsi,
         geometry: { type: 'Point', coordinates: [-79.91, 9.35] },
-        properties: { mmsi: vessel.mmsi, category: 'cargo', cog: 145.2, hasCourse: true },
+        properties: {
+          mmsi: vessel.mmsi,
+          category: 'cargo',
+          cog: 145.2,
+          hasCourse: true,
+          stale: false,
+        },
       },
     ]);
   });
 
-  it('marca los buques sin rumbo y no copia el nombre a la capa', () => {
-    const [feature] = toFeatureCollection(new Map([[1, { ...vessel, cog: null }]])).features;
+  it('marca como atenuado un buque con señal mayor a 15 minutos y oculta el nombre', () => {
+    const now = Date.parse('2026-10-16T15:00:00Z');
+    const [feature] = toFeatureCollection(new Map([[1, { ...vessel, cog: null }]]), {
+      now,
+    }).features;
 
     expect(feature?.properties).toEqual({
       mmsi: vessel.mmsi,
       category: 'cargo',
       cog: 0,
       hasCourse: false,
+      stale: true,
     });
     expect(JSON.stringify(feature)).not.toContain('onerror');
+  });
+
+  it('filtra por categoría oculta y por solo en tránsito', () => {
+    const now = Date.parse('2026-10-16T14:35:00Z');
+    const tanker: LiveVessel = { ...vessel, mmsi: 636000001, ship_type: 80 };
+    const vessels = new Map([
+      [vessel.mmsi, vessel],
+      [tanker.mmsi, tanker],
+    ]);
+
+    const onlyTanker = toFeatureCollection(vessels, {
+      hiddenCategories: new Set(['cargo']),
+      transitOnly: false,
+      transitMmsis: new Set(),
+      now,
+    });
+    expect(onlyTanker.features.map((f) => f.id)).toEqual([636000001]);
+
+    const onlyTransit = toFeatureCollection(vessels, {
+      hiddenCategories: new Set(),
+      transitOnly: true,
+      transitMmsis: new Set([vessel.mmsi]),
+      now,
+    });
+    expect(onlyTransit.features.map((f) => f.id)).toEqual([vessel.mmsi]);
   });
 });
 

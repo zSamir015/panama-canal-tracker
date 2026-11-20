@@ -69,9 +69,55 @@
 
   /* Movimiento */
   --transition-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Tipografía telemétrica tabular */
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
 }
 
 /* Tema oscuro OLED / Consola nocturna de operaciones con contraste AA verificado. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-brand: #050a12;
+    --color-brand-hover: #0e1929;
+    --color-on-brand: #f1f5f9;
+    --color-page: #070d16;
+    --color-surface: #0f172a;
+    --color-surface-elevated: #162238;
+    --color-surface-glass: rgb(15 23 42 / 90%);
+    --color-surface-muted: #1e293b;
+
+    --color-text: #e2e8f0;
+    --color-text-strong: #f8fafc;
+    --color-text-secondary: #cbd5e1;
+    --color-text-muted: #94a3b8;
+
+    --color-border: #334155;
+    --color-border-subtle: #1e293b;
+    --color-divider: #192436;
+
+    --color-accent: #2563eb;
+    --color-accent-hover: #1d4ed8;
+    --color-accent-text: #60a5fa;
+    --color-accent-soft: rgb(37 99 235 / 18%);
+    --color-on-accent: #ffffff;
+    --color-danger: #f87171;
+    --color-danger-bg: rgb(239 68 68 / 15%);
+    --color-danger-border: rgb(248 113 113 / 40%);
+    --color-notice: #fbbf24;
+    --color-notice-bg: rgb(251 191 36 / 14%);
+    --color-notice-border: rgb(251 191 36 / 38%);
+    --color-warning-bg: #2e2007;
+    --color-warning-border: #d97706;
+    --color-warning-text: #fde68a;
+
+    --color-skeleton: #1e293b;
+
+    --shadow-panel: 0 10px 28px rgb(0 0 0 / 50%), 0 2px 8px rgb(0 0 0 / 36%);
+    --shadow-card: 0 2px 8px rgb(0 0 0 / 38%), 0 1px 2px rgb(0 0 0 / 26%);
+    --shadow-sheet: 0 -8px 28px rgb(0 0 0 / 55%);
+  }
+}
+
 [data-theme='dark'] {
   --color-brand: #050a12;
   --color-brand-hover: #0e1929;

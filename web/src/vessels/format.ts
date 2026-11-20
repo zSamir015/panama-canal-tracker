@@ -60,3 +60,21 @@ export function agoText(iso: string | null, now: number): string {
   }
   return `hace ${String(Math.round(minutes / 60))} h`;
 }
+
+const PANAMA_FORMATTER = new Intl.DateTimeFormat('es-PA', {
+  timeZone: 'America/Panama',
+  dateStyle: 'medium',
+  timeStyle: 'short',
+});
+
+/** Hora absoluta formateada en zona horaria de Panamá (`America/Panama`) para tooltips `title`. */
+export function panamaDateTimeText(iso: string | null): string | undefined {
+  if (iso === null) {
+    return undefined;
+  }
+  const timestamp = Date.parse(iso);
+  if (Number.isNaN(timestamp)) {
+    return undefined;
+  }
+  return `${PANAMA_FORMATTER.format(timestamp)} (Panamá)`;
+}
