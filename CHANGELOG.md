@@ -8,7 +8,7 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ### Changed
 - Licencia: de MIT a **todos los derechos reservados** (issue #166). El código sigue siendo público
   para verlo y evaluarlo, pero usarlo, copiarlo o modificarlo requiere permiso escrito. Las
-  versiones hasta `9f0c28b` se publicaron bajo MIT y siguen bajo MIT. Actualizados `LICENSE`, los
+  versiones hasta `cd0bc3d` se publicaron bajo MIT y siguen bajo MIT. Actualizados `LICENSE`, los
   README, `pyproject.toml` (`LicenseRef-AllRightsReserved`) y `web/package.json` (`UNLICENSED`).
 
 ### Security
