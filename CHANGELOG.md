@@ -5,6 +5,11 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Changed
+- `docs/SECURITY_REVIEW.md` recoge el hallazgo de `/ws/live` (arreglado en #158), los riesgos
+  aceptados (enumeración por el registro, access token válido 15 min tras el logout, sin cambio de
+  contraseña, `starlette` sin declarar) y las cabeceras reales de la demo en Pages (issue #180).
+
 ## [1.0.0] - 2026-11-20
 
 Fase 7: producción y pulido de portafolio. Métricas Prometheus y `/ready`, copias de la base

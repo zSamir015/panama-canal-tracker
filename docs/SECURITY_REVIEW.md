@@ -24,6 +24,8 @@ despliegue**, no como fallo pendiente de `v1.0.0`.
 | Lectura línea a línea de auth, admin, CORS, cabeceras y WebSocket | Revisados `security.py`, `core/auth.py`, `services/auth.py`, `routers/auth.py`, `routers/admin.py`, `main.py`, `middleware.py`, `headers.py`, `logging.py`, `config.py`, `routers/live.py`, `routers/infrastructure.py` y `schemas/auth.py` |
 | Prueba en navegador (Chromium) de la app completa con CSP (`vite build`) | Pila local (`db`, `redis`, simulador, worker, API) + `web/dist` en el mismo origen (`http://localhost:14173`): login (`200`), mapa + worker de MapLibre + tiles OpenFreeMap, `/ws/live` (`En vivo · 8 buques`), `/transits/current`, `/vessels/{mmsi}` y `/history`, `/stats/*` (`200`). **0 violaciones de CSP, 0 errores de consola** y sin tokens en logs |
 | Revisión visual de `docs/media/` (`13` PNGs + fotogramas de `live-map.gif`) | Solo la ventana de la app, con buques/datos simulados; sin pestañas, barras del navegador, rutas locales, correos personales ni secretos |
+| Demo en GitHub Pages (cabeceras con `curl -I`) | HTTPS con `Strict-Transport-Security: max-age=31556952` y redirección `301` desde HTTP, puestas por GitHub; CSP en el `<meta>` |
+| Alertas abiertas en GitHub (Dependabot y secret scanning) | **0** y **0** |
 | Configuración de GitHub (`gh api`) | `secret_scanning`, `secret_scanning_push_protection` y `dependabot_security_updates` **activados** |
 | Imágenes base y acciones de GitHub | `timescaledb-ha` y `redis:8.10.2-alpine` fijadas por digest en `docker-compose.yml`; todas las acciones de `.github/workflows/` fijadas por SHA |
 | Lockfiles, Dockerfile y pila de contenedores | `1 254` y `2 031` líneas con `--hash=`; `Dockerfile` con `USER 10001:10001` y `.dockerignore`; `docker-compose.stack.yml` sin puertos publicados para `db` ni `redis` y contenedores `read_only` + `cap_drop: ALL` |
@@ -42,7 +44,26 @@ despliegue**, no como fallo pendiente de `v1.0.0`.
   * `HardenedCORSMiddleware` valida orígenes explícitos sin `*`, `allow_credentials=True`, métodos `GET/POST/DELETE`, cabeceras `Authorization/Content-Type`, y en preflights rechazados devuelve `400 problem+json` sin anunciar cabeceras `Access-Control-Allow-*`.
   * `SecurityHeadersMiddleware` inyecta `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, `Cross-Origin-Resource-Policy: same-site` y `Cache-Control: no-store` en `/api/v1/auth/`.
   * `BodySizeLimitMiddleware` corta a 64 KB tanto por `Content-Length` como leyendo chunks; `RequestIdMiddleware` genera UUID propio ignorando cabeceras entrantes; `logging.py` redacta campos sensibles de forma recursiva, desactiva `show_locals` en tracebacks y fija el logger `websockets` en `INFO` como mínimo.
-  * `/ws/live` valida `Origin` contra `CORS_ORIGINS` antes de `accept()`, autentica en el primer mensaje (≤ 5 s), limita frames a 4 KB, mensajes a 20/10 s y conexiones a 5 por usuario en Redis. `/metrics` exige `METRICS_TOKEN` comparado con `hmac.compare_digest` (401 si no hay token configurado).
+  * `/ws/live` valida `Origin` contra `CORS_ORIGINS` antes de `accept()`, autentica en el primer mensaje (≤ 5 s) y cierra la conexión con `4401` cuando caduca ese access token (hallazgo 1, arreglado en #158), limita frames a 4 KB, mensajes a 20/10 s y conexiones a 5 por usuario en Redis. `/metrics` exige `METRICS_TOKEN` comparado con `hmac.compare_digest` (401 si no hay token configurado).
+
+## Hallazgos
+
+| # | Hallazgo | Gravedad | Estado |
+|---|---|---|---|
+| 1 | `/ws/live` validaba el access token solo en el primer mensaje: la conexión seguía recibiendo posiciones aunque el token caducara (15 min) o el usuario cerrara sesión. Ningún test lo veía porque ninguno esperaba a que caducara | Baja (datos de solo lectura para cualquier usuario registrado) | **Arreglado** en #158 (issue #157): se cierra con `4401` al caducar y el frontend, que ya trataba el `4401`, renueva el token y reconecta. Test `test_the_connection_closes_with_4401_when_the_token_expires` |
+
+## Riesgos aceptados
+
+- **El registro dice si un email ya existe** (`409`). El login no lo revela, pero `register` sí: sin
+  verificación por correo no se puede responder igual en los dos casos. Lo frena el límite de 3
+  registros por minuto e IP, y la lista de usuarios de un tracker de buques no es un dato sensible.
+- **Un access token sigue valiendo en la API REST hasta 15 minutos tras el logout.** Es el precio
+  de un JWT sin estado: el logout revoca el refresh, así que no se puede renovar. Comprobar una
+  lista de revocación en cada petición costaría una consulta por petición.
+- **No hay cambio de contraseña.** La regla "cambiar la contraseña revoca todas las sesiones"
+  (§8.4) no aplica todavía; si se añade, debe revocar todas las familias del usuario.
+- **`starlette` se importa sin declararla.** Llega con FastAPI, que fija su versión; declararla
+  aparte podría chocar con ese rango.
 
 ## Estado por apartado de AGENTS.md §8
 
@@ -51,12 +72,12 @@ despliegue**, no como fallo pendiente de `v1.0.0`.
 | 8.1 | Claves y secretos | **Cumple** | `gitleaks` (0 en 93 commits), secret scanning + push protection activos |
 | 8.2 | Variables de entorno | **Cumple** | Sin `os.environ` fuera de `config.py`; `SecretStr`; validación fail-fast en producción |
 | 8.3 | Rutas de administración | **Cumple** | `require_admin` a nivel de router, log de auditoría, tests 401/403 (leído línea a línea) |
-| 8.4 | Autenticación | **Cumple** | PyJWT HS256, rotación + familia, cookie `HttpOnly`/`Secure`/`SameSite=Strict`, anti-enumeración (leído + probado) |
+| 8.4 | Autenticación | **Cumple** | PyJWT HS256, rotación + familia, cookie `HttpOnly`/`Secure`/`SameSite=Strict`, login sin enumeración (leído + probado); `/ws/live` ya no sobrevive al token (#158); ver "Riesgos aceptados" |
 | 8.5 | Autorización de usuarios | **No aplica / Cumple** | Datos de buques/tránsitos compartidos; `logout` filtra por `user.id` |
 | 8.6 | Validación de entradas | **Cumple** | Pydantic `extra="forbid"`, límite de body 64 KB y WS 4 KB, SQL parametrizado, parser AIS estricto |
 | 8.7 | XSS | **Cumple** | React sin sinks peligrosos, regla ESLint + tests con `<img onerror>` en ficha y WS |
 | 8.8 | Rate limiting | **Cumple (capa de app)** | Límites en Redis (auth fail-closed 503, API fail-open); la capa de proxy queda como requisito previo al despliegue |
-| 8.9 | Endpoints | **Cumple** | `test_deny_by_default` + `test_every_websocket_route_is_a_known_authenticated_one`; `/metrics` con token propio; Origin + auth en `/ws/live` |
+| 8.9 | Endpoints | **Cumple** | `test_deny_by_default` + `test_every_websocket_route_is_a_known_authenticated_one`; `/metrics` con token propio; Origin + auth en `/ws/live`, que se cierra al caducar el token (#158) |
 | 8.10 | CORS | **Cumple** | `HardenedCORSMiddleware` con orígenes explícitos (leído línea a línea + tests) |
 | 8.11 | Cabeceras y CSP | **Cumple (app + meta CSP)** | Middleware de seguridad en API; CSP del frontend probada en vivo en Chromium con app completa (0 violaciones); HSTS y `frame-ancestors` en cabecera quedan para el proxy |
 | 8.12 | Modo de depuración | **Cumple** | Sin `debug=True`, sin source maps (`sourcemap: false`), `/docs` público por diseño |
@@ -93,4 +114,5 @@ La versión `v1.0.0` se entrega únicamente con la demo estática en GitHub Page
   del Canal; los umbrales y polígonos de tránsitos y fondeaderos se verificaron con datos
   sintéticos, no calibrados contra estadísticas de la ACP.
 * **Recolector de AIS en GitHub Actions (`ADR-0012`)**: zona gris de uso de minutos programados;
-  permanece apagado por defecto (`AIS_COLLECT_ENABLED`).
+  el workflow está apagado por defecto y se enciende con la variable `AIS_COLLECT_ENABLED` (hoy
+  encendida desde el 2026-11-07 para la validación de la 5.7).
