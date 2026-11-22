@@ -13,6 +13,13 @@ describe('urlState', () => {
     });
   });
 
+  it('lee y escribe la vista del historial', () => {
+    expect(readUrlState('?view=history')).toEqual({ view: 'history', mmsi: null });
+
+    writeUrlState({ view: 'history', mmsi: null });
+    expect(window.location.search).toBe('?view=history');
+  });
+
   it('descarta MMSIs inválidos o vistas desconocidas sin romper', () => {
     expect(readUrlState('?view=other&mmsi=123')).toEqual({ view: 'map', mmsi: null });
     expect(readUrlState('?mmsi=abc')).toEqual({ view: 'map', mmsi: null });

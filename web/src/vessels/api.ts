@@ -42,17 +42,18 @@ export const DIRECTORY_PAGE_SIZE = 200;
 export const DIRECTORY_MAX_PAGES = 10;
 
 /**
- * Todos los buques conocidos, página a página (los más vistos primero). Una sola página dejaba
- * fuera a los buques más antiguos del buscador en cuanto había más de 200.
+ * Todos los buques que cumplen un filtro, página a página (los vistos más recientemente primero).
+ * Una sola página dejaba fuera a los buques más antiguos en cuanto había más de 200.
  */
-export async function fetchVesselDirectory(
+async function fetchVesselPages(
   token: string,
+  filter: string,
   fetchImpl?: typeof fetch,
 ): Promise<VesselSummary[]> {
   const all: VesselSummary[] = [];
   for (let page = 1; page <= DIRECTORY_MAX_PAGES; page += 1) {
     const result = await apiGet(
-      `/vessels?size=${String(DIRECTORY_PAGE_SIZE)}&page=${String(page)}`,
+      `/vessels?size=${String(DIRECTORY_PAGE_SIZE)}&page=${String(page)}${filter}`,
       token,
       parseVesselPage,
       fetchImpl,
@@ -63,6 +64,27 @@ export async function fetchVesselDirectory(
     }
   }
   return all;
+}
+
+/** Todos los buques conocidos. */
+export function fetchVesselDirectory(
+  token: string,
+  fetchImpl?: typeof fetch,
+): Promise<VesselSummary[]> {
+  return fetchVesselPages(token, '', fetchImpl);
+}
+
+/**
+ * Los buques con alguna posición desde hace `sinceMs` (`seen_since`, en UTC; la API admite hasta
+ * 90 días), el más reciente primero.
+ */
+export function fetchSeenVessels(
+  token: string,
+  sinceMs: number,
+  fetchImpl?: typeof fetch,
+): Promise<VesselSummary[]> {
+  const since = new Date(Date.now() - sinceMs).toISOString();
+  return fetchVesselPages(token, `&seen_since=${encodeURIComponent(since)}`, fetchImpl);
 }
 
 function parseVesselPage(body: unknown): { items: VesselSummary[]; total: number } | null {

@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
+  type RefObject,
 } from 'react';
 import './App.css';
 import { ApiError } from './api/client';
@@ -23,6 +24,7 @@ import type { ShipCategory } from './map/vesselGeoJson';
 import type { MapFocusTarget } from './map/VesselMap';
 import { GuideDialog } from './onboarding/GuideDialog';
 import { hasSeenGuide, rememberGuideSeen } from './onboarding/guideStorage';
+import { HistoryView } from './history/HistoryView';
 import { StatsView } from './stats/StatsView';
 import { useTransitDurations } from './stats/queries';
 import {
@@ -39,7 +41,7 @@ import { TransitsPanel } from './transits/TransitsPanel';
 import { useCurrentTransits } from './transits/queries';
 import { ConnectionDot } from './ui/ConnectionDot';
 import { type AppView, readUrlState, writeUrlState } from './urlState';
-import { fetchVesselDetail } from './vessels/api';
+import { fetchVesselDetail, type VesselSummary } from './vessels/api';
 import { HeaderVesselSearch, type SearchCandidate } from './vessels/HeaderVesselSearch';
 import { useVesselTrack } from './vessels/queries';
 import { DEFAULT_TRAIL_WINDOW, type TrailWindowId, trailWindow } from './vessels/trailWindow';
@@ -78,6 +80,7 @@ export function App() {
   const [transitOnly, setTransitOnly] = useState(false);
   const mapTabRef = useRef<HTMLButtonElement>(null);
   const statsTabRef = useRef<HTMLButtonElement>(null);
+  const historyTabRef = useRef<HTMLButtonElement>(null);
   // Guía al primer uso (issue #137): sale sola hasta que se cierra una vez; luego, con el "?".
   const [guideOpen, setGuideOpen] = useState(() => !hasSeenGuide());
   const closeGuide = useCallback(() => {
@@ -226,17 +229,49 @@ export function App() {
     [activeVessels.vessels],
   );
 
-  const handleTabKeyDown = useCallback((event: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'ArrowRight' || event.key === 'End') {
-      event.preventDefault();
-      setView('stats');
-      statsTabRef.current?.focus();
-    } else if (event.key === 'ArrowLeft' || event.key === 'Home') {
-      event.preventDefault();
-      setView('map');
-      mapTabRef.current?.focus();
-    }
-  }, []);
+  const handleTabKeyDown = useCallback(
+    (event: ReactKeyboardEvent<HTMLDivElement>) => {
+      const order: [AppView, RefObject<HTMLButtonElement | null>][] = [
+        ['map', mapTabRef],
+        ['stats', statsTabRef],
+        ['history', historyTabRef],
+      ];
+      const index = order.findIndex(([name]) => name === view);
+      let next: number | null = null;
+      if (event.key === 'ArrowRight') {
+        next = Math.min(index + 1, order.length - 1);
+      } else if (event.key === 'ArrowLeft') {
+        next = Math.max(index - 1, 0);
+      } else if (event.key === 'Home') {
+        next = 0;
+      } else if (event.key === 'End') {
+        next = order.length - 1;
+      }
+      const target = next === null ? undefined : order[next];
+      if (target !== undefined) {
+        event.preventDefault();
+        setView(target[0]);
+        target[1].current?.focus();
+      }
+    },
+    [view],
+  );
+
+  // Desde el historial: el buque se abre en el mapa con su ficha y la estela del periodo.
+  const openFromHistory = useCallback(
+    (vessel: VesselSummary, trail: TrailWindowId) => {
+      setTrailWindowId(trail);
+      selectFromSearch({
+        mmsi: vessel.mmsi,
+        name: vessel.name,
+        imo: vessel.imo,
+        shipType: vessel.ship_type,
+        lon: vessel.lon,
+        lat: vessel.lat,
+      });
+    },
+    [selectFromSearch],
+  );
 
   return (
     <main className="app">
@@ -352,6 +387,36 @@ export function App() {
                   </svg>
                   <span>Estadísticas</span>
                 </button>
+                <button
+                  ref={historyTabRef}
+                  type="button"
+                  role="tab"
+                  aria-selected={view === 'history'}
+                  tabIndex={view === 'history' ? 0 : -1}
+                  onClick={() => {
+                    setView('history');
+                  }}
+                >
+                  <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                    <circle
+                      cx="8"
+                      cy="8"
+                      r="5.6"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                    <path
+                      d="M8 4.8V8l2.2 1.4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span>Historial</span>
+                </button>
               </div>
             </nav>
           )}
@@ -439,6 +504,8 @@ export function App() {
       <GuideDialog open={mapReady && guideOpen} demo={isDemo} onClose={closeGuide} />
       {view === 'stats' && !isDemo && token !== null ? (
         <StatsView token={token} onUnauthorized={renew} />
+      ) : view === 'history' && !isDemo && token !== null ? (
+        <HistoryView token={token} onUnauthorized={renew} onOpen={openFromHistory} />
       ) : (
         <section className="app__map" aria-label="Mapa en vivo">
           {mapReady ? (

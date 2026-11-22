@@ -1,4 +1,6 @@
-export type AppView = 'map' | 'stats';
+export type AppView = 'map' | 'stats' | 'history';
+
+const VIEWS: readonly AppView[] = ['map', 'stats', 'history'];
 
 export interface UrlState {
   view: AppView;
@@ -10,7 +12,8 @@ const VALID_MMSI_MAX = 999_999_999;
 
 export function readUrlState(search: string = getSearch()): UrlState {
   const params = new URLSearchParams(search);
-  const view: AppView = params.get('view') === 'stats' ? 'stats' : 'map';
+  const requested = params.get('view');
+  const view: AppView = VIEWS.find((item) => item === requested) ?? 'map';
   const rawMmsi = params.get('mmsi');
   let mmsi: number | null = null;
   if (rawMmsi !== null && /^\d{9}$/.test(rawMmsi)) {
@@ -27,8 +30,8 @@ export function writeUrlState(state: UrlState, replace = false): void {
     return;
   }
   const url = new URL(window.location.href);
-  if (state.view === 'stats') {
-    url.searchParams.set('view', 'stats');
+  if (state.view !== 'map') {
+    url.searchParams.set('view', state.view);
   } else {
     url.searchParams.delete('view');
   }

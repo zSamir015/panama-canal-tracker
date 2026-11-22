@@ -292,6 +292,23 @@ describe('App', () => {
     expect(screen.queryByRole('region', { name: 'Estadísticas' })).not.toBeInTheDocument();
   });
 
+  it('abre el historial y, al elegir un buque, lo muestra en el mapa con su ficha', async () => {
+    window.localStorage.setItem('panama-canal-tracker:guide-seen', '1');
+    stubApi({ refreshStatuses: [200] });
+    renderWithQuery(<App />);
+
+    await screen.findByRole('button', { name: 'buque de prueba' });
+    await userEvent.click(screen.getByRole('tab', { name: 'Historial' }));
+
+    expect(await screen.findByRole('region', { name: 'Historial' })).toBeVisible();
+    expect(window.location.search).toContain('view=history');
+    await userEvent.click(await screen.findByRole('button', { name: /PACIFIC STAR/ }));
+
+    expect(screen.queryByRole('region', { name: 'Historial' })).not.toBeInTheDocument();
+    expect(await screen.findByRole('region', { name: 'Mapa en vivo' })).toBeVisible();
+    expect(window.location.search).toBe('?mmsi=352001234');
+  });
+
   it('sincroniza el MMSI seleccionado con la URL y responde al buscador global con /', async () => {
     window.localStorage.setItem('panama-canal-tracker:guide-seen', '1');
     stubApi({ refreshStatuses: [200] });
