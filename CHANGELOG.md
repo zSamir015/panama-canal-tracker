@@ -6,6 +6,9 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- Capturas nuevas en `docs/media/` (`ui-desktop-history.png`, `ui-desktop-trail-7d.png`,
+  `ui-mobile-history.png`), hechas con buques simulados de nombres ficticios, y sección «Vessel
+  History & Routes» en `README.md` y `README.es.md` (issue #193).
 - Pestaña **Historial** (issue #191): los buques con alguna posición en las últimas 24 h, 48 h,
   7 días o 30 días (`GET /vessels?seen_since=`, el más reciente primero), con filtro por nombre,
   MMSI o IMO. Pulsar uno lo abre en el mapa con su ficha, centrado en su última posición y con la
@@ -27,6 +30,8 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `db` no está en marcha. Procedimiento en `docs/BACKUP.md`.
 
 ### Changed
+- Historial: la columna del MMSI queda alineada en todas las filas (la hora tiene ancho fijo), en
+  escritorio y en móvil (issue #193).
 - El buscador de la cabecera carga todo el directorio de buques (páginas de 200, hasta 2 000) y no
   solo los 200 vistos más recientemente: con 605 buques dejaba fuera a 405 (issue #189).
 - Validación 5.7 repetida con **14,9 días** de AIS real (`2026-11-07` a `2026-11-21`, 37 ejecuciones
