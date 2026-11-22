@@ -39,3 +39,8 @@ se pueda cortar el acceso a una cuenta si hiciera falta.
 - La demo del portafolio (Fase 4) es pública como web, pero el mapa pide registro; el GIF del
   README (4.9) enseña el mapa sin necesidad de cuenta.
 - Si AISStream publica términos que lo permitan, o lo confirma, se puede revisar con un ADR nuevo.
+
+## Nota posterior
+El ADR-0020 (2026-11-22) permite capturas estáticas con datos reales en el README, con
+enmascarado de embarcaciones personales. Esta decisión sigue vigente para la aplicación: no hay
+acceso anónimo a los datos.
