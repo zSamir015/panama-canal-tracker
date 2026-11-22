@@ -2536,3 +2536,93 @@
     display: none;
   }
 }
+
+/* Historial de buques (issue #191). Reutiliza la carcasa de las estadísticas. */
+.history__filter {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.history__filter input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+  color: var(--color-text-strong);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.history__filter input:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.history__list {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.75rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history__row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1.3fr) minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.55rem 0.8rem;
+  font: inherit;
+  color: var(--color-text-strong);
+  text-align: left;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.history__row:hover {
+  background: var(--color-page);
+}
+
+.history__row:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.history__dot {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+}
+
+.history__name {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history__meta,
+.history__seen {
+  overflow: hidden;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history__seen {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 640px) {
+  .history__row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .history__meta {
+    display: none;
+  }
+}

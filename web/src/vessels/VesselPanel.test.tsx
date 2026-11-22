@@ -183,7 +183,7 @@ describe('VesselPanel: ventana de la estela', () => {
     expect(screen.queryByRole('group', { name: 'Ventana de la estela' })).not.toBeInTheDocument();
   });
 
-  it('enseña las cuatro ventanas, marca la activa y avisa al elegir otra', async () => {
+  it('enseña las cinco ventanas, marca la activa y avisa al elegir otra', async () => {
     stubDetail(detail);
     const onChange = vi.fn();
     renderWithWindow({ trailWindowId: '24h', onTrailWindowChange: onChange });
@@ -193,7 +193,7 @@ describe('VesselPanel: ventana de la estela', () => {
     const labels = within(group)
       .getAllByRole('button')
       .map((button) => button.textContent);
-    expect(labels).toEqual(['30 min', '6 h', '24 h', '7 días']);
+    expect(labels).toEqual(['30 min', '6 h', '24 h', '48 h', '7 días']);
     expect(within(group).getByRole('button', { name: '24 h' })).toHaveAttribute(
       'aria-pressed',
       'true',

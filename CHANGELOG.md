@@ -6,6 +6,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- Pestaña **Historial** (issue #191): los buques con alguna posición en las últimas 24 h, 48 h,
+  7 días o 30 días (`GET /vessels?seen_since=`, el más reciente primero), con filtro por nombre,
+  MMSI o IMO. Pulsar uno lo abre en el mapa con su ficha, centrado en su última posición y con la
+  estela del periodo (nueva ventana de 48 h; 30 días usa la de 7). Sin cambios de backend.
 - Ficha del buque: selector de la ventana de la estela (30 min, 6 h, 24 h, 7 días; antes fija en
   30 min). Las ventanas largas piden `from` a `GET /vessels/{mmsi}/history`, se recargan cada 60 s y
   cortan la estela por huecos de señal proporcionales a la ventana (5 min, 30 min, 2 h, 6 h); si la

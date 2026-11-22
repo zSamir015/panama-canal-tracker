@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchVesselDetail, fetchVesselDirectory, fetchVesselTrack } from './api';
+import { fetchSeenVessels, fetchVesselDetail, fetchVesselDirectory, fetchVesselTrack } from './api';
 import { DEFAULT_TRAIL_WINDOW, type TrailWindowId, trailWindow } from './trailWindow';
 
 /** Cada cuánto se recarga la estela mientras la ficha está abierta. */
@@ -15,6 +15,21 @@ export function useVesselDirectory(token: string | null) {
         throw new Error('Sin sesión');
       }
       return fetchVesselDirectory(token);
+    },
+    enabled: token !== null,
+    staleTime: 60_000,
+  });
+}
+
+/** Buques vistos desde hace `sinceMs`; `periodId` identifica la petición en la caché. */
+export function useSeenVessels(token: string | null, periodId: string, sinceMs: number) {
+  return useQuery({
+    queryKey: ['vessels', 'seen', periodId, token],
+    queryFn: () => {
+      if (token === null) {
+        throw new Error('Sin sesión');
+      }
+      return fetchSeenVessels(token, sinceMs);
     },
     enabled: token !== null,
     staleTime: 60_000,

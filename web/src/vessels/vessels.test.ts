@@ -4,6 +4,7 @@ import type { LiveVessel } from '../live/protocol';
 import {
   DIRECTORY_MAX_PAGES,
   DIRECTORY_PAGE_SIZE,
+  fetchSeenVessels,
   fetchVesselDirectory,
   fetchVesselTrack,
   parseVesselDetail,
@@ -164,6 +165,35 @@ describe('fetchVesselTrack con ventana', () => {
     const gaps = TRAIL_WINDOWS.map((item) => item.gapMs);
     expect(gaps).toEqual([...gaps].sort((x, y) => x - y));
     expect(new Set(gaps).size).toBe(gaps.length);
+  });
+});
+
+describe('fetchSeenVessels', () => {
+  it('pide `seen_since` en UTC y todas las páginas, con el token en la cabecera', async () => {
+    const make = (mmsi: number) => ({
+      mmsi,
+      name: null,
+      imo: null,
+      ship_type: null,
+      last_seen_at: null,
+    });
+    const fetchImpl = vi.fn<typeof fetch>((input) => {
+      const page = new URL(urlOf(input), 'http://localhost').searchParams.get('page');
+      const items = page === '1' ? [make(352000001)] : [make(352000002)];
+      return Promise.resolve(Response.json({ items, total: 2, page: Number(page), size: 200 }));
+    });
+    const before = Date.now();
+
+    const all = await fetchSeenVessels('abc', 48 * 3_600_000, fetchImpl);
+
+    expect(all.map((item) => item.mmsi)).toEqual([352000001, 352000002]);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    const [url, init] = fetchImpl.mock.calls[0] ?? [];
+    const asked = new URL(urlOf(url), 'http://localhost');
+    const since = asked.searchParams.get('seen_since') ?? '';
+    expect(since).toMatch(/Z$/);
+    expect(Date.parse(since)).toBeGreaterThanOrEqual(before - 48 * 3_600_000);
+    expect(init?.headers).toEqual({ Authorization: 'Bearer abc' });
   });
 });
 
