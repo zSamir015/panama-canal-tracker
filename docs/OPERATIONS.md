@@ -129,19 +129,19 @@ valor.
 
 ## Problemas conocidos
 
-- **Docker no responde**: Colima no ha arrancado. `brew services list` y `colima status`.
-- **El worker no escribe**: comprobar `worker.err.log`. La causa habitual es que AISStream cierre la
+- Docker no responde: Colima no ha arrancado. `brew services list` y `colima status`.
+- El worker no escribe: comprobar `worker.err.log`. La causa habitual es que AISStream cierre la
   conexión por exceso de conexiones con la misma clave.
-- **El mapa en vivo está casi vacío**: es la cobertura de AISStream, no un fallo. Solo se ven los
+- El mapa en vivo está casi vacío: es la cobertura de AISStream, no un fallo. Solo se ven los
   buques con una posición de los últimos 30 minutos (`docs/VALIDATION.md`).
-- **Estadísticas vacías**: solo cuentan tránsitos completados, y con la cobertura gratuita casi no
+- Estadísticas vacías: solo cuentan tránsitos completados, y con la cobertura gratuita casi no
   hay ninguno (`docs/VALIDATION.md`).
-- **Un test de integración falla una vez y pasa al repetir**: los hay sensibles al tiempo, por
+- Un test de integración falla una vez y pasa al repetir: los hay sensibles al tiempo, por
   ejemplo el de caducidad del token del WebSocket en un ejecutor lento. Relanzar el job; si se
   repite, es un fallo real.
-- **`docker compose exec` dentro de un bucle `while read` se come la entrada del bucle**: añadir
+- `docker compose exec` dentro de un bucle `while read` se come la entrada del bucle: añadir
   `</dev/null`.
-- **zsh no separa una variable con varias rutas**: escribir las rutas o usar un array.
+- zsh no separa una variable con varias rutas: escribir las rutas o usar un array.
 
 ## Qué no cubre
 

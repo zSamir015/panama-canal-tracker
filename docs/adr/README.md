@@ -25,3 +25,4 @@ aceptada.
 | [0017](0017-v1-sin-entorno-de-produccion.md) | `v1.0.0` sin entorno de producción | Aceptada |
 | [0018](0018-satelite-esri-world-imagery.md) | Capa satelital gratuita con Esri World Imagery y modo oscuro con OpenFreeMap | Aceptada |
 | [0019](0019-recolector-continuo-y-worker-a-la-vez.md) | Recolector AIS continuo y ejecución simultánea con worker local | Aceptada |
+| [0020](0020-capturas-con-datos-reales.md) | Capturas estáticas con datos reales de AISStream | Aceptada |
