@@ -32,9 +32,9 @@ El sistema tiene tres partes:
 
 ## Estado
 
-El proyecto está terminado. Las Fases 0 a 7 del [roadmap](docs/ROADMAP.md) están cerradas y
-`v1.0.0` se publicó el 2026-11-20. Los cambios posteriores son mejoras pequeñas de la interfaz y de
-las herramientas, y constan en *Unreleased* del [changelog](CHANGELOG.md).
+El proyecto está terminado. Las Fases 0 a 7 del [roadmap](docs/ROADMAP.md) están cerradas: `v1.0.0`
+se publicó el 2026-11-20, seguida de `v1.1.0` (2026-11-22) con mejoras posteriores de interfaz,
+herramientas y documentación recogidas en el [changelog](CHANGELOG.md).
 
 Hay dos decisiones de alcance deliberadas:
 

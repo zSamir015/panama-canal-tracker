@@ -5,7 +5,19 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-22
+
+Mantenimiento y mejoras posteriores a `v1.0.0`: pestaña **Historial** (`24 h`, `48 h`, `7` y
+`30 días`), selector de ventana para la estela del buque (hasta `7 días`), buscador completo del
+directorio de buques, importador idempotente del recolector de GitHub (`scripts/import_collected.py`),
+copia nocturna automática en macOS, repetición de la validación con 14,9 días de AIS real, capturas
+reales y ADR-0020, documentación de entrega y operación (`docs/OPERATIONS.md`, `docs/README.md`) y
+reorganización de las convenciones en `docs/ENGINEERING.md`.
+
 ### Changed
+- Convenciones del repositorio movidas de `AGENTS.md` a `docs/ENGINEERING.md` y eliminados los
+  ficheros específicos de asistentes (`CLAUDE.md`, `.github/copilot-instructions.md`), con todas las
+  referencias en código, tests y documentación actualizadas (issue #199).
 - Documentación de proyecto terminado (issue #197): `docs/README.md` (índice), `docs/OPERATIONS.md`
   (qué corre y dónde, arranque, comprobaciones, rotación de secretos y problemas conocidos),
   `docs/adr/README.md` (índice de decisiones), `SECURITY.md` ampliado, `README.md` y `README.es.md`

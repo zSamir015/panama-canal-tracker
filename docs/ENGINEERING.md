@@ -326,9 +326,9 @@ Principio general: **denegar por defecto** — todo cerrado salvo lo que se abre
 
 ## 9. Estado actual
 
-> **Proyecto terminado.** Las Fases 0 a 7 están cerradas y `v1.0.0` se publicó el 2026-11-20. Desde
-> entonces solo hay mantenimiento y mejoras pequeñas de la interfaz y de las herramientas, que se
-> listan en `[Unreleased]` del `CHANGELOG.md`. No hay fases abiertas en `docs/ROADMAP.md`.
+> **Proyecto terminado.** Las Fases 0 a 7 están cerradas: `v1.0.0` se publicó el 2026-11-20 y
+> `v1.1.0` el 2026-11-22 con las mejoras posteriores recogidas en `CHANGELOG.md`. No hay fases
+> abiertas en `docs/ROADMAP.md`.
 >
 > Límites que cualquier cambio debe respetar: se entrega sin entorno de producción (ADR-0017); los
 > datos de AISStream no se exponen a visitantes anónimos (ADR-0008, ADR-0020); la cobertura gratuita
