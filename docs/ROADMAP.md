@@ -137,7 +137,7 @@ objetivo sin degradar la ingesta.
 - [x] 5.6 Panel "en tránsito ahora" en el mapa
 - [x] 5.7 **Validación con datos reales**: comparar tránsitos detectados por día con estadísticas
       públicas de la ACP; documentar precisión, falsos positivos y causas en `docs/VALIDATION.md`
-      (ejecutada sobre 12,5 días de datos reales; cobertura insuficiente en AISStream, límite
+      (ejecutada sobre 14,9 días de datos reales; cobertura insuficiente en AISStream, límite
       documentado y aceptado)
 
 **Aceptación**: una trayectoria sintética Atlántico → Pacífico produce un `transit` `completed`,

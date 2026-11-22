@@ -329,9 +329,9 @@ Principio general: **denegar por defecto** — todo cerrado salvo lo que se abre
 
 > **Fase 7 — Producción y pulido de portafolio (cerrada; `v1.0.0` publicada).** Las Fases 0 a 7
 > (`v0.1.0`–`v0.6.0`, cerrando la Fase 7 con `7.1`–`7.6` completadas en `docs/ROADMAP.md` y
-> revisión de seguridad en `docs/SECURITY_REVIEW.md`) están terminadas. La validación con 12,5 días
-> de AIS real documenta la cobertura parcial en `docs/VALIDATION.md`, y `v1.0.0` (publicada el 2026-11-20) se entrega sin
-> entorno de producción (ADR-0017).
+> revisión de seguridad en `docs/SECURITY_REVIEW.md`) están terminadas. La validación con 14,9 días
+> de AIS real documenta la cobertura parcial en `docs/VALIDATION.md`, y `v1.0.0` (publicada el
+> 2026-11-20) se entrega sin entorno de producción (ADR-0017).
 
 ## 10. Comandos útiles
 

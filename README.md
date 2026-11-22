@@ -109,13 +109,13 @@ Phases 0–7 are complete; `v1.0.0` is released.
 
 ## Validation & Load Test Results
 
-- **Real AIS Validation ([docs/VALIDATION.md](docs/VALIDATION.md))**: across **12.5 days** (`2026-11-07`
-  to `2026-11-19`, `29` collector runs covering `156.3 h / 299.4 h` or `52.2%`), the tracker
-  recorded **8,286 positions** from **500 vessels**, **304 anchorage visits** (`267` Pacific, `37`
-  Atlantic), and **2 full transits** (`18 h 48 min` and `10 h 08 min` southbound) vs `~437` expected
-  (`~35/day` ACP average). Only `84` positions (`1.0%`) fell in entrance zones and `25` inside Culebra
+- **Real AIS Validation ([docs/VALIDATION.md](docs/VALIDATION.md))**: across **14.9 days** (`2026-11-07`
+  to `2026-11-21`, `37` collector runs covering `201.4 h / 356.4 h` or `56.5%`), the tracker
+  recorded **10,040 positions** from **595 vessels**, **307 anchorage visits** (`270` Pacific, `37`
+  Atlantic), and **2 full transits** (`18 h 48 min` and `10 h 08 min` southbound) vs `~520` expected
+  (`~35/day` ACP average). Only `86` positions (`0.9%`) fell in entrance zones and `26` inside Culebra
   / Miraflores, confirming free terrestrial AISStream coverage inside the Canal is partial while
-  `2,578` stopped positions fall outside the initial anchorage boxes. Transit thresholds remain
+  `3,875` stopped positions fall outside the initial anchorage boxes. Transit thresholds remain
   calibrated on OSM-aligned synthetic tracks, while `ADR-0019` and `scripts/ais_coverage.py`
   (`#165`, `#169`) improve collection uptime and measure Type 27 / wide-bbox reception.
 - **WebSocket `/ws/live` Load Test ([docs/LOAD_TEST.md](docs/LOAD_TEST.md))**: with **500 concurrent
@@ -167,7 +167,7 @@ and profile. For local host development (`--reload`), see [AGENTS.md](AGENTS.md#
 | [docs/API_DESIGN.md](docs/API_DESIGN.md) | REST and WebSocket contract |
 | [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md) | AIS source, limits, geographic zones |
 | [docs/LOAD_TEST.md](docs/LOAD_TEST.md) | WebSocket load test: 500 clients, results and method |
-| [docs/VALIDATION.md](docs/VALIDATION.md) | 12.5-day real AIS coverage study & precision findings |
+| [docs/VALIDATION.md](docs/VALIDATION.md) | 14.9-day real AIS coverage study & precision findings |
 | [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Security checklist & production hardening baseline |
 | [docs/AIS_COLLECTOR.md](docs/AIS_COLLECTOR.md) | Continuous GitHub Actions AIS collector workflow |
 | [docs/LOCAL_WORKER_MAC.md](docs/LOCAL_WORKER_MAC.md) | Stable macOS local worker setup (`launchd` + `caffeinate`) |
