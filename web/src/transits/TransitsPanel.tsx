@@ -191,7 +191,16 @@ function TransitRow({ transit, now, medianMinutes, selected, onSelect }: Transit
             }
             aria-hidden="true"
           >
-            {isSouth ? '↓' : '↑'}
+            <svg viewBox="0 0 12 12" width="10" height="10" focusable="false">
+              <path
+                d={isSouth ? 'M6 1.5v9M2.5 7 6 10.5 9.5 7' : 'M6 10.5v-9M2.5 5 6 1.5 9.5 5'}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </span>
           {directionText(transit.direction)} · {elapsedText(transit.entered_at, now)}
         </span>

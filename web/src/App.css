@@ -838,8 +838,6 @@
   place-items: center;
   width: 1.05rem;
   height: 1.05rem;
-  font-size: 0.72rem;
-  font-weight: 700;
   border-radius: var(--radius-xs);
 }
 

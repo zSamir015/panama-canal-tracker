@@ -13,6 +13,9 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `db` no está en marcha. Procedimiento en `docs/BACKUP.md`.
 
 ### Changed
+- Panel de tránsitos: el sentido (sur/norte) se marca con un icono SVG decorativo en lugar de los
+  caracteres `↓`/`↑`, que se dibujaban distinto según la tipografía (issue #161; el resto del
+  issue ya estaba en #162).
 - `docs/SECURITY_REVIEW.md` recoge el hallazgo de `/ws/live` (arreglado en #158), los riesgos
   aceptados (enumeración por el registro, access token válido 15 min tras el logout, sin cambio de
   contraseña, `starlette` sin declarar) y las cabeceras reales de la demo en Pages (issue #180).
