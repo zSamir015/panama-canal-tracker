@@ -167,3 +167,56 @@ describe('VesselPanel', () => {
     expect(await screen.findByRole('heading', { name: 'EXAMPLE' })).toBeVisible();
   });
 });
+
+describe('VesselPanel: ventana de la estela', () => {
+  function renderWithWindow(props: Partial<Parameters<typeof VesselPanel>[0]> = {}) {
+    return renderWithQuery(
+      <VesselPanel mmsi={detail.mmsi} token="abc" live={undefined} onClose={vi.fn()} {...props} />,
+    );
+  }
+
+  it('sin selector ofrece solo la nota de 30 minutos', async () => {
+    stubDetail(detail);
+    renderWithWindow();
+
+    expect(await screen.findByText(/Estela: últimos 30 minutos\./)).toBeVisible();
+    expect(screen.queryByRole('group', { name: 'Ventana de la estela' })).not.toBeInTheDocument();
+  });
+
+  it('enseña las cuatro ventanas, marca la activa y avisa al elegir otra', async () => {
+    stubDetail(detail);
+    const onChange = vi.fn();
+    renderWithWindow({ trailWindowId: '24h', onTrailWindowChange: onChange });
+    await screen.findByText('EXAMPLE');
+
+    const group = screen.getByRole('group', { name: 'Ventana de la estela' });
+    const labels = within(group)
+      .getAllByRole('button')
+      .map((button) => button.textContent);
+    expect(labels).toEqual(['30 min', '6 h', '24 h', '7 días']);
+    expect(within(group).getByRole('button', { name: '24 h' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(within(group).getByRole('button', { name: '30 min' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    expect(screen.getByText(/Estela: últimos 24 horas\./)).toBeVisible();
+
+    await userEvent.click(within(group).getByRole('button', { name: '7 días' }));
+
+    expect(onChange).toHaveBeenCalledWith('7d');
+  });
+
+  it('avisa cuando la API recortó la estela', async () => {
+    stubDetail(detail);
+    renderWithWindow({
+      trailWindowId: '7d',
+      onTrailWindowChange: vi.fn(),
+      trailTruncated: true,
+    });
+
+    expect(await screen.findByText(/se enseñan los más recientes/)).toBeVisible();
+  });
+});

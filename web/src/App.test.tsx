@@ -95,7 +95,7 @@ function stubApi({
         }),
       );
     }
-    if (url.endsWith('/vessels?size=200')) {
+    if (url.includes('/vessels?size=200')) {
       return Promise.resolve(
         json(200, {
           items: [

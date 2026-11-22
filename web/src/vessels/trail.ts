@@ -16,6 +16,7 @@ export const TRAIL_GAP_MS = 5 * 60_000;
 export function trailFeature(
   track: VesselTrack | undefined,
   live: LiveVessel | undefined,
+  gapMs: number = TRAIL_GAP_MS,
 ): Feature<MultiLineString> | null {
   const points: { position: Position; time: number }[] = (track?.coordinates ?? []).map(
     (position, index) => ({ position, time: Date.parse(track?.timestamps[index] ?? '') }),
@@ -31,7 +32,7 @@ export function trailFeature(
   for (const { position, time } of points) {
     const current = segments.at(-1);
     // Sin hora válida no se puede medir el hueco: se sigue el tramo actual.
-    if (current && (previous === undefined || !(time - previous > TRAIL_GAP_MS))) {
+    if (current && (previous === undefined || !(time - previous > gapMs))) {
       current.push(position);
     } else {
       segments.push([position]);
