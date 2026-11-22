@@ -1,7 +1,8 @@
 """Acceso a la tabla `transits` (tareas 5.3 y 5.4).
 
 Escrituras del worker (abrir y cerrar tránsitos) y lecturas para reconstruir el estado del
-detector al arrancar. Solo SQL construido con SQLAlchemy y parámetros enlazados (AGENTS.md §8.6).
+detector al arrancar. Solo SQL construido con SQLAlchemy y parámetros enlazados
+(docs/ENGINEERING.md §8.6).
 """
 
 from dataclasses import dataclass

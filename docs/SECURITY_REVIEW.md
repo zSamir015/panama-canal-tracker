@@ -1,11 +1,11 @@
 # Revisión de seguridad final (tarea 7.6)
 
-Revisión completa de lo construido frente a `AGENTS.md` §8, ejecutada el **2026-11-19** sobre
+Revisión completa de lo construido frente a `docs/ENGINEERING.md` §8, ejecutada el **2026-11-19** sobre
 `main` (`ef6e484`) con el alcance definido en el **ADR-0017** (`v1.0.0` sin entorno de producción:
 demo estática en GitHub Pages y pila completa local con `docker compose`).
 
 **Resultado**: los controles de código, dependencias, secretos, contenedores, cabeceras de la API,
-CSP del frontend y capturas cumplen `AGENTS.md` §8 para este alcance. Lo que requiere un servidor
+CSP del frontend y capturas cumplen `docs/ENGINEERING.md` §8 para este alcance. Lo que requiere un servidor
 público (reverse proxy, TLS/HSTS, límites globales por IP, bloqueo de `/metrics`, `frame-ancestors`
 en cabecera y backups programados) queda documentado abajo como **requisito previo a cualquier
 despliegue**, no como fallo pendiente de `v1.0.0`.
@@ -65,7 +65,7 @@ despliegue**, no como fallo pendiente de `v1.0.0`.
 - **`starlette` se importa sin declararla.** Llega con FastAPI, que fija su versión; declararla
   aparte podría chocar con ese rango.
 
-## Estado por apartado de AGENTS.md §8
+## Estado por apartado de docs/ENGINEERING.md §8
 
 | § | Tema | Estado (alcance ADR-0017) | Evidencia |
 |---|---|---|---|

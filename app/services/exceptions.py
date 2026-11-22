@@ -1,4 +1,4 @@
-"""Excepciones de dominio (AGENTS.md §3).
+"""Excepciones de dominio (docs/ENGINEERING.md §3).
 
 Los servicios lanzan estas excepciones sin saber nada de HTTP más allá del código que les
 corresponde; el handler global de `app/core/errors.py` las convierte en `problem+json`.
@@ -21,7 +21,7 @@ class EmailAlreadyRegisteredError(DomainError):
 
 
 class InvalidCredentialsError(DomainError):
-    # Mismo mensaje exista o no el email (AGENTS.md §8.4).
+    # Mismo mensaje exista o no el email (docs/ENGINEERING.md §8.4).
     status_code = HTTPStatus.UNAUTHORIZED
     detail = "Email o contraseña incorrectos"
     headers = MappingProxyType({"WWW-Authenticate": "Bearer"})

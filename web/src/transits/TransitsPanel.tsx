@@ -17,7 +17,7 @@ interface TransitsPanelProps {
 /**
  * "En tránsito ahora": los buques que entraron por una entrada del Canal y aún no han salido por
  * la otra. Nombres y demás datos vienen de AIS: se pintan como texto con React, nunca como HTML
- * (AGENTS.md §8.7).
+ * (docs/ENGINEERING.md §8.7).
  *
  * En móvil es una barra al pie del mapa que se despliega o se arrastra como hoja inferior; en
  * escritorio el CSS oculta el asa y la lista se ve siempre (issue #123).

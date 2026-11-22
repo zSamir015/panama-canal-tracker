@@ -74,9 +74,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(RequestIdMiddleware)
 
-    # Denegar por defecto (AGENTS.md §8.9): todo lo que cuelga de este router exige un access token
-    # válido. Las rutas públicas de la lista blanca van en `public_api_router`, para que abrir
-    # una ruta sea siempre una decisión explícita.
+    # Denegar por defecto (docs/ENGINEERING.md §8.9): todo lo que cuelga de este router exige un
+    # access token válido. Las rutas públicas de la lista blanca van en `public_api_router`, para
+    # que abrir una ruta sea siempre una decisión explícita.
     api_router = APIRouter(
         prefix="/api/v1",
         dependencies=[Depends(get_current_user), Depends(limit_api_by_user)],

@@ -3,7 +3,7 @@ import { ESLint } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
 // Prueba la configuración real (`eslint.config.js`) sobre fragmentos de código: si alguien quita
-// la regla anti-XSS (AGENTS.md §8.7), este test falla.
+// la regla anti-XSS (docs/ENGINEERING.md §8.7), este test falla.
 const eslint = new ESLint();
 
 async function restrictedSyntaxErrors(code: string): Promise<string[]> {

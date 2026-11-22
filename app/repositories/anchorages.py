@@ -1,7 +1,7 @@
 """Acceso a la tabla `anchorage_visits` (tarea 6.1).
 
 Escrituras del worker (abrir y cerrar visitas) y lecturas para reconstruir el estado del detector
-al arrancar. Solo SQL construido con SQLAlchemy y parámetros enlazados (AGENTS.md §8.6).
+al arrancar. Solo SQL construido con SQLAlchemy y parámetros enlazados (docs/ENGINEERING.md §8.6).
 """
 
 from dataclasses import dataclass

@@ -17,7 +17,7 @@ Closes #
 - [ ] `mypy app tests` sin errores
 - [ ] Probado manualmente (describir):
 
-## Checklist de seguridad (AGENTS.md §8)
+## Checklist de seguridad (docs/ENGINEERING.md §8)
 
 - [ ] No hay secretos, `.env`, datos personales ni rutas locales en el diff, capturas o GIFs
 - [ ] Endpoints nuevos: requieren auth (o están en la lista blanca justificada) y tienen tests 401/403

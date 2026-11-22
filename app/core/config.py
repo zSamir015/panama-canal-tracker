@@ -1,4 +1,4 @@
-"""Configuración de la aplicación leída de variables de entorno (AGENTS.md §8.2).
+"""Configuración de la aplicación leída de variables de entorno (docs/ENGINEERING.md §8.2).
 
 Este es el único módulo que lee el entorno. El resto del código pide la configuración con
 `get_settings()` y nunca usa `os.environ`.
@@ -60,7 +60,8 @@ class Settings(BaseSettings):
     jwt_audience: str = Field(default="panama-canal-tracker-api", min_length=1)
     access_token_expire_minutes: int = Field(default=15, ge=1, le=60)
     refresh_token_expire_days: int = Field(default=7, ge=1, le=30)
-    # Lleva la contraseña del rol `canal_app` (sin DDL), así que es un secreto (AGENTS.md §8.16).
+    # Lleva la contraseña del rol `canal_app` (sin DDL), así que es un secreto
+    # (docs/ENGINEERING.md §8.16).
     database_url: SecretStr = SecretStr(DATABASE_URL_PLACEHOLDER)
     # Rol `canal_owner` (DDL). Solo la usa Alembic: el proceso de la API no necesita tenerla, así
     # que no tiene valor por defecto y `alembic/env.py` falla si no está definida.
@@ -68,8 +69,9 @@ class Settings(BaseSettings):
     # Contador del rate limiting (ADR-0007). Lleva la contraseña de Redis.
     redis_url: SecretStr = SecretStr(REDIS_URL_PLACEHOLDER)
 
-    # Worker AIS (Fase 3). La key solo la lee el proceso `worker` (AGENTS.md §8.1): la API no la
-    # necesita, así que no tiene valor por defecto y el worker se niega a arrancar sin ella.
+    # Worker AIS (Fase 3). La key solo la lee el proceso `worker` (docs/ENGINEERING.md §8.1): la
+    # API no la necesita, así que no tiene valor por defecto y el worker se niega a arrancar sin
+    # ella.
     aisstream_api_key: SecretStr | None = None
     # `ws://` solo para el simulador local (scripts/ais_simulator.py); en producción, `wss://`.
     aisstream_url: str = AISSTREAM_DEFAULT_URL

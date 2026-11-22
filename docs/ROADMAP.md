@@ -3,7 +3,7 @@
 Desarrollo por fases. **Una fase a la vez, en orden.** Cada fase termina con:
 
 1. Tests verdes en CI y criterios de aceptación cumplidos.
-2. Documentación de la entrega (AGENTS.md §7): README, diagramas, capturas/GIF si hay algo visible.
+2. Documentación de la entrega (docs/ENGINEERING.md §7): README, diagramas, capturas/GIF si hay algo visible.
 3. Entrada en `CHANGELOG.md` y tag `v0.<fase>.0`.
 
 Organización en GitHub: **un Milestone por fase, un Issue por tarea, un PR por Issue.**
@@ -15,11 +15,11 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` terminada
 ## Fase 0 — Scaffold `[x]`
 
 - [x] Estructura de directorios (`app/`, `web/`, `tests/`, `scripts/`, `docs/`)
-- [x] `AGENTS.md` (fuente única), `CLAUDE.md` y `copilot-instructions.md` apuntando a él
+- [x] `docs/ENGINEERING.md` (convenciones del proyecto)
 - [x] `docs/` (ARCHITECTURE, ROADMAP, DATA_SOURCES, API_DESIGN) y ADRs 0001–0006
 - [x] `pyproject.toml` (deps, ruff, pytest, mypy), `.python-version`, `LICENSE` (MIT)
 - [x] Plantilla de PR con checklist de seguridad
-- [x] Baseline de seguridad: reglas en AGENTS.md §8, `SECURITY.md`, `.dockerignore`,
+- [x] Baseline de seguridad: reglas en docs/ENGINEERING.md §8, `SECURITY.md`, `.dockerignore`,
       `.gitignore` endurecido, pre-commit con gitleaks, Dependabot, lockfiles con hashes
 
 **Aceptación**: repo clonable con documentación coherente; sin código de aplicación.

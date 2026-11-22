@@ -2,7 +2,7 @@
 
 - **Fecha**: 2026-10-22
 - **Estado**: Aceptada
-- **Modifica**: ADR-0002 y la regla 6 de `AGENTS.md` (una sola conexión por API key)
+- **Modifica**: ADR-0002 y la regla 6 de `docs/ENGINEERING.md` (una sola conexión por API key)
 
 ## Contexto
 El dueño quiere ver los buques que, en cualquier parte del mundo, declaran como destino el Canal
@@ -74,6 +74,6 @@ En la de 7 min también aparecieron rutas que **salen** de Panamá (`PAMIT>ITVDL
   tripulación no siempre actualiza destino y ETA; por eso las ETA vencidas van al final y la
   lista se acota por antigüedad del informe.
 - El destino es texto libre que escribe la tripulación: se valida en el parser (sin caracteres
-  de control, máx. 64) y se devuelve como texto, nunca como HTML (AGENTS.md §8.6, §8.7).
+  de control, máx. 64) y se devuelve como texto, nunca como HTML (docs/ENGINEERING.md §8.6, §8.7).
 - La lista de patrones se amplía con tests: cada falso positivo real que aparezca se añade a
   `tests/test_canal_destination.py` antes de cambiar la detección.

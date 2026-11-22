@@ -23,5 +23,5 @@ dependencias nuevas.
 | Proveedor externo (Auth0, Clerk) | oculta justo lo que el proyecto quiere demostrar |
 
 ## Consecuencias
-- `AGENTS.md` y el código usan Argon2id; ninguna referencia a bcrypt/passlib.
+- `docs/ENGINEERING.md` y el código usan Argon2id; ninguna referencia a bcrypt/passlib.
 - Antes de la Fase 2: verificar que las versiones de `pyproject.toml` instalan y pasan tests.

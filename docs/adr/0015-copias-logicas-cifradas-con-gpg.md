@@ -4,7 +4,7 @@
 - **Estado**: Aceptada
 
 ## Contexto
-AGENTS.md §8.16 pide "backups automáticos, cifrados y con restauración probada" y la tarea 7.2 del
+docs/ENGINEERING.md §8.16 pide "backups automáticos, cifrados y con restauración probada" y la tarea 7.2 del
 roadmap repite lo mismo. La base es PostgreSQL 16 con PostGIS y TimescaleDB, y hoy no hay un
 servidor desplegado (ADR-0011, ADR-0012): solo existe el contenedor de desarrollo. El volumen es
 pequeño (la cobertura de AISStream en el Canal es escasa, `docs/DATA_SOURCES.md` §2b).

@@ -3,7 +3,7 @@
 - **Base URL**: `/api/v1`. Excepción: `/health`, `/ready` y `/metrics` van en la raíz (los usa
   la infraestructura, no los clientes).
 - **Auth**: `Authorization: Bearer <access_token>`. **Denegar por defecto**: todo endpoint exige
-  token salvo los marcados con "—" en estas tablas (AGENTS.md §8.9).
+  token salvo los marcados con "—" en estas tablas (docs/ENGINEERING.md §8.9).
 - **Límites**: body ≤ 64 KB, `size` ≤ 200, rangos de fechas acotados, 429 con `Retry-After`.
 - **Errores**: `application/problem+json` según RFC 9457:
 
@@ -46,7 +46,7 @@
   Path=/api/v1/auth`. Nunca en el body ni en `localStorage`. Es un JWT firmado
   (`token_type: refresh`) cuyo `jti` se guarda en `refresh_tokens`; un access token no sirve como
   refresh ni al revés. Cada login abre una sesión (familia); reutilizar un refresh ya rotado
-  revoca esa sesión completa (AGENTS.md §8.4), no las demás sesiones del usuario.
+  revoca esa sesión completa (docs/ENGINEERING.md §8.4), no las demás sesiones del usuario.
 - **Logout**: `204`, revoca la sesión del refresh de la cookie (solo si es del usuario del access
   token) y borra la cookie.
 - **Register**: body `{email, password}` con `extra="forbid"`; contraseña de 12 a 128 caracteres.

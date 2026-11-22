@@ -30,7 +30,7 @@ export default defineConfig({
     },
   },
   build: {
-    // Sin source maps públicos salvo decisión explícita (AGENTS.md §8.12).
+    // Sin source maps públicos salvo decisión explícita (docs/ENGINEERING.md §8.12).
     sourcemap: false,
     // MapLibre ocupa ~1 MB minificado y no se puede trocear; va en su propio chunk, cargado
     // después del login (App.tsx). El aviso sigue saltando si otro chunk crece de más.

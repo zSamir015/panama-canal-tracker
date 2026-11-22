@@ -1,4 +1,4 @@
-"""Contrato de los endpoints de auth (docs/API_DESIGN.md, AGENTS.md §8.6).
+"""Contrato de los endpoints de auth (docs/API_DESIGN.md, docs/ENGINEERING.md §8.6).
 
 `extra="forbid"`: un campo desconocido (por ejemplo `role`) se rechaza con 422 en lugar de
 ignorarse; así nadie puede colarse un rol en el registro.

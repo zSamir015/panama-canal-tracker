@@ -1,6 +1,6 @@
 # Servicios de desarrollo local (Fase 2): la API corre en el host con `uvicorn` y se conecta aquí.
 # Los puertos solo escuchan en 127.0.0.1. Producción tendrá su propio compose, sin puertos
-# publicados (AGENTS.md §8.16, docs/ARCHITECTURE.md).
+# publicados (docs/ENGINEERING.md §8.16, docs/ARCHITECTURE.md).
 #
 # Las contraseñas salen de `.env` (ver `.env.example`); sin ellas `docker compose` no arranca.
 # Imágenes fijadas por versión y digest (índice multi-arquitectura: amd64 y arm64).

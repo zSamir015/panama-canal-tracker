@@ -7,20 +7,21 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 // Insertar HTML con datos dinámicos abre la puerta al XSS: los nombres y destinos de los buques
-// vienen de AIS, y cualquiera con un transpondedor puede escribirlos (AGENTS.md §8.7).
+// vienen de AIS, y cualquiera con un transpondedor puede escribirlos (docs/ENGINEERING.md §8.7).
 const noRawHtml = [
   {
     selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
-    message: 'Prohibido dangerouslySetInnerHTML (AGENTS.md §8.7): renderiza texto con React.',
+    message:
+      'Prohibido dangerouslySetInnerHTML (docs/ENGINEERING.md §8.7): renderiza texto con React.',
   },
   {
     selector: 'AssignmentExpression > MemberExpression[property.name=/^(innerHTML|outerHTML)$/]',
-    message: 'Prohibido asignar innerHTML/outerHTML (AGENTS.md §8.7): usa textContent.',
+    message: 'Prohibido asignar innerHTML/outerHTML (docs/ENGINEERING.md §8.7): usa textContent.',
   },
   {
     selector: 'CallExpression[callee.property.name=/^(insertAdjacentHTML|setHTML)$/]',
     message:
-      'Prohibido insertAdjacentHTML y Popup.setHTML de MapLibre (AGENTS.md §8.7): usa setText.',
+      'Prohibido insertAdjacentHTML y Popup.setHTML de MapLibre (docs/ENGINEERING.md §8.7): usa setText.',
   },
 ];
 

@@ -40,19 +40,19 @@ rechaza URLs que no sean `http(s)` o que lleven credenciales.
 ## Ver el mapa en local
 
 Con la base, Redis, la API (`uvicorn app.main:app`), el simulador y el worker en marcha (ver
-`AGENTS.md` §10), `npm run dev` y abrir `http://localhost:5173`. El proxy de Vite deja la API en
+`docs/ENGINEERING.md` §10), `npm run dev` y abrir `http://localhost:5173`. El proxy de Vite deja la API en
 el mismo origen, así que `CORS_ORIGINS` solo necesita `http://localhost:5173`. Hace falta una
 cuenta (`POST /api/v1/auth/register` o `/docs`).
 
 ## Cómo está organizado
 
-| Carpeta        | Qué hay                                                                               |
-| -------------- | ------------------------------------------------------------------------------------- |
-| `src/auth/`    | Login y sesión (`useSession`); el access token vive solo en memoria (AGENTS.md §8.4)  |
-| `src/live/`    | Protocolo de `/ws/live`, estado de los buques y el hook `useLiveVessels`              |
-| `src/api/`     | Cliente REST de `/api/v1` con el token en la cabecera (`ApiError` con el código HTTP) |
-| `src/vessels/` | Ficha del buque (`VesselPanel`), estela de 30 min, consultas con TanStack Query       |
-| `src/map/`     | `VesselMap` (MapLibre), GeoJSON, categorías y colores, iconos SDF y viewport          |
+| Carpeta        | Qué hay                                                                                        |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| `src/auth/`    | Login y sesión (`useSession`); el access token vive solo en memoria (docs/ENGINEERING.md §8.4) |
+| `src/live/`    | Protocolo de `/ws/live`, estado de los buques y el hook `useLiveVessels`                       |
+| `src/api/`     | Cliente REST de `/api/v1` con el token en la cabecera (`ApiError` con el código HTTP)          |
+| `src/vessels/` | Ficha del buque (`VesselPanel`), estela de 30 min, consultas con TanStack Query                |
+| `src/map/`     | `VesselMap` (MapLibre), GeoJSON, categorías y colores, iconos SDF y viewport                   |
 
 Al hacer clic en un buque se abre su ficha y se dibuja su estela (`GET /vessels/{mmsi}/history`,
 recargada cada 15 s). La estela se corta donde faltan más de 5 minutos de señal, para no inventar
@@ -91,8 +91,8 @@ stateDiagram-v2
 
 - Los datos de buques vienen de AIS y cualquiera puede escribirlos: se muestran **siempre como
   texto**. ESLint prohíbe `dangerouslySetInnerHTML`, asignar `innerHTML`/`outerHTML`,
-  `insertAdjacentHTML` y `Popup.setHTML()` de MapLibre (AGENTS.md §8.7);
+  `insertAdjacentHTML` y `Popup.setHTML()` de MapLibre (docs/ENGINEERING.md §8.7);
   `src/test/lint-rules.test.ts` comprueba que la regla sigue activa.
 - Tests con un buque llamado `<img src=x onerror=alert(1)>`, tanto si el nombre llega por la API
   REST como por `/ws/live` (`src/App.test.tsx`): se ve como texto y no se crea ninguna imagen.
-- Sin source maps en el build de producción (AGENTS.md §8.12).
+- Sin source maps en el build de producción (docs/ENGINEERING.md §8.12).

@@ -21,7 +21,7 @@ interface HistoryViewProps {
 
 /**
  * Historial: los buques con alguna posición en un periodo, el más reciente primero. Todo lo que
- * viene de AIS (nombre incluido) se pinta como texto con React, nunca como HTML (AGENTS.md §8.7).
+ * viene de AIS (nombre incluido) se pinta como texto con React, nunca como HTML (docs/ENGINEERING.md §8.7).
  */
 export function HistoryView({ token, onUnauthorized, onOpen, now = Date.now }: HistoryViewProps) {
   const [periodId, setPeriodId] = useState(HISTORY_PERIODS[0]?.id ?? '24h');

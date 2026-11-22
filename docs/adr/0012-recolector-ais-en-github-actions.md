@@ -2,7 +2,7 @@
 
 - **Fecha**: 2026-11-06
 - **Estado**: Aceptada (modificada por [ADR-0019](0019-recolector-continuo-y-worker-a-la-vez.md))
-- **Modifica**: la regla 6 de `AGENTS.md` (AISStream solo desde el proceso `worker`)
+- **Modifica**: la regla 6 de `docs/ENGINEERING.md` (AISStream solo desde el proceso `worker`)
 
 ## Contexto
 La detección de tránsitos (Fase 5) y su validación contra las estadísticas de la ACP (tarea 5.7)
@@ -52,7 +52,7 @@ sube como artefacto. Arranca una ventana nueva cada 6 horas.
 - **Una conexión más a AISStream**: el worker usa dos con `AIS_CANAL_BOUND_ENABLED=true`
   (ADR-0009). Según [ADR-0019](0019-recolector-continuo-y-worker-a-la-vez.md), pueden ejecutarse a la
   vez **solo con `AIS_CANAL_BOUND_ENABLED=false`** en el worker (1 conexión worker + 1 recolector).
-- **Excepción a la regla 6 de `AGENTS.md`**: la key de AISStream se usa también desde
+- **Excepción a la regla 6 de `docs/ENGINEERING.md`**: la key de AISStream se usa también desde
   `scripts/ais_coverage.py` y `scripts/ais_collect.py`, nunca desde el navegador ni desde la API.
 - Los artefactos caducan a los 90 días. Se descargan y descifran en local (`data/`, fuera de git):
   ver `docs/AIS_COLLECTOR.md`.

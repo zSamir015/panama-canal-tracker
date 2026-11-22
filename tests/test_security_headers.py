@@ -34,7 +34,7 @@ def client_for(app: FastAPI) -> httpx.AsyncClient:
 def assert_security_headers(response: httpx.Response) -> None:
     for name, value in SECURITY_HEADERS.items():
         assert response.headers.get(name) == value, name
-    # Obsoleto y a veces dañino: los navegadores actuales lo ignoran (AGENTS.md §8.11).
+    # Obsoleto y a veces dañino: los navegadores actuales lo ignoran (docs/ENGINEERING.md §8.11).
     assert "x-xss-protection" not in response.headers
 
 

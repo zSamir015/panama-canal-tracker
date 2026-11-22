@@ -1,4 +1,4 @@
-"""Dependencias de autenticación y autorización (AGENTS.md §8.3, §8.4 y §8.9).
+"""Dependencias de autenticación y autorización (docs/ENGINEERING.md §8.3, §8.4 y §8.9).
 
 - `get_current_user`: exige `Authorization: Bearer <access_token>` válido y un usuario que exista.
 - `require_admin`: además exige el rol `admin`.

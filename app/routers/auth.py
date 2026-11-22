@@ -1,8 +1,8 @@
 """Endpoints `/api/v1/auth/*` (docs/API_DESIGN.md "Auth").
 
 Dos routers:
-- `public_router`: register, login y refresh. Es la lista blanca de AGENTS.md §8.9; `app/main.py`
-  lo monta fuera del router que exige token.
+- `public_router`: register, login y refresh. Es la lista blanca de docs/ENGINEERING.md §8.9;
+  `app/main.py` lo monta fuera del router que exige token.
 - `router`: logout y me, que exigen access token como el resto de `/api/v1`.
 
 El refresh token viaja solo en una cookie `HttpOnly` (JavaScript no puede leerla), `Secure`,

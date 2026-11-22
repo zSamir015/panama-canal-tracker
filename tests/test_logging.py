@@ -108,7 +108,8 @@ def test_tracebacks_do_not_include_local_variables() -> None:
 
 
 def test_includes_context_bound_with_contextvars() -> None:
-    # Permite que todos los logs de una petición lleven el mismo request_id (AGENTS.md §8.9).
+    # Permite que todos los logs de una petición lleven el mismo request_id
+    # (docs/ENGINEERING.md §8.9).
     stream = io.StringIO()
     configure_logging("INFO", stream=stream)
     structlog.contextvars.bind_contextvars(request_id="req-1")

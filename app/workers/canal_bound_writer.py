@@ -189,5 +189,5 @@ class CanalBoundWriter:
         for row in batch.upserts:
             self.stats.ports[row.port_locode] = self.stats.ports.get(row.port_locode, 0) + 1
         self.stats.last_flush_at = datetime.now(UTC)
-        # Solo recuentos: destinos y nombres son datos externos (AGENTS.md §8.6).
+        # Solo recuentos: destinos y nombres son datos externos (docs/ENGINEERING.md §8.6).
         logger.info("ais_canal_bound_batch_written", upserted=len(batch.upserts), removed=removed)

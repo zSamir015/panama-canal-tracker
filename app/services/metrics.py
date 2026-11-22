@@ -3,8 +3,8 @@
 Dos piezas:
 
 - `render` escribe el formato de exposición de texto de Prometheus (versión 0.0.4) a mano: unas
-  pocas métricas con nombres y etiquetas fijos, sin una librería nueva que auditar (AGENTS.md
-  §8.14). Nunca lleva texto de AIS ni datos de usuario: solo números.
+  pocas métricas con nombres y etiquetas fijos, sin una librería nueva que auditar
+  (docs/ENGINEERING.md §8.14). Nunca lleva texto de AIS ni datos de usuario: solo números.
 - `MetricsService` reúne las cifras. Las del worker AIS salen del estado que publica en Redis
   (3.5) y las de tránsitos y fondeo, de la base. Si una dependencia no responde, sus métricas se
   omiten y `canal_dependency_up` lo dice: un scrape nunca falla por eso.

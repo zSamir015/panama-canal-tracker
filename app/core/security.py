@@ -1,6 +1,6 @@
 """Hash de contraseñas (Argon2id) y tokens JWT de acceso y de refresh.
 
-ADR-0003, AGENTS.md §8.4 y §8.17.
+ADR-0003, docs/ENGINEERING.md §8.4 y §8.17.
 
 Funciones puras, sin I/O: no leen la base ni el entorno. La configuración llega por parámetro.
 """
@@ -91,7 +91,7 @@ def verify_password(password: str, hashed: str | None) -> PasswordCheck:
 
     Con `hashed=None` (el email no existe) verifica igualmente contra un hash ficticio y devuelve
     inválido: la respuesta tarda lo mismo exista o no el usuario, así que el tiempo no revela qué
-    emails están registrados (AGENTS.md §8.4).
+    emails están registrados (docs/ENGINEERING.md §8.4).
     """
     if len(password) > PASSWORD_MAX_LENGTH:
         # Ninguna contraseña guardada puede medir más; se evita hashear entradas enormes.

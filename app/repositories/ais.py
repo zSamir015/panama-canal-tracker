@@ -1,7 +1,7 @@
 """Escritura de datos AIS: upsert de `vessels` e inserción por lotes de `positions` (tarea 3.4).
 
 Todo es SQL construido con SQLAlchemy y parámetros enlazados: la geometría se forma con funciones
-de PostGIS a partir de los números, nunca componiendo texto (AGENTS.md §8.6).
+de PostGIS a partir de los números, nunca componiendo texto (docs/ENGINEERING.md §8.6).
 """
 
 from collections.abc import Sequence

@@ -36,6 +36,6 @@ quiere saber.
 |---|---|
 | [ROADMAP.md](ROADMAP.md) | Las siete fases y lo que cerró cada una |
 | [../CHANGELOG.md](../CHANGELOG.md) | Cambios por versión |
-| [../AGENTS.md](../AGENTS.md) | Convenciones de código, pruebas, seguridad y flujo de trabajo |
+| [ENGINEERING.md](ENGINEERING.md) | Convenciones de código, pruebas, seguridad y flujo de trabajo |
 
 Las capturas y animaciones están en `media/`.

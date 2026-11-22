@@ -1,4 +1,5 @@
-"""Rate limiting con el contador en Redis, compartido entre réplicas (ADR-0007, AGENTS.md §8.8).
+"""Rate limiting con el contador en Redis, compartido entre réplicas (ADR-0007,
+docs/ENGINEERING.md §8.8).
 
 - Auth (login, register, refresh): ventana deslizante exacta (moving window). Si Redis no
   responde, **falla cerrado** con 503: sin límite, la fuerza bruta contra el login no tendría freno.

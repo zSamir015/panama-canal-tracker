@@ -11,7 +11,7 @@ export interface LiveVessel {
   cog: number | null;
   sog: number | null;
   ship_type: number | null;
-  /** Texto libre de AIS: se muestra siempre como texto (AGENTS.md §8.7). */
+  /** Texto libre de AIS: se muestra siempre como texto (docs/ENGINEERING.md §8.7). */
   name: string | null;
   ts: string;
 }

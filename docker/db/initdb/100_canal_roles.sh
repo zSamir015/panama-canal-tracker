@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Roles de la base de datos (AGENTS.md §8.16). Solo se ejecuta al crear el volumen por primera vez;
+# Roles de la base de datos (docs/ENGINEERING.md §8.16). Solo se ejecuta al crear el volumen por primera vez;
 # para aplicar cambios: `docker compose down -v` (borra los datos locales) y `docker compose up -d`.
 #
 # - canal_owner: dueño de la base y del esquema `public`; ejecuta las migraciones (DDL).

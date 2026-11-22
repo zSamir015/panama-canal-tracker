@@ -1,6 +1,6 @@
 import type { Bbox } from '../live/protocol';
 
-/** Zona del Canal (AGENTS.md §1): vista inicial del mapa. */
+/** Zona del Canal (docs/ENGINEERING.md §1): vista inicial del mapa. */
 export const CANAL_BBOX: Bbox = [-80.2, 8.4, -79.2, 9.7];
 
 /**

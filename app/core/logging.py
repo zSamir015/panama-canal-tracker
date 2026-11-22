@@ -1,4 +1,4 @@
-"""Logs estructurados en JSON con structlog (AGENTS.md §3).
+"""Logs estructurados en JSON con structlog (docs/ENGINEERING.md §3).
 
 Una línea JSON por evento, tanto para los logs propios (`structlog.get_logger()`) como para los de
 librerías que usan `logging` (uvicorn, etc.). Los campos sensibles se redactan antes de escribirse:
@@ -111,5 +111,5 @@ def configure_logging(level: str, *, stream: TextIO | None = None) -> None:
         uvicorn_logger.propagate = True
 
     # La librería `websockets` escribe cada frame en DEBUG, y los de `/ws/live` llevan el access
-    # token (AGENTS.md §8.9): nunca baja de INFO, aunque la app esté en DEBUG.
+    # token (docs/ENGINEERING.md §8.9): nunca baja de INFO, aunque la app esté en DEBUG.
     logging.getLogger("websockets").setLevel(max(numeric_level, logging.INFO))

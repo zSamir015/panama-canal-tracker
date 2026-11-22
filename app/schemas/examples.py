@@ -5,7 +5,7 @@ documentación viva. Para que no mientan, `tests/test_openapi.py` valida cada ej
 modelo y exige que todas las operaciones tengan resumen, descripción y ejemplos.
 
 Los valores son inventados: MMSI de ejemplo, fechas del 6 de noviembre de 2026 y el correo
-`demo@example.com` (nunca datos reales, AGENTS.md §7.1).
+`demo@example.com` (nunca datos reales, docs/ENGINEERING.md §7.1).
 """
 
 from typing import Any

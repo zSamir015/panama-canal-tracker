@@ -61,7 +61,8 @@ async def test_cors_rejects_unlisted_origin(app: FastAPI) -> None:
 
 @pytest.mark.parametrize("app_env", ["development", "test", "production"])
 def test_app_never_runs_in_debug_mode(app_env: str) -> None:
-    # Con debug=True Starlette responde los 500 con la traza completa en HTML (AGENTS.md §8.12).
+    # Con debug=True Starlette responde los 500 con la traza completa en HTML
+    # (docs/ENGINEERING.md §8.12).
     settings = Settings(
         _env_file=None,
         app_env=app_env,

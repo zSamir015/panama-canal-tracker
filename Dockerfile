@@ -6,7 +6,7 @@
 # - Base fijada por versión y digest (índice multi-arquitectura: amd64 y arm64).
 # - Dependencias solo desde requirements.lock, con hashes: la misma instalación siempre.
 # - Sin secretos en ninguna capa: ni ARG ni ENV con credenciales; todo llega por entorno al
-#   arrancar el contenedor (AGENTS.md §8.1). `.dockerignore` deja fuera `.env`, tests y docs.
+#   arrancar el contenedor (docs/ENGINEERING.md §8.1). `.dockerignore` deja fuera `.env`, tests y docs.
 # - Se ejecuta como un usuario sin privilegios.
 
 ARG PYTHON_IMAGE=python:3.12.15-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258

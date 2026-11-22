@@ -210,7 +210,7 @@ async def _expire(expires_at: datetime) -> None:
     """Cierra con 4401 cuando caduca el access token: el cliente lo renueva y vuelve a entrar.
 
     Sin esto, un token validado una vez mantendría el flujo en vivo para siempre, aunque caduque
-    o el usuario cierre sesión (AGENTS.md §8.4).
+    o el usuario cierre sesión (docs/ENGINEERING.md §8.4).
     """
     await asyncio.sleep(max(0.0, (expires_at - datetime.now(UTC)).total_seconds()))
     raise _Close(CLOSE_UNAUTHORIZED, "token_expired")

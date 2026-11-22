@@ -1,11 +1,11 @@
-# AGENTS.md — Fuente única de verdad para asistentes de IA
+# Convenciones de ingeniería
 
-Este archivo es la **fuente de verdad** para cualquier asistente de IA que trabaje en este repositorio
-(Claude Code, GitHub Copilot, Kimi u otro). `CLAUDE.md` y `.github/copilot-instructions.md` solo
-apuntan aquí. Si hay conflicto entre documentos, **gana este archivo**; si el conflicto es real,
-corrígelo con un ADR, no lo ignores.
+Este documento reúne las convenciones de código, pruebas, seguridad y flujo de trabajo del
+repositorio. Si hay conflicto entre documentos, gana este; si el conflicto es real, se corrige con
+un ADR en lugar de ignorarlo.
 
-Léelo completo antes de generar código.
+Conviene leerlo entero antes de cambiar código. El proyecto está terminado (ver §9): lo que sigue
+describe cómo se construyó y cómo mantenerlo con el mismo nivel de exigencia.
 
 ---
 
@@ -50,9 +50,8 @@ Documentos de referencia (leer según la tarea):
 7. No modificar `docs/` salvo para reflejar una decisión real; toda decisión nueva va en un ADR
    en `docs/adr/` con el siguiente número libre.
 8. **Seguridad**: cumplir la sección 8 completa en cada cambio. Denegar por defecto.
-9. **Atribución**: no añadir créditos a asistentes de IA en el repositorio. Nada de trailers
-   `Co-Authored-By`, líneas "Generated with ...", ni menciones a Claude, Copilot o Kimi en
-   commits, PRs, comentarios, issues o código. El autor de los commits es el dueño del repo.
+9. **Autoría**: el autor de los commits es el dueño del repositorio. No se añaden trailers
+   `Co-Authored-By` ni créditos de herramientas en commits, PRs, comentarios, issues o código.
 
 ## 3. Convenciones de código — backend (`app/`)
 
@@ -91,13 +90,13 @@ Documentos de referencia (leer según la tarea):
 - Mensajes AIS de ejemplo en `tests/fixtures/ais_messages/`. Ningún test depende de AISStream real.
 - Cobertura mínima: 80 % en `app/` (lo exige el CI desde Fase 2).
 
-## 6. Flujo de trabajo y coordinación entre asistentes
+## 6. Flujo de trabajo
 
-- Seguir **estrictamente** `docs/ROADMAP.md`: **una fase a la vez, en orden**. No adelantar
-  funcionalidad de fases futuras salvo petición explícita.
+- Seguir `docs/ROADMAP.md`: una fase a la vez, en orden, sin adelantar funcionalidad de fases
+  futuras. Todas las fases están cerradas; los cambios nuevos son mantenimiento y no abren fases.
 - **Un issue = una rama = un PR.** Rama `tipo/descripcion-corta` (ej. `feat/health-endpoint`).
-- **Un asistente por rama.** Antes de empezar, revisar el issue y los PR abiertos para no pisar
-  trabajo de otro asistente. Dejar el estado en el issue al terminar o al quedarse bloqueado.
+- Una persona por rama. Antes de empezar, revisar el issue y los PR abiertos para no pisar trabajo
+  en curso. Dejar el estado en el issue al terminar o al quedarse bloqueado.
 - Commits: [Conventional Commits](https://www.conventionalcommits.org/) en inglés
   (`feat:`, `fix:`, `test:`, `docs:`, `chore:`, `refactor:`, `ci:`).
 - PRs usan `.github/pull_request_template.md`. CI verde antes de pedir revisión.
@@ -357,4 +356,4 @@ cd web && npm ci && npm run lint && npm run typecheck && npm test && npm run bui
 ## 11. Si algo no está claro
 
 1. Revisar `docs/` y los ADRs.
-2. Si persiste la duda: **preguntar al usuario antes de asumir** y documentar la decisión como ADR.
+2. Si persiste la duda, preguntar antes de asumir y documentar la decisión como ADR.

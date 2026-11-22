@@ -44,7 +44,7 @@ Out of scope: the AISStream service, the map tile providers, GitHub itself, and 
 
 The reasoning and the results of the last full review are in
 [`docs/SECURITY_REVIEW.md`](docs/SECURITY_REVIEW.md). The conventions are in
-[`AGENTS.md`](AGENTS.md) section 8.
+[`docs/ENGINEERING.md`](docs/ENGINEERING.md) section 8.
 
 ## Known limits
 
