@@ -1,5 +1,5 @@
 /**
- * Content-Security-Policy del frontend (AGENTS.md §8.11), construida con la misma configuración
+ * Content-Security-Policy del frontend (docs/ENGINEERING.md §8.11), construida con la misma configuración
  * que lee la aplicación: la API (`VITE_API_URL`, vacío = el mismo origen) y el proveedor de tiles
  * (`VITE_MAP_STYLE_URL`, ADR-0010). Así cambiar de API o de tiles no deja la política vieja.
  *

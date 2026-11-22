@@ -9,7 +9,8 @@ reales sin una máquina encendida, y el replay de la tarea 5.5 los lee después.
 
 Usa la key de `AISSTREAM_API_KEY` y nunca la escribe, ni en el fichero ni en la salida. Si la
 conexión se cae, reconecta con espera creciente hasta que se acaba el tiempo. Cuenta como una
-conexión más con la misma key: no ejecutarlo a la vez que el worker (AGENTS.md §2.6, ADR-0009).
+conexión más con la misma key: no ejecutarlo a la vez que el worker (docs/ENGINEERING.md §2.6,
+ADR-0009).
 
 De cada mensaje solo guarda lo que necesita el detector de tránsitos y su validación; no guarda
 nombres ni destinos de los buques.

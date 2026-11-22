@@ -1,4 +1,4 @@
-"""Cabeceras HTTP que la API añade a sus respuestas (AGENTS.md §8.11)."""
+"""Cabeceras HTTP que la API añade a sus respuestas (docs/ENGINEERING.md §8.11)."""
 
 REQUEST_ID_HEADER = "X-Request-ID"
 

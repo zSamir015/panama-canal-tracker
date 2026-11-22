@@ -40,7 +40,7 @@ interface VesselPanelProps {
 
 /**
  * Ficha del buque seleccionado. Todo lo que viene de AIS (nombre incluido) se pinta como texto con
- * React, nunca como HTML (AGENTS.md §8.7).
+ * React, nunca como HTML (docs/ENGINEERING.md §8.7).
  */
 export function VesselPanel({
   mmsi,

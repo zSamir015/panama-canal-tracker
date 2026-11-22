@@ -11,7 +11,7 @@ license = "LicenseRef-AllRightsReserved"
 license-files = ["LICENSE"]
 requires-python = ">=3.12"
 authors = [{ name = "Samir Herrera" }]
-# Política de dependencias (AGENTS.md §8, regla de dependencias):
+# Política de dependencias (docs/ENGINEERING.md §8, regla de dependencias):
 # - Solo se declaran paquetes que el código usa. Cada fase añade los suyos en su PR.
 # - Mínimos = versiones verificadas al añadirlas (2026-10-15; auth el 2026-10-20);
 #   techo = siguiente versión mayor.
@@ -80,7 +80,7 @@ branch = true
 concurrency = ["greenlet", "thread"]
 
 [tool.coverage.report]
-# AGENTS.md §5: mínimo en `app/` desde la Fase 2. El CI falla por debajo.
+# docs/ENGINEERING.md §5: mínimo en `app/` desde la Fase 2. El CI falla por debajo.
 fail_under = 80
 
 [tool.mypy]

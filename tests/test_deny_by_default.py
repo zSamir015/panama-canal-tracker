@@ -1,4 +1,5 @@
-"""Denegar por defecto (AGENTS.md §8.9): toda ruta fuera de la lista blanca exige un token.
+"""Denegar por defecto (docs/ENGINEERING.md §8.9): toda ruta fuera de la lista blanca exige un
+token.
 
 Las rutas se recorren desde el esquema OpenAPI y no desde `app.routes`: desde FastAPI 0.143,
 `app.routes` guarda cada router incluido como un solo objeto, sin sus rutas. Una ruta con

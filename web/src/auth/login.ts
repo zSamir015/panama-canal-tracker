@@ -7,7 +7,7 @@ export class LoginError extends Error {
 
 /**
  * `POST /api/v1/auth/login`. Devuelve la sesión (access token y caducidad), que se guarda solo en
- * memoria (AGENTS.md §8.4); el refresh token llega en una cookie `HttpOnly` que JavaScript no puede
+ * memoria (docs/ENGINEERING.md §8.4); el refresh token llega en una cookie `HttpOnly` que JavaScript no puede
  * leer.
  */
 export async function login(
@@ -46,7 +46,7 @@ export async function login(
 
 /**
  * `POST /api/v1/auth/register` seguido de `login` automático. El rol no se envía nunca: el
- * servidor siempre asigna `user` (AGENTS.md §8.3).
+ * servidor siempre asigna `user` (docs/ENGINEERING.md §8.3).
  */
 export async function register(
   email: string,

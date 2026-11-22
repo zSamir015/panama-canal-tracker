@@ -17,7 +17,7 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 from app.core.errors import problem_response
 from app.core.headers import REQUEST_ID_HEADER, security_headers
 
-MAX_BODY_BYTES = 64 * 1024  # AGENTS.md §8.6
+MAX_BODY_BYTES = 64 * 1024  # docs/ENGINEERING.md §8.6
 
 
 class RequestIdMiddleware:
@@ -50,7 +50,7 @@ class RequestIdMiddleware:
 
 
 class SecurityHeadersMiddleware:
-    """Añade las cabeceras de seguridad de AGENTS.md §8.11 a todas las respuestas."""
+    """Añade las cabeceras de seguridad de docs/ENGINEERING.md §8.11 a todas las respuestas."""
 
     def __init__(self, app: ASGIApp) -> None:
         self.app = app

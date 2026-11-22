@@ -1,4 +1,4 @@
-"""Registro, login, refresh y logout (AGENTS.md §8.4, docs/API_DESIGN.md "Auth").
+"""Registro, login, refresh y logout (docs/ENGINEERING.md §8.4, docs/API_DESIGN.md "Auth").
 
 Este servicio decide cuándo termina cada transacción: hace commit al final de cada operación que
 escribe. Si algo falla antes, `get_db` hace rollback y no queda nada a medias.
@@ -50,7 +50,7 @@ class AuthService:
         self._refresh_tokens = RefreshTokenRepository(session)
 
     async def register(self, email: str, password: str) -> User:
-        # El rol no llega del cliente: el registro siempre crea `user` (AGENTS.md §8.3).
+        # El rol no llega del cliente: el registro siempre crea `user` (docs/ENGINEERING.md §8.3).
         if await self._users.get_by_email(email) is not None:
             raise EmailAlreadyRegisteredError
         try:

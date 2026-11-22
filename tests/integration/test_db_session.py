@@ -31,7 +31,7 @@ async def test_connects_with_the_least_privileged_role(db_app: FastAPI) -> None:
 
 
 async def test_app_role_cannot_run_ddl(db_app: FastAPI) -> None:
-    # Mínimo privilegio (AGENTS.md §8.16): crear tablas es trabajo de `canal_owner`.
+    # Mínimo privilegio (docs/ENGINEERING.md §8.16): crear tablas es trabajo de `canal_owner`.
     async with db_app.state.session_factory() as session:
         with pytest.raises(ProgrammingError, match="permission denied"):
             await session.execute(text("CREATE TABLE should_not_exist (id int)"))

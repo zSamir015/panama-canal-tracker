@@ -2,11 +2,11 @@
 
 - **Fecha**: 2026-11-06
 - **Estado**: Aceptada
-- **Modifica**: la frase "`/metrics` no se expone a Internet (solo red interna)" de AGENTS.md §8.9
+- **Modifica**: la frase "`/metrics` no se expone a Internet (solo red interna)" de docs/ENGINEERING.md §8.9
 
 ## Contexto
 La tarea 7.1 pide `/metrics` para Prometheus, `/ready` y una alerta si el worker pasa más de
-5 minutos sin mensajes. AGENTS.md dice que `/metrics` va solo por la red interna, pero la API no
+5 minutos sin mensajes. docs/ENGINEERING.md dice que `/metrics` va solo por la red interna, pero la API no
 puede saber desde dónde le llegan las peticiones: depende de cómo se configure el proxy, y un
 despliegue mal configurado la dejaría abierta. Además, lo que exporta (estado del worker, número
 de tránsitos) no es secreto pero tampoco hay motivo para publicarlo.
@@ -22,7 +22,7 @@ de tránsitos) no es secreto pero tampoco hay motivo para publicarlo.
   mensajes de error, y lo usa el orquestador.
 - El formato de exposición de texto de Prometheus se escribe a mano
   (`app/services/metrics.py`) en vez de usar `prometheus_client`. Son unas pocas métricas con
-  nombres y etiquetas fijos, y una dependencia más es algo más que auditar (AGENTS.md §8.14).
+  nombres y etiquetas fijos, y una dependencia más es algo más que auditar (docs/ENGINEERING.md §8.14).
   Un test comprueba que cada línea tiene la forma del formato.
 - Las métricas del worker salen del estado que ya publica en Redis (3.5): la API no se conecta al
   worker ni a AISStream.

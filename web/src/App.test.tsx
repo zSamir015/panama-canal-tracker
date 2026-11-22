@@ -209,7 +209,7 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
   });
 
-  it('un nombre hostil que llega por /ws/live se muestra como texto (AGENTS.md §8.7)', async () => {
+  it('un nombre hostil que llega por /ws/live se muestra como texto (docs/ENGINEERING.md §8.7)', async () => {
     stubApi({ detailName: 'NOMBRE REST' });
     const hostile = '<img src=x onerror=alert(1)>';
     // WebSocket de mentira: al recibir la suscripción contesta con un snapshot del buque.

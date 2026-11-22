@@ -2,7 +2,7 @@
 
 El worker publica `LiveUpdate` en Redis (3.5) y la API lo reenvía a los navegadores (4.2): los dos
 usan estos mismos modelos. Los mensajes del cliente se validan como cualquier entrada externa:
-tipos estrictos, campos desconocidos rechazados y límites de tamaño (AGENTS.md §8.6).
+tipos estrictos, campos desconocidos rechazados y límites de tamaño (docs/ENGINEERING.md §8.6).
 """
 
 from typing import Annotated, Literal

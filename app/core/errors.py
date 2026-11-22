@@ -1,4 +1,4 @@
-"""Respuestas de error `application/problem+json` (RFC 9457, AGENTS.md §3 y §8.9).
+"""Respuestas de error `application/problem+json` (RFC 9457, docs/ENGINEERING.md §3 y §8.9).
 
 Todas las respuestas de error de la API tienen la misma forma:
 

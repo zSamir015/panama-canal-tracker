@@ -181,7 +181,7 @@ carga de datos recolectados, ver [docs/OPERATIONS.md](docs/OPERATIONS.md).
 | [docs/VALIDATION.md](docs/VALIDATION.md) | Estudio con AIS real: qué se puede y qué no se puede concluir |
 | [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Revisión de seguridad final y lo que exigiría un despliegue |
 | [docs/adr/](docs/adr/README.md) | Decisiones de arquitectura ([0001](docs/adr/0001-stack-tecnico.md) a [0020](docs/adr/0020-capturas-con-datos-reales.md)) |
-| [AGENTS.md](AGENTS.md) | Convenciones de código, pruebas, seguridad y flujo de trabajo |
+| [docs/ENGINEERING.md](docs/ENGINEERING.md) | Convenciones de código, pruebas, seguridad y flujo de trabajo |
 
 Este README existe en inglés y en español; el resto de la documentación está en español.
 

@@ -4,7 +4,7 @@
 - **Estado**: Aceptada
 
 ## Contexto
-AGENTS.md §8.8 pide límites finos en la app con un contador en Redis compartido entre réplicas:
+docs/ENGINEERING.md §8.8 pide límites finos en la app con un contador en Redis compartido entre réplicas:
 login 5/min por IP y por email, register 3/min por IP, refresh 10/min, API general 120/min por
 usuario y 5 conexiones WebSocket simultáneas por usuario. Respuesta 429 con `Retry-After` en
 `problem+json`. La API es async: ninguna llamada a Redis puede bloquear el event loop.

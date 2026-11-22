@@ -1,10 +1,10 @@
-"""Base del patrón repository (AGENTS.md §3).
+"""Base del patrón repository (docs/ENGINEERING.md §3).
 
 Los repositorios son la única capa que habla con el ORM. Los routers y los servicios reciben
 objetos de dominio, nunca una sesión ni sentencias SQL.
 
 Regla de oro: consultas solo con el constructor de SQLAlchemy y parámetros enlazados. Prohibido
-construir SQL con f-strings o concatenación, también dentro de `text()` (AGENTS.md §8.6).
+construir SQL con f-strings o concatenación, también dentro de `text()` (docs/ENGINEERING.md §8.6).
 """
 
 from sqlalchemy import select

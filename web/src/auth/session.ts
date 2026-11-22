@@ -37,7 +37,7 @@ let inFlight: Promise<Session | null> | null = null;
  * `POST /api/v1/auth/refresh` con la cookie `HttpOnly`. Devuelve la sesión nueva, `null` si no hay
  * sesión que renovar (401) o lanza `SessionError` si ahora no se puede.
  *
- * Cada refresh rota la cookie y reutilizar una ya rotada revoca la sesión entera (AGENTS.md §8.4),
+ * Cada refresh rota la cookie y reutilizar una ya rotada revoca la sesión entera (docs/ENGINEERING.md §8.4),
  * así que nunca hay dos renovaciones a la vez: las llamadas en paralelo de esta pestaña comparten
  * la misma petición y, entre pestañas, un Web Lock las pone en fila.
  */

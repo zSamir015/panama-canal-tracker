@@ -1,4 +1,4 @@
-"""Crea un usuario administrador (AGENTS.md §8.3).
+"""Crea un usuario administrador (docs/ENGINEERING.md §8.3).
 
 La API nunca crea admins: el registro siempre asigna el rol `user`. El primer admin se crea con
 este script, con acceso a la base (`DATABASE_URL` de `.env`):

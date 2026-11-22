@@ -11,7 +11,7 @@ from tests.scripts_loader import load_script
 
 export_zones = load_script("export_zones")
 
-# Caja de trabajo del proyecto (AGENTS.md §1): lat 8.4 a 9.7, lon -80.2 a -79.2.
+# Caja de trabajo del proyecto (docs/ENGINEERING.md §1): lat 8.4 a 9.7, lon -80.2 a -79.2.
 MIN_LON, MAX_LON = -80.2, -79.2
 MIN_LAT, MAX_LAT = 8.4, 9.7
 

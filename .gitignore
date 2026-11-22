@@ -49,6 +49,6 @@ service-account*.json
 *.sql.gz
 backups/
 
-# Instrucciones personales de Claude Code y notas de aprendizaje (privadas)
+# Instrucciones y notas personales (privadas)
 CLAUDE.local.md
 *Aprendizaje*.md

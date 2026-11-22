@@ -46,7 +46,7 @@ function signedOut(expired: boolean): State {
 }
 
 /**
- * Sesión del navegador. El access token vive solo en memoria (AGENTS.md §8.4); al cargar la
+ * Sesión del navegador. El access token vive solo en memoria (docs/ENGINEERING.md §8.4); al cargar la
  * página se recupera con la cookie del refresh, se renueva un minuto antes de caducar y también
  * cuando la API lo rechaza. Si la renovación falla por red, el token actual se conserva y se
  * reintenta; si la API dice que no hay sesión (401), toca volver a entrar.

@@ -1,4 +1,4 @@
-"""Router de administración: `/api/v1/admin/*` (AGENTS.md §8.3).
+"""Router de administración: `/api/v1/admin/*` (docs/ENGINEERING.md §8.3).
 
 `require_admin` se aplica a nivel de router: cualquier endpoint que se añada aquí queda protegido
 aunque su función no lo declare. Sin token → 401; rol `user` → 403. Cada acción se registra en el

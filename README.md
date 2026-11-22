@@ -178,7 +178,7 @@ data, see [docs/OPERATIONS.md](docs/OPERATIONS.md).
 | [docs/VALIDATION.md](docs/VALIDATION.md) | Study with real AIS: what it can and cannot conclude |
 | [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Final security review and what a deployment would need |
 | [docs/adr/](docs/adr/README.md) | Architecture decisions ([0001](docs/adr/0001-stack-tecnico.md) to [0020](docs/adr/0020-capturas-con-datos-reales.md)) |
-| [AGENTS.md](AGENTS.md) | Conventions for code, tests, security and workflow |
+| [docs/ENGINEERING.md](docs/ENGINEERING.md) | Conventions for code, tests, security and workflow |
 
 This README is available in English and Spanish; the rest of the documentation is in Spanish.
 

@@ -5,8 +5,8 @@
   backpressure: un cliente lento no acumula mensajes, solo el estado más reciente.
 - `LiveHub`: una suscripción a Redis por réplica de la API (ADR-0004) que reparte cada `update`
   del worker entre los `ClientView` conectados a esa réplica.
-- `ConnectionLimiter`: como mucho 5 conexiones por usuario entre todas las réplicas (AGENTS.md
-  §8.8), con un sorted set en Redis.
+- `ConnectionLimiter`: como mucho 5 conexiones por usuario entre todas las réplicas
+  (docs/ENGINEERING.md §8.8), con un sorted set en Redis.
 """
 
 import asyncio
