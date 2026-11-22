@@ -104,9 +104,9 @@ conexión AIS aguas arriba. Detalles en [docs/ARCHITECTURE.md](docs/ARCHITECTURE
 | 4 | Mapa en tiempo real y demo | ✅ |
 | 5 | Detección de tránsitos y validación | ✅ |
 | 6 | Esperas en fondeo y estadísticas | ✅ |
-| 7 | Endurecimiento para producción y mejoras UI/UX | ✅ (listo para `v1.0.0`; sin despliegue productivo gestionado según [ADR-0017](docs/adr/0017-v1-sin-entorno-de-produccion.md)) |
+| 7 | Endurecimiento para producción y mejoras UI/UX | ✅ (`v1.0.0` publicada; sin despliegue productivo gestionado según [ADR-0017](docs/adr/0017-v1-sin-entorno-de-produccion.md)) |
 
-Las fases 0 a 7 están completas y listas para `v1.0.0`.
+Las fases 0 a 7 están completas; `v1.0.0` está publicada.
 
 ## Resultados de validación y carga
 
