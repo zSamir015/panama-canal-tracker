@@ -1,7 +1,7 @@
 # ADR-0003: PyJWT y pwdlib (Argon2id) para autenticación
 
 - **Fecha**: 2026-10-15
-- **Estado**: Aceptada (confirmar con instalación real al iniciar la Fase 2)
+- **Estado**: Aceptada. Comprobada con la instalación real: PyJWT y pwdlib con Argon2id están en uso
 
 ## Contexto
 El scaffold inicial usaba `python-jose` y `passlib[bcrypt]`. Ambas librerías tienen muy poca

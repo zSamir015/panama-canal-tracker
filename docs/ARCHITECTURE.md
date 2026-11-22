@@ -109,15 +109,28 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
   `web/src/config.ts`. Comandos en `web/README.md`.
 - Buques como **una capa GeoJSON** renderizada por WebGL (escala a miles de puntos), icono rotado
   según rumbo (COG/heading) y color por tipo de buque.
-- Funciones: posiciones en vivo, ficha del buque al hacer clic, estela de los últimos N minutos,
-  zonas del Canal y fondeaderos dibujadas, panel de tránsitos en curso.
+- Funciones: posiciones en vivo, ficha del buque al hacer clic, estela, zonas del Canal y
+  fondeaderos dibujadas, panel de tránsitos en curso, estadísticas e historial.
+- Vistas (`?view=`): `map` (por defecto), `stats` e `history`; la vista y el buque seleccionado se
+  guardan en la URL.
+- **Estela**: la ficha ofrece ventanas de 30 min, 6 h, 24 h, 48 h y 7 días. Las que no son la de
+  por defecto piden `GET /vessels/{mmsi}/history?from=`; la API admite como máximo 7 días y 2000
+  puntos, y avisa si recorta. La línea solo une posiciones recibidas y se corta donde falta señal
+  más tiempo que un umbral que crece con la ventana (5 min, 30 min, 2 h, 3 h, 6 h): con la
+  cobertura gratuita de AISStream las posiciones están espaciadas, y unirlas sin límite inventaría
+  un trayecto que nadie vio.
+- **Historial**: lista los buques con alguna posición en las últimas 24 h, 48 h, 7 o 30 días
+  (`GET /vessels?seen_since=`, todas las páginas) con un filtro por nombre, MMSI o IMO. Elegir un
+  buque lo abre en el mapa con su ficha y la estela de una ventana equivalente. No existe en la
+  demo estática porque necesita la API.
+- El buscador de la cabecera carga el directorio completo de buques (páginas de 200).
 
 ### 2.5 Servicios de dominio (`app/services/`)
 - `TransitService`: detección de tránsitos (ver §4).
 - `AnchorageService`: detección de esperas en fondeo (ver §4).
 - `StatsService`: estadísticas sobre agregados continuos de TimescaleDB.
 
-## 3. Modelo de datos (propuesta — se refina en cada fase con migraciones Alembic)
+## 3. Modelo de datos (el esquema vigente es el de las migraciones Alembic)
 
 ### `vessels`
 | Campo | Tipo | Notas |
@@ -217,12 +230,19 @@ escalar horizontalmente sin abrir más conexiones a AISStream; el worker es úni
 
 ## 5. Despliegue
 
-- `docker compose` con 4 servicios: `db` (TimescaleDB + PostGIS), `redis`, `api`, `worker`.
-  El frontend se sirve como estático (CDN o el mismo host).
-- Imágenes multi-stage, usuario no root, healthchecks.
-- Producción: un VPS pequeño basta para el volumen del Canal; la arquitectura permite separar
-  servicios si crece. El worker necesita estar **siempre encendido** (los planes que duermen
-  procesos no sirven).
+Estado actual (ADR-0017): no hay entorno de producción. Se ejecuta en una pila local y hay una
+demo estática. Ver `docs/OPERATIONS.md`.
+
+- Desarrollo: `docker-compose.yml` con `db` (TimescaleDB + PostGIS) y `redis`, que solo escuchan en
+  `127.0.0.1`; la API, el worker y el frontend corren como procesos del equipo.
+- Pila completa en contenedores: `docker-compose.stack.yml` añade `migrate`, `api` y `worker` (y
+  `simulator` con un perfil). La base de datos y Redis no publican puertos y cada servicio recibe
+  solo sus variables. Imágenes multi-stage, usuario no root, sistema de archivos de solo lectura.
+- Demo: el frontend compilado con `VITE_DEMO=true` en GitHub Pages, con datos simulados (ADR-0011).
+- Recolección de datos reales: GitHub Actions (ADR-0012, ADR-0019) y un LaunchAgent de macOS para
+  el worker local. El worker debe estar siempre encendido: los planes que duermen procesos no sirven.
+- Si se desplegara en un servidor, harían falta proxy con TLS, copias programadas fuera de la
+  máquina y monitorización, descritos en `docs/SECURITY_REVIEW.md`.
 
 ## 6. Seguridad (resumen; reglas completas en AGENTS.md §8)
 
@@ -305,6 +325,7 @@ flowchart LR
 
 ## 9. Decisiones
 
-Ver `docs/adr/`: 0001 stack · 0002 AISStream · 0003 auth · 0004 worker + Redis ·
-0005 TimescaleDB · 0006 mapa web · 0007 rate limiting · 0008 datos solo con sesión ·
-0009 segunda conexión para destinos al Canal.
+El índice completo, con el estado de cada una, está en [`docs/adr/`](adr/README.md). Las que
+más condicionan el diseño: 0004 (worker y API separados, con Redis), 0005 (TimescaleDB), 0008
+(datos solo con sesión), 0012 y 0019 (recolección continua), 0016 (sentido por rumbo) y 0017 (sin
+entorno de producción).
