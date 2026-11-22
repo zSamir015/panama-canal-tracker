@@ -103,9 +103,9 @@ keeping a single upstream AIS connection. Full details in [docs/ARCHITECTURE.md]
 | 4 | Real-time map and live demo | ✅ |
 | 5 | Transit detection and validation | ✅ |
 | 6 | Anchorage waits and statistics | ✅ |
-| 7 | Production hardening & UI/UX overhaul | ✅ (ready for `v1.0.0`; no managed prod deploy per [ADR-0017](docs/adr/0017-v1-sin-entorno-de-produccion.md)) |
+| 7 | Production hardening & UI/UX overhaul | ✅ (`v1.0.0` released; no managed prod deploy per [ADR-0017](docs/adr/0017-v1-sin-entorno-de-produccion.md)) |
 
-Phases 0–7 are complete and ready for `v1.0.0`.
+Phases 0–7 are complete; `v1.0.0` is released.
 
 ## Validation & Load Test Results
 
