@@ -13,6 +13,11 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `db` no está en marcha. Procedimiento en `docs/BACKUP.md`.
 
 ### Changed
+- Validación 5.7 repetida con **14,9 días** de AIS real (`2026-11-07` a `2026-11-21`, 37 ejecuciones
+  legibles, 10 040 posiciones de 595 buques, issue #185): misma conclusión, sin cambiar umbrales. La
+  cobertura sigue siendo el límite (2 tránsitos completos, entrada atlántica sin señal desde el
+  12 nov); desde el 20 nov el volumen por ventana se recuperó y la escucha encadenada es continua.
+  `docs/VALIDATION.md`, los README, `docs/ROADMAP.md` y `AGENTS.md` §9 actualizados.
 - Panel de tránsitos: el sentido (sur/norte) se marca con un icono SVG decorativo en lugar de los
   caracteres `↓`/`↑`, que se dibujaban distinto según la tipografía (issue #161; el resto del
   issue ya estaba en #162).

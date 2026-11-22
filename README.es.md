@@ -110,13 +110,13 @@ Las fases 0 a 7 están completas; `v1.0.0` está publicada.
 
 ## Resultados de validación y carga
 
-- **Validación con AIS real ([docs/VALIDATION.md](docs/VALIDATION.md))**: durante **12,5 días**
-  (`2026-11-07` al `2026-11-19`, `29` ejecuciones del recolector equivalentes a `156,3 h / 299,4 h`,
-  el `52,2 %`), se registraron **8.286 posiciones** de **500 buques**, **304 visitas a fondeo**
-  (`267` en Pacífico, `37` en Atlántico) y **2 tránsitos completos** (`18 h 48 min` y `10 h 08 min` en
-  sentido sur) frente a `~437` esperados (`~35/día` de media ACP). Solo `84` posiciones (`1,0 %`)
-  cayeron en las entradas y `25` en Culebra / Miraflores, confirmando que la cobertura terrestre
-  gratuita de AISStream dentro del Canal es parcial mientras `2.578` posiciones paradas quedan fuera de
+- **Validación con AIS real ([docs/VALIDATION.md](docs/VALIDATION.md))**: durante **14,9 días**
+  (`2026-11-07` al `2026-11-21`, `37` ejecuciones del recolector equivalentes a `201,4 h / 356,4 h`,
+  el `56,5 %`), se registraron **10.040 posiciones** de **595 buques**, **307 visitas a fondeo**
+  (`270` en Pacífico, `37` en Atlántico) y **2 tránsitos completos** (`18 h 48 min` y `10 h 08 min` en
+  sentido sur) frente a `~520` esperados (`~35/día` de media ACP). Solo `86` posiciones (`0,9 %`)
+  cayeron en las entradas y `26` en Culebra / Miraflores, confirmando que la cobertura terrestre
+  gratuita de AISStream dentro del Canal es parcial mientras `3.875` posiciones paradas quedan fuera de
   los polígonos iniciales de fondeo. Los umbrales siguen calibrados sobre trayectorias sintéticas
   sobre OSM, mientras `ADR-0019` y `scripts/ais_coverage.py` (`#165`, `#169`) amplían las horas de
   escucha y miden la recepción Tipo 27 / caja ampliada.
@@ -172,7 +172,7 @@ variables y el perfil `--profile simulator`. Para desarrollo local con `--reload
 | [docs/API_DESIGN.md](docs/API_DESIGN.md) | Contrato REST y WebSocket |
 | [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md) | Fuente AIS, límites y zonas geográficas |
 | [docs/LOAD_TEST.md](docs/LOAD_TEST.md) | Prueba de carga WebSocket (500 clientes) |
-| [docs/VALIDATION.md](docs/VALIDATION.md) | Estudio de 12,5 días de cobertura AIS real |
+| [docs/VALIDATION.md](docs/VALIDATION.md) | Estudio de 14,9 días de cobertura AIS real |
 | [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Revisión de seguridad y requisitos previos a producción |
 | [docs/AIS_COLLECTOR.md](docs/AIS_COLLECTOR.md) | Flujo continuo del recolector AIS en GitHub Actions |
 | [docs/LOCAL_WORKER_MAC.md](docs/LOCAL_WORKER_MAC.md) | Worker estable en macOS con `launchd` y `caffeinate` |
