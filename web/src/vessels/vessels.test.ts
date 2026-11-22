@@ -1,7 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ApiError } from '../api/client';
 import type { LiveVessel } from '../live/protocol';
-import { fetchVesselTrack, parseVesselDetail, parseVesselTrack } from './api';
+import {
+  DIRECTORY_MAX_PAGES,
+  DIRECTORY_PAGE_SIZE,
+  fetchVesselDirectory,
+  fetchVesselTrack,
+  parseVesselDetail,
+  parseVesselTrack,
+} from './api';
 import {
   agoText,
   courseText,
@@ -11,6 +18,7 @@ import {
   speedText,
 } from './format';
 import { trailFeature } from './trail';
+import { DEFAULT_TRAIL_WINDOW, TRAIL_WINDOWS, trailWindow } from './trailWindow';
 
 const detail = {
   mmsi: 352001234,
@@ -117,6 +125,103 @@ describe('fetchVesselTrack', () => {
   });
 });
 
+function urlOf(input: RequestInfo | URL | undefined): string {
+  if (input === undefined) {
+    return '';
+  }
+  if (typeof input === 'string') {
+    return input;
+  }
+  return input instanceof URL ? input.href : input.url;
+}
+
+describe('fetchVesselTrack con ventana', () => {
+  it('pide desde hace la ventana con `from` en UTC y sin tocar el resto de la URL', async () => {
+    const fetchImpl = vi.fn<typeof fetch>(() => Promise.resolve(Response.json(track)));
+    const before = Date.now();
+
+    await fetchVesselTrack(352001234, 'abc', fetchImpl, 6 * 3_600_000);
+
+    const [url] = fetchImpl.mock.calls[0] ?? [];
+    const asked = new URL(urlOf(url), 'http://localhost');
+    expect(asked.pathname).toBe('/api/v1/vessels/352001234/history');
+    const from = Date.parse(asked.searchParams.get('from') ?? '');
+    expect(String(asked.searchParams.get('from'))).toMatch(/Z$/);
+    expect(from).toBeGreaterThanOrEqual(before - 6 * 3_600_000);
+    expect(from).toBeLessThanOrEqual(Date.now() - 6 * 3_600_000);
+    expect([...asked.searchParams.keys()]).toEqual(['from']);
+  });
+
+  it('ninguna ventana pasa de los 7 días que admite el servidor', () => {
+    for (const item of TRAIL_WINDOWS) {
+      expect(item.ms).toBeLessThan(7 * 24 * 3_600_000);
+    }
+    expect(DEFAULT_TRAIL_WINDOW.ms).toBe(30 * 60_000);
+    expect(trailWindow('7d').ms).toBeGreaterThan(trailWindow('24h').ms);
+  });
+
+  it('los huecos de señal tolerados crecen con la ventana', () => {
+    const gaps = TRAIL_WINDOWS.map((item) => item.gapMs);
+    expect(gaps).toEqual([...gaps].sort((x, y) => x - y));
+    expect(new Set(gaps).size).toBe(gaps.length);
+  });
+});
+
+describe('fetchVesselDirectory', () => {
+  const row = (mmsi: number) => ({
+    mmsi,
+    name: null,
+    imo: null,
+    ship_type: null,
+    last_seen_at: null,
+  });
+
+  it('pide páginas hasta tener todos los buques', async () => {
+    const pages: Record<string, unknown> = {
+      '1': { items: [row(352000001), row(352000002)], total: 3, page: 1, size: 200 },
+      '2': { items: [row(352000003)], total: 3, page: 2, size: 200 },
+    };
+    const fetchImpl = vi.fn<typeof fetch>((input) => {
+      const page = new URL(urlOf(input), 'http://localhost').searchParams.get('page') ?? '';
+      return Promise.resolve(Response.json(pages[page]));
+    });
+
+    const all = await fetchVesselDirectory('abc', fetchImpl);
+
+    expect(all.map((item) => item.mmsi)).toEqual([352000001, 352000002, 352000003]);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    const [first] = fetchImpl.mock.calls[0] ?? [];
+    expect(urlOf(first)).toContain(`size=${String(DIRECTORY_PAGE_SIZE)}&page=1`);
+  });
+
+  it('se para en una página vacía aunque el total prometa más', async () => {
+    const fetchImpl = vi.fn<typeof fetch>(() =>
+      Promise.resolve(Response.json({ items: [], total: 50, page: 1, size: 200 })),
+    );
+
+    expect(await fetchVesselDirectory('abc', fetchImpl)).toEqual([]);
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
+  it('no pide más páginas que el tope', async () => {
+    const fetchImpl = vi.fn<typeof fetch>(() =>
+      Promise.resolve(Response.json({ items: [row(352000001)], total: 99999, page: 1, size: 200 })),
+    );
+
+    await fetchVesselDirectory('abc', fetchImpl);
+
+    expect(fetchImpl).toHaveBeenCalledTimes(DIRECTORY_MAX_PAGES);
+  });
+
+  it('una respuesta sin total es un error, no una lista a medias', async () => {
+    const fetchImpl = vi.fn<typeof fetch>(() =>
+      Promise.resolve(Response.json({ items: [row(352000001)] })),
+    );
+
+    await expect(fetchVesselDirectory('abc', fetchImpl)).rejects.toThrow('inesperada');
+  });
+});
+
 describe('formatos de la ficha', () => {
   it('muestra cada dato o un guion si falta', () => {
     expect(aisTypeCodeText(70)).toBe('70');
@@ -194,6 +299,27 @@ describe('trailFeature', () => {
       withGap.coordinates.slice(0, 3),
       withGap.coordinates.slice(3),
     ]);
+  });
+
+  it('con una ventana larga tolera huecos mayores antes de cortar', () => {
+    const sparse = {
+      coordinates: [
+        [-79.6, 9.0],
+        [-79.7, 9.1],
+        [-79.8, 9.2],
+      ] as [number, number][],
+      timestamps: ['2026-10-23T10:00:00Z', '2026-10-23T11:10:00Z', '2026-10-23T11:13:00Z'],
+      truncated: false,
+    };
+
+    // 70 min sin señal al principio: con los 5 min de la ventana corta se parte; con la de 24 h
+    // (2 h) no.
+    expect(trailFeature(sparse, undefined)?.geometry.coordinates).toEqual([
+      sparse.coordinates.slice(1),
+    ]);
+    expect(trailFeature(sparse, undefined, trailWindow('24h').gapMs)?.geometry.coordinates).toEqual(
+      [sparse.coordinates],
+    );
   });
 
   it('descarta los tramos de un solo punto y sin dos puntos no hay línea', () => {

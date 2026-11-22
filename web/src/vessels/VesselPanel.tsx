@@ -16,6 +16,12 @@ import {
   speedText,
 } from './format';
 import { useVesselDetail } from './queries';
+import {
+  DEFAULT_TRAIL_WINDOW,
+  TRAIL_WINDOWS,
+  type TrailWindowId,
+  trailWindow,
+} from './trailWindow';
 
 interface VesselPanelProps {
   mmsi: number;
@@ -24,6 +30,11 @@ interface VesselPanelProps {
   live: LiveVessel | undefined;
   /** Tránsito activo si este buque está cruzando el Canal ahora mismo. */
   currentTransit?: CurrentTransit | undefined;
+  /** Ventana de la estela y cómo cambiarla; sin `onTrailWindowChange` no se ofrece el selector. */
+  trailWindowId?: TrailWindowId;
+  onTrailWindowChange?: ((id: TrailWindowId) => void) | undefined;
+  /** La API recortó la estela a sus 2 000 puntos más recientes. */
+  trailTruncated?: boolean;
   onClose: () => void;
 }
 
@@ -31,7 +42,16 @@ interface VesselPanelProps {
  * Ficha del buque seleccionado. Todo lo que viene de AIS (nombre incluido) se pinta como texto con
  * React, nunca como HTML (AGENTS.md §8.7).
  */
-export function VesselPanel({ mmsi, token, live, currentTransit, onClose }: VesselPanelProps) {
+export function VesselPanel({
+  mmsi,
+  token,
+  live,
+  currentTransit,
+  trailWindowId = DEFAULT_TRAIL_WINDOW.id,
+  onTrailWindowChange,
+  trailTruncated = false,
+  onClose,
+}: VesselPanelProps) {
   const detail = useVesselDetail(mmsi, token);
   const now = useNow(5000);
   const [copied, setCopied] = useState(false);
@@ -240,7 +260,26 @@ export function VesselPanel({ mmsi, token, live, currentTransit, onClose }: Vess
           </div>
         </>
       )}
-      <p className="vessel-panel__note">Estela: últimos 30 minutos.</p>
+      {onTrailWindowChange !== undefined && (
+        <div className="vessel-panel__trail" role="group" aria-label="Ventana de la estela">
+          {TRAIL_WINDOWS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              aria-pressed={item.id === trailWindowId}
+              onClick={() => {
+                onTrailWindowChange(item.id);
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+      <p className="vessel-panel__note">
+        Estela: últimos {trailWindow(trailWindowId).phrase}.
+        {trailTruncated && ' Hay más puntos de los que caben: se enseñan los más recientes.'}
+      </p>
     </aside>
   );
 }

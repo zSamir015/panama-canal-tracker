@@ -37,11 +37,40 @@ export interface VesselSummary {
   lon: number | null;
 }
 
-export function fetchVesselDirectory(
+/** Tamaño máximo de página de `GET /vessels` y tope de páginas (2 000 buques). */
+export const DIRECTORY_PAGE_SIZE = 200;
+export const DIRECTORY_MAX_PAGES = 10;
+
+/**
+ * Todos los buques conocidos, página a página (los más vistos primero). Una sola página dejaba
+ * fuera a los buques más antiguos del buscador en cuanto había más de 200.
+ */
+export async function fetchVesselDirectory(
   token: string,
   fetchImpl?: typeof fetch,
 ): Promise<VesselSummary[]> {
-  return apiGet('/vessels?size=200', token, parseVesselDirectory, fetchImpl);
+  const all: VesselSummary[] = [];
+  for (let page = 1; page <= DIRECTORY_MAX_PAGES; page += 1) {
+    const result = await apiGet(
+      `/vessels?size=${String(DIRECTORY_PAGE_SIZE)}&page=${String(page)}`,
+      token,
+      parseVesselPage,
+      fetchImpl,
+    );
+    all.push(...result.items);
+    if (result.items.length === 0 || all.length >= result.total) {
+      break;
+    }
+  }
+  return all;
+}
+
+function parseVesselPage(body: unknown): { items: VesselSummary[]; total: number } | null {
+  const items = parseVesselDirectory(body);
+  if (items === null || !isRecord(body) || !Number.isInteger(body.total)) {
+    return null;
+  }
+  return { items, total: body.total as number };
 }
 
 export function fetchVesselDetail(
@@ -52,13 +81,21 @@ export function fetchVesselDetail(
   return apiGet(`/vessels/${String(mmsi)}`, token, parseVesselDetail, fetchImpl);
 }
 
-/** La estela: por defecto, los últimos 30 minutos que decide el servidor. */
+/**
+ * La estela. Sin `windowMs`, los últimos 30 minutos que decide el servidor; con él, desde hace
+ * esa cantidad de milisegundos hasta ahora (`from` es una hora con zona, en UTC).
+ */
 export function fetchVesselTrack(
   mmsi: number,
   token: string,
   fetchImpl?: typeof fetch,
+  windowMs?: number,
 ): Promise<VesselTrack> {
-  return apiGet(`/vessels/${String(mmsi)}/history`, token, parseVesselTrack, fetchImpl);
+  const query =
+    windowMs === undefined
+      ? ''
+      : `?from=${encodeURIComponent(new Date(Date.now() - windowMs).toISOString())}`;
+  return apiGet(`/vessels/${String(mmsi)}/history${query}`, token, parseVesselTrack, fetchImpl);
 }
 
 export function parseVesselDirectory(body: unknown): VesselSummary[] | null {

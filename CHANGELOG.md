@@ -6,6 +6,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- Ficha del buque: selector de la ventana de la estela (30 min, 6 h, 24 h, 7 días; antes fija en
+  30 min). Las ventanas largas piden `from` a `GET /vessels/{mmsi}/history`, se recargan cada 60 s y
+  cortan la estela por huecos de señal proporcionales a la ventana (5 min, 30 min, 2 h, 6 h); si la
+  API recorta a sus 2 000 puntos más recientes, la ficha lo dice (issue #189).
 - `scripts/import_collected.py` (issue #187): importa a la base local los ficheros del recolector
   de GitHub (buques con datos estáticos, posiciones y los tránsitos y visitas a fondeo ya cerrados,
   recalculados con los detectores del worker). Ensayo por defecto, `--apply` para escribir;
@@ -19,6 +23,8 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
   `db` no está en marcha. Procedimiento en `docs/BACKUP.md`.
 
 ### Changed
+- El buscador de la cabecera carga todo el directorio de buques (páginas de 200, hasta 2 000) y no
+  solo los 200 vistos más recientemente: con 605 buques dejaba fuera a 405 (issue #189).
 - Validación 5.7 repetida con **14,9 días** de AIS real (`2026-11-07` a `2026-11-21`, 37 ejecuciones
   legibles, 10 040 posiciones de 595 buques, issue #185): misma conclusión, sin cambiar umbrales. La
   cobertura sigue siendo el límite (2 tránsitos completos, entrada atlántica sin señal desde el

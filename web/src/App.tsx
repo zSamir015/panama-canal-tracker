@@ -42,6 +42,7 @@ import { type AppView, readUrlState, writeUrlState } from './urlState';
 import { fetchVesselDetail } from './vessels/api';
 import { HeaderVesselSearch, type SearchCandidate } from './vessels/HeaderVesselSearch';
 import { useVesselTrack } from './vessels/queries';
+import { DEFAULT_TRAIL_WINDOW, type TrailWindowId, trailWindow } from './vessels/trailWindow';
 import { trailFeature } from './vessels/trail';
 import { VesselPanel } from './vessels/VesselPanel';
 
@@ -88,7 +89,8 @@ export function App() {
   // ya no hay sesión, `useSession` pasa a `signedOut` con `expired` y se vuelve al login.
   const live = useLiveVessels(isDemo ? null : token, bbox, renew);
   const demo = useDemoVessels();
-  const track = useVesselTrack(selectedMmsi, isDemo ? null : token);
+  const [trailWindowId, setTrailWindowId] = useState<TrailWindowId>(DEFAULT_TRAIL_WINDOW.id);
+  const track = useVesselTrack(selectedMmsi, isDemo ? null : token, trailWindowId);
 
   useEffect(() => {
     applyDocumentTheme(theme);
@@ -460,6 +462,9 @@ export function App() {
                       token={token}
                       live={selectedLive}
                       currentTransit={selectedTransit}
+                      trailWindowId={trailWindowId}
+                      onTrailWindowChange={setTrailWindowId}
+                      trailTruncated={track.data?.truncated === true}
                       onClose={closePanel}
                     />
                   ) : null
@@ -489,7 +494,11 @@ export function App() {
                     onViewportChange={setBbox}
                     selectedMmsi={selectedMmsi}
                     onSelect={setSelectedMmsi}
-                    trail={selectedMmsi === null ? null : trailFeature(track.data, selectedLive)}
+                    trail={
+                      selectedMmsi === null
+                        ? null
+                        : trailFeature(track.data, selectedLive, trailWindow(trailWindowId).gapMs)
+                    }
                     basemap={basemap}
                     theme={theme}
                     focusTarget={focusTarget}
