@@ -72,9 +72,9 @@ BACKUP_KEEP_DAYS=14 scripts/db_backup.sh /var/backups/canal
 
 ## Programarlas
 
-No hay servidor desplegado (ADR-0011) y `v1.0.0` se entrega sin él (ADR-0017): las copias están
-listas para programarse, pero **no están programadas en ningún sitio**. El día que haya un
-servidor Linux, con `cron` (cada noche a las 03:00, quedándose con las de los últimos 14 días):
+No hay servidor desplegado (ADR-0011) y `v1.0.0` se entrega sin él (ADR-0017). Hay dos formas de
+programarlas: en la Mac donde corre la pila local (abajo) y, el día que haya un servidor Linux, con
+`cron` (cada noche a las 03:00, quedándose con las de los últimos 14 días):
 
 ```cron
 0 3 * * * cd /opt/panama-canal-tracker && BACKUP_PASSPHRASE="$(cat /etc/canal/backup-passphrase)" BACKUP_KEEP_DAYS=14 scripts/db_backup.sh /var/backups/canal
@@ -83,6 +83,27 @@ servidor Linux, con `cron` (cada noche a las 03:00, quedándose con las de los �
 El fichero de la contraseña con permisos `600`, fuera del repositorio y de las copias. Conviene
 llevar las copias a otro disco o a otro sitio: una copia en la misma máquina no protege de perderla.
 Tras instalarlo, ejecutar `scripts/db_backup_check.sh` en ese servidor y restaurar una copia real.
+
+### En la Mac (LaunchAgent)
+
+La Mac que recolecta AIS (ADR-0019) puede hacer la copia sola cada noche a las 03:00. La
+contraseña de cifrado vive en el Keychain, nunca en el plist ni en el repositorio. Una sola vez:
+
+```bash
+security add-generic-password -a "$USER" -s panama-canal-tracker-db-backup -w "$(openssl rand -base64 32)"
+scripts/macos/install_launchd_backup.sh            # instala y carga el agente
+launchctl kickstart gui/$(id -u)/com.panama-canal-tracker.backup   # prueba inmediata
+scripts/macos/install_launchd_backup.sh --status   # estado y últimas líneas del log
+```
+
+**Guarda esa contraseña también en tu gestor de contraseñas** (se lee con
+`security find-generic-password -a "$USER" -s panama-canal-tracker-db-backup -w`): si pierdes el
+Keychain, las copias no se pueden abrir. Las copias van a `~/Backups/panama-canal-tracker` con
+retención de 14 días (`BACKUP_DIR` y `BACKUP_KEEP_DAYS` las cambian) y los logs a
+`~/Library/Logs/panama-canal-tracker/backup.{out,err}.log`. Si la Mac duerme a las 03:00, launchd
+lanza la copia al despertar. El wrapper (`scripts/macos/run_db_backup.sh`) espera hasta 60 s a que
+el contenedor `db` esté en marcha y, si no lo está, falla sin hacer nada.
+`--uninstall` quita el agente y deja intactos las copias y el Keychain.
 
 ## Límites
 
@@ -93,8 +114,10 @@ Tras instalarlo, ejecutar `scripts/db_backup_check.sh` en ese servidor y restaur
 - **Probado solo contra el contenedor de desarrollo** y bases temporales, con datos sintéticos.
   No se ha restaurado nunca una copia de una base de producción (no existe) ni con volumen real.
   Con datos reales conviene medir cuánto tarda la copia y la restauración.
-- **Programación y copias fuera de la máquina: sin hacer ni probar** (ADR-0017). La retención sí
-  está probada, contra el contenedor de desarrollo.
+- **Copias fuera de la máquina: sin hacer** (ADR-0017). En la Mac la copia nocturna está
+  programada, pero cae en el mismo disco que la base: no protege de perder el equipo. Copia
+  `~/Backups/panama-canal-tracker` a otro disco o a la nube de vez en cuando. La retención está
+  probada contra el contenedor de desarrollo.
 - El volcado de `pg_dump` avisa de claves foráneas circulares en el catálogo de TimescaleDB; la
   restauración funciona (está en la prueba) porque se hace con el superusuario y con las funciones
   `pre_restore` y `post_restore`.

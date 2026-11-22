@@ -5,6 +5,13 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Added
+- Copia nocturna de la base en la Mac (issue #182): LaunchAgent `com.panama-canal-tracker.backup`
+  (`scripts/macos/install_launchd_backup.sh`) que a las 03:00 ejecuta `scripts/macos/run_db_backup.sh`.
+  La contraseña de cifrado se lee del Keychain, las copias van a `~/Backups/panama-canal-tracker`
+  con retención de 14 días, y el wrapper se niega a copiar si falta la contraseña o el contenedor
+  `db` no está en marcha. Procedimiento en `docs/BACKUP.md`.
+
 ### Changed
 - `docs/SECURITY_REVIEW.md` recoge el hallazgo de `/ws/live` (arreglado en #158), los riesgos
   aceptados (enumeración por el registro, access token válido 15 min tras el logout, sin cambio de
