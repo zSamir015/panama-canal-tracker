@@ -30,9 +30,9 @@ The system has three parts:
 
 ## Status
 
-The project is complete. Phases 0 to 7 of the [roadmap](docs/ROADMAP.md) are closed and `v1.0.0`
-was released on 2026-11-20. Changes after the release are small improvements to the interface and
-the tooling, listed under *Unreleased* in the [changelog](CHANGELOG.md).
+The project is complete. Phases 0 to 7 of the [roadmap](docs/ROADMAP.md) are closed: `v1.0.0`
+was released on 2026-11-20, followed by `v1.1.0` (2026-11-22) with post-release interface, tooling,
+and documentation improvements listed in the [changelog](CHANGELOG.md).
 
 Two scope decisions are deliberate:
 
