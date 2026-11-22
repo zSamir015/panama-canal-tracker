@@ -5,6 +5,15 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Changed
+- Documentación de proyecto terminado (issue #197): `docs/README.md` (índice), `docs/OPERATIONS.md`
+  (qué corre y dónde, arranque, comprobaciones, rotación de secretos y problemas conocidos),
+  `docs/adr/README.md` (índice de decisiones), `SECURITY.md` ampliado, `README.md` y `README.es.md`
+  reescritos en un tono sobrio y con el estado final del proyecto, estado final en
+  `docs/ROADMAP.md` y `AGENTS.md` §9, y `docs/ARCHITECTURE.md` al día (historial, estela por
+  ventana y estado del despliegue). Los estados de los ADR-0003 y ADR-0005 ya no quedan pendientes
+  de una fase.
+
 ### Added
 - Capturas con datos reales de AISStream (`docs/media/real-ais-history-48h.png` y
   `real-ais-route-7d.png`) en `README.md` y `README.es.md`, y ADR-0020 con el alcance de

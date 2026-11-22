@@ -1,209 +1,204 @@
 # Panama Canal Tracker
 
-> Seguimiento en tiempo real de los buques que cruzan el Canal de Panamá: ingesta AIS Clase A/B en
-> vivo, detección automática de tránsitos y esperas en fondeo, mapa satelital/vectorial y analítica.
+Seguimiento de los buques del Canal de Panamá a partir de datos AIS en vivo: ingiere el flujo AIS,
+infiere los tránsitos y las esperas en fondeadero y los muestra en un mapa en tiempo real con
+estadísticas e historial.
 
 [English](README.md)
 
 [![CI](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/zSamir015/panama-canal-tracker/actions/workflows/ci.yml)
 [![Licencia: todos los derechos reservados](https://img.shields.io/badge/Licencia-Todos%20los%20derechos%20reservados-red.svg)](LICENSE)
 
-**[Demo en vivo](https://zsamir015.github.io/panama-canal-tracker/)**: corre directo en el navegador
-con trayectorias simuladas sobre el eje real del Canal (también accesible desde «Ver demo sin
-cuenta» en el login, sin backend ni API key).
+[Demo en vivo](https://zsamir015.github.io/panama-canal-tracker/): la demo estática corre en el
+navegador con buques simulados que siguen el eje real del Canal, o desde «Ver demo sin cuenta» en
+la pantalla de acceso. No necesita clave de API ni backend.
 
-![Recorrido visual operativo: vista clara del Canal, buscador global, tooltip, satélite oscuro y estadísticas KPI](docs/media/live-map.gif)
+![Recorrido por la interfaz: vista clara del Canal, buscador global, tooltip, vista satelital oscura y estadísticas](docs/media/live-map.gif)
 
----
+## Resumen
 
-## Recorrido visual y capacidades principales
+No existe una fuente pública con los tránsitos oficiales del Canal. Este proyecto infiere los
+tránsitos y las esperas en fondeadero a partir de señales AIS en bruto y dice con claridad dónde
+termina esa inferencia: la cobertura terrestre gratuita de AIS dentro del Canal es parcial, así
+que en la mayor parte del cauce no hay señal (ver [Datos y límites](#datos-y-límites)).
 
-### Navegación en tiempo real (Consola OLED Oscura + Satélite Esri)
-Todas las trayectorias del simulador y la demo siguen el cauce navegable real de OpenStreetMap por
-Bahía Limón, Esclusas de Gatún, Lago Gatún, Corte Culebra y Balboa sin cruzar tierra. Las siluetas
-navales direccionales con puente blanco se combinan con balizas compactas en fondeaderos y escala
-adaptativa según el zoom.
+El sistema tiene tres partes:
 
-![Buques navegando de forma fluida por Lago Gatún y Corte Culebra sobre imagen satelital Esri](docs/media/live-motion.gif)
+- Un worker de ingesta que lee AIS de [AISStream.io](https://aisstream.io), valida y guarda las
+  posiciones y ejecuta los detectores de tránsitos y de fondeo.
+- Un servicio FastAPI que expone endpoints REST y un WebSocket con las posiciones en vivo.
+- Un frontend React y MapLibre con el mapa en vivo, un panel de tránsitos, estadísticas y un
+  historial.
 
-### Galería de funcionalidades
+## Estado
 
-| Mapa claro y barra operativa de escritorio | Modo oscuro OLED y capa satelital |
+El proyecto está terminado. Las Fases 0 a 7 del [roadmap](docs/ROADMAP.md) están cerradas y
+`v1.0.0` se publicó el 2026-11-20. Los cambios posteriores son mejoras pequeñas de la interfaz y de
+las herramientas, y constan en *Unreleased* del [changelog](CHANGELOG.md).
+
+Hay dos decisiones de alcance deliberadas:
+
+- No hay entorno de producción ([ADR-0017](docs/adr/0017-v1-sin-entorno-de-produccion.md)). Se
+  ejecuta como una pila local de `docker compose` y una demo estática en GitHub Pages. Lo que
+  todavía exigiría un despliegue público está en [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md).
+- Los datos de AISStream no se enseñan a visitantes anónimos
+  ([ADR-0008](docs/adr/0008-demo-con-login.md)): el mapa exige una cuenta y la demo pública usa
+  datos simulados.
+
+## Capturas
+
+### Interfaz, con datos simulados
+
+| Mapa claro y barra lateral | Tema oscuro y capa satelital |
 | :---: | :---: |
-| ![Mapa de escritorio en tema claro con 18 buques, KPIs y leyenda interactiva](docs/media/ui-desktop-light-map.png) | ![Vista satelital oscura con casco del buque, estela de 30 min, copiar MMSI y hora de Panamá](docs/media/ui-desktop-dark-satellite.png) |
-| *Flota de 18 buques en vivo, KPIs operativos en barra lateral, filtros por tipo y leyenda interactiva* | *Esri World Imagery (`ADR-0018`), tema oscuro OLED, estela de 30 min, «Copiar MMSI» y hora `America/Panama`* |
+| ![Mapa claro con 18 buques, cifras de la flota y leyenda filtrable](docs/media/ui-desktop-light-map.png) | ![Vista satelital oscura con un buque seleccionado, su estela de 30 minutos y la zona horaria de Panamá](docs/media/ui-desktop-dark-satellite.png) |
+| Cifras de la flota, filtros por tipo de buque y leyenda interactiva. | Esri World Imagery ([ADR-0018](docs/adr/0018-satelite-esri-world-imagery.md)), tema oscuro, últimos 30 minutos de estela y horas en `America/Panama`. |
 
-| Buscador global (`/`, `⌘K`) y progreso de tránsito | Tooltip de escritorio y escala según zoom |
+| Buscador y progreso de tránsito | Tooltip al pasar el cursor |
 | :---: | :---: |
-| ![Buscador global en cabecera y barras de progreso de tránsitos con sentido](docs/media/ui-desktop-search-transits.png) | ![Tooltip al pasar el cursor sobre el buque mostrando nombre, tipo y velocidad](docs/media/ui-desktop-hover-tooltip.png) |
-| *Buscador por nombre, MMSI o IMO, estado sincronizado en URL (`?mmsi=&view=`) y progreso estimado sobre la mediana* | *Tooltip de escritorio (`nombre · tipo · velocidad`), atenuación de señal antigua (>15 min) y balizas compactas* |
+| ![Desplegable del buscador de la cabecera y barras de progreso de tránsito con sentido](docs/media/ui-desktop-search-transits.png) | ![Tooltip sobre un buque con nombre, tipo y velocidad](docs/media/ui-desktop-hover-tooltip.png) |
+| Búsqueda por nombre, MMSI o IMO (`/` o `⌘K`), URL compartible (`?mmsi=&view=`) y progreso estimado sobre la mediana de los tránsitos. | Nombre, tipo y velocidad al pasar el cursor; las señales de más de 15 minutos se atenúan. |
 
-| Estadísticas del Canal (`?view=stats`) | Vista móvil (`390×844`) y hoja arrastrable |
+| Estadísticas (`?view=stats`) | Diseño móvil (`390×844`) |
 | :---: | :---: |
-| ![Vista de estadísticas con KPIs superiores, comparativa frente al periodo anterior y aviso de cobertura AIS](docs/media/ui-desktop-stats-kpis.png) | ![Vista móvil responsiva oscura con hoja inferior expandida y arrastrable](docs/media/ui-mobile-sheet.png) |
-| *Tarjetas KPI con variación vs periodo anterior, aviso honesto de cobertura AIS parcial y barras apiladas por sentido* | *Corrección `100dvh` para iOS Safari, cabecera compacta y hoja inferior táctil arrastrable (`useSheetDrag`)* |
+| ![Vista de estadísticas con cifras del periodo, comparación con el periodo anterior y aviso de cobertura](docs/media/ui-desktop-stats-kpis.png) | ![Diseño móvil oscuro con una hoja inferior desplegada](docs/media/ui-mobile-sheet.png) |
+| Cifras del periodo frente al anterior, aviso de cobertura AIS parcial y barras diarias por sentido. | Cabecera compacta y una hoja inferior que se puede arrastrar. |
 
-### Historial de buques y rutas
+### Historial y rutas, con datos simulados
 
-| Historial de buques (`?view=history`) | Ventana de la ruta (30 min → 7 días) |
+| Historial (`?view=history`) | Ventana de la ruta |
 | :---: | :---: |
-| ![Pestaña Historial con los buques vistos en las últimas 48 horas, su tipo, MMSI y cuánto hace de su última señal](docs/media/ui-desktop-history.png) | ![Mapa oscuro con la ruta de 7 días de un buque seleccionado cruzando el Canal y el selector de ventana en su ficha](docs/media/ui-desktop-trail-7d.png) |
-| *Buques con alguna posición en las últimas 24 h, 48 h, 7 o 30 días, el más reciente primero, con filtro por nombre, MMSI o IMO; al pulsar uno se abre en el mapa* | *Selector de ventana en la ficha del buque (`30 min`, `6 h`, `24 h`, `48 h`, `7 días`); la línea solo une posiciones realmente recibidas y se corta en los huecos largos de señal* |
+| ![Pestaña Historial con los buques vistos en las últimas 48 horas](docs/media/ui-desktop-history.png) | ![Mapa oscuro con la ruta de 7 días de un buque y el selector de ventana en su ficha](docs/media/ui-desktop-trail-7d.png) |
+| Buques con una posición en las últimas 24 h, 48 h, 7 o 30 días, el más reciente primero, con filtro por nombre, MMSI o IMO. Al elegir uno se abre en el mapa. | La ficha ofrece 30 min, 6 h, 24 h, 48 h y 7 días. La línea solo une posiciones recibidas y se corta en los huecos largos de señal. |
 
-| Historial en móvil (`390×844`) | Cómo funciona |
-| :---: | :--- |
-| ![Historial de buques en móvil con botones de periodo, filtro y filas](docs/media/ui-mobile-history.png) | - `GET /api/v1/vessels?seen_since=` lista los buques; `GET /api/v1/vessels/{mmsi}/history?from=` dibuja la ruta.<br>- La ventana llega a 7 días (límite de la API) y avisa si la API la recortó a sus 2.000 puntos más recientes.<br>- La pestaña Historial no aparece en la demo estática (necesita la API). |
-
-*Estas capturas usan buques simulados con nombres y posiciones ficticios, nunca datos AIS reales ni cuentas personales.*
+La pestaña Historial necesita la API, así que la demo estática no la incluye. Las capturas de arriba
+usan buques simulados con nombres ficticios.
 
 ### Con datos AIS reales
 
 | Historial, últimas 48 horas | Ruta de 7 días de un carguero |
 | :---: | :---: |
-| ![Pestaña Historial con buques reales vistos en las últimas 48 horas; las embarcaciones personales están enmascaradas](docs/media/real-ais-history-48h.png) | ![Ruta real de 7 días de un carguero llegando al fondeadero del Pacífico del Canal](docs/media/real-ais-route-7d.png) |
-| *117 buques reales en 48 horas. Los veleros, embarcaciones de recreo y pesqueros se enmascaran porque su nombre y MMSI pueden identificar a una persona* | *Un carguero que llega al fondeadero del Pacífico desde el sureste. Solo se enseña la ruta de buques comerciales* |
+| ![Historial con buques reales de las últimas 48 horas; las embarcaciones personales están enmascaradas](docs/media/real-ais-history-48h.png) | ![Ruta real de 7 días de un carguero llegando al fondeadero del Pacífico](docs/media/real-ais-route-7d.png) |
+| 117 buques reales. Los veleros, embarcaciones de recreo y pesqueros se enmascaran porque su nombre y MMSI pueden identificar a una persona. | Un carguero que llega al fondeadero del Pacífico desde el sureste. Solo se enseña la ruta de buques comerciales. |
 
-*Datos reales de [AISStream.io](https://aisstream.io), recogidos entre el 2026-11-07 y el 2026-11-22 por el worker local y el recolector de GitHub. La cobertura terrestre es parcial, así que el resultado es escaso por naturaleza. Son imágenes estáticas: la aplicación no expone datos a visitantes anónimos ([ADR-0008](docs/adr/0008-demo-con-login.md), [ADR-0020](docs/adr/0020-capturas-con-datos-reales.md)).*
+Datos reales de [AISStream.io](https://aisstream.io), recogidos entre el 2026-11-07 y el 2026-11-22
+por el worker local y el recolector de GitHub. La cobertura es parcial, así que el resultado es
+escaso. Son imágenes estáticas ([ADR-0020](docs/adr/0020-capturas-con-datos-reales.md)).
 
----
+## Funcionalidades
 
-## Qué hace
-
-- 📡 **Ingiere** mensajes AIS Clase A y Clase B (`PositionReport`, `StandardClassBPositionReport`,
-  `ExtendedClassBPositionReport`, `StaticDataReport` y `ShipStaticData`) desde
-  [AISStream.io](https://aisstream.io) con volcado por lotes y difusión WebSocket cada `0,5 s`
-- 🗺️ **Muestra** todos los buques en una sola capa WebGL GeoJSON (React + MapLibre GL) con cascos
-  navales direccionales, capas **Estándar / Satélite**, tema claro/oscuro (`prefers-color-scheme`)
-  y atenuación de señales antiguas
-- 🔍 **Detecta** tránsitos completos (Atlántico ↔ Pacífico) con sentido (`↓`/`↑`), barra de progreso
-  estimada, duración y medianas históricas
-- ⏱️ **Mide** esperas en los fondeaderos Atlántico y Pacífico antes de entrar al Canal
-- 🕘 **Reproduce el historial**: una pestaña *Historial* lista los buques vistos en las últimas 24 h,
-  48 h, 7 o 30 días, y la ficha de cada buque dibuja su ruta en una ventana de `30 min` a `7 días`
-- 📊 **Expone** analítica REST y flujo WebSocket en vivo sobre TimescaleDB + PostGIS
-- ♿ **UX y accesibilidad**: pestañas WAI-ARIA (`tablist`/`tab`) con flechas, gestión automática de
-  foco en fichas, buscador `/` y `⌘K`, URL compartible, conmutador de contraseña, botones `Reintentar`
-  en español y tipografía monoespaciada tabular (`--font-mono`)
-- 🔐 **Seguridad endurecida**: JWT con rotación de refresh cookies HttpOnly (`Argon2id`), CSP estricto
-  y regla ESLint que prohíbe `dangerouslySetInnerHTML`
-
-No existe una API pública oficial con los tránsitos del Canal. Este proyecto **infiere** tránsitos y
-esperas desde señales AIS y comunica de forma transparente la cobertura terrestre parcial tanto en
-estados vacíos como en estadísticas.
+- Ingesta de mensajes AIS de Clase A y Clase B desde AISStream, escritos por lotes cada 0,5 s y
+  publicados por Redis hacia el WebSocket.
+- Mapa en tiempo real con los buques en una sola capa WebGL, mapas base vectorial y satelital, temas
+  claro y oscuro y filtro por tipo de buque.
+- Detección de tránsitos completos entre las entradas del Atlántico y del Pacífico, con sentido,
+  progreso estimado y tiempo transcurrido ([ADR-0016](docs/adr/0016-sentido-de-entrada-por-rumbo.md)).
+- Medida de la espera en los fondeaderos del Atlántico y del Pacífico antes de entrar.
+- Estadísticas por periodo e historial con una ventana de ruta seleccionable de hasta 7 días.
+- Búsqueda por nombre, MMSI o IMO y estado guardado en la URL.
+- Controles accesibles: navegación entre vistas con las flechas, gestión del foco en los paneles y
+  foco de teclado visible.
+- Autenticación con tokens de acceso de vida corta y tokens de refresco rotativos en una cookie
+  `HttpOnly`, una Content Security Policy estricta y una regla de lint que prohíbe insertar HTML.
 
 ## Arquitectura
 
 ```mermaid
 flowchart LR
-    AIS["AISStream.io / Simulador"] -->|WebSocket| W["Worker de ingesta"]
-    W -->|"batch 0,5 s"| DB[("PostgreSQL + PostGIS + TimescaleDB")]
-    W -->|"publish"| R[("Redis Pub/Sub")]
-    R -->|"push 0,5 s"| API["FastAPI · N réplicas"]
+    AIS["AISStream.io o simulador"] -->|WebSocket| W["Worker de ingesta"]
+    W -->|"inserción por lotes, 0,5 s"| DB[("PostgreSQL, PostGIS, TimescaleDB")]
+    W -->|publica| R[("Redis pub/sub")]
+    R -->|"envío, 0,5 s"| API["FastAPI"]
     DB --> API
-    API -->|"REST + WebSocket"| WEB["React + TypeScript + MapLibre GL"]
+    API -->|"REST y WebSocket"| WEB["React, TypeScript, MapLibre GL"]
 ```
 
-El worker y la API son procesos independientes: la API escala horizontalmente manteniendo una única
-conexión AIS aguas arriba. Detalles en [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+El worker y la API son procesos distintos ([ADR-0004](docs/adr/0004-worker-separado-y-redis.md)),
+de modo que la API puede escalar sin abrir más conexiones a AISStream; el worker es una única
+instancia por diseño. Los detalles están en [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Stack técnico y calidad
+## Tecnología y calidad
 
-| Capa | Tecnología y verificación |
+| Capa | Tecnología |
 |---|---|
-| API y Auth | Python 3.12, FastAPI (async), Pydantic v2, PyJWT, `pwdlib` (Argon2id) |
-| Datos y Geo | PostgreSQL 16, PostGIS, TimescaleDB, SQLAlchemy 2.0 async, Alembic |
-| Tiempo real | Worker WebSocket AIS Clase A/B (`0,5 s`), Redis pub/sub, `/ws/live` |
-| Frontend | React 19, TypeScript estricto, Vite, MapLibre GL JS (WebGL), TanStack Query |
-| Calidad | **797** tests unitarios backend (`pytest -m "not integration"`), **247** tests frontend (`Vitest`), `mypy --strict`, `ruff`, `eslint --max-warnings=0`, `pip-audit`, `gitleaks` |
-| Operación | Docker Compose endurecido (no-root), GitHub Actions (7 checks CI), métricas Prometheus |
+| API y autenticación | Python 3.12, FastAPI (asíncrono), Pydantic v2, PyJWT, `pwdlib` (Argon2id) |
+| Datos | PostgreSQL 16, PostGIS, TimescaleDB, SQLAlchemy 2.0 asíncrono, Alembic |
+| Tiempo real | Worker WebSocket de AISStream, Redis pub/sub, `/ws/live` |
+| Frontend | React 19, TypeScript (strict), Vite, MapLibre GL JS, TanStack Query |
+| Operación | Docker Compose con contenedores sin root y de solo lectura, GitHub Actions, Prometheus `/metrics` |
 
-## Estado del proyecto
+Las comprobaciones corren en CI en cada pull request y deben pasar antes de fusionar: 1.147 tests
+del backend (unitarios y de integración contra PostgreSQL y Redis reales), 274 del frontend,
+`mypy --strict`, `ruff`, `eslint --max-warnings=0`, `pip-audit`, `npm audit`, `gitleaks` y la
+construcción de las imágenes.
 
-| Fase | Alcance | Estado |
-|---|---|---|
-| 0 | Scaffold y documentación | ✅ |
-| 1 | Esqueleto FastAPI, CI, seguridad del repo | ✅ |
-| 2 | Base de datos y autenticación | ✅ |
-| 3 | Worker de ingesta AIS | ✅ |
-| 4 | Mapa en tiempo real y demo | ✅ |
-| 5 | Detección de tránsitos y validación | ✅ |
-| 6 | Esperas en fondeo y estadísticas | ✅ |
-| 7 | Endurecimiento para producción y mejoras UI/UX | ✅ (`v1.0.0` publicada; sin despliegue productivo gestionado según [ADR-0017](docs/adr/0017-v1-sin-entorno-de-produccion.md)) |
+## Datos y límites
 
-Las fases 0 a 7 están completas; `v1.0.0` está publicada.
+[docs/VALIDATION.md](docs/VALIDATION.md) compara el detector con AIS real durante 14,9 días
+(2026-11-07 al 2026-11-21):
 
-## Resultados de validación y carga
+- El recolector escuchó 201,4 de 356,4 horas (56,5 %) y registró 10.040 posiciones de 595 buques.
+- Solo 86 posiciones (0,9 %) cayeron dentro de las zonas de entrada y 26 dentro del corredor del
+  Canal.
+- El detector completó 2 tránsitos, frente a unos 520 esperados según la media de unos 35 diarios de
+  la Autoridad del Canal.
 
-- **Validación con AIS real ([docs/VALIDATION.md](docs/VALIDATION.md))**: durante **14,9 días**
-  (`2026-11-07` al `2026-11-21`, `37` ejecuciones del recolector equivalentes a `201,4 h / 356,4 h`,
-  el `56,5 %`), se registraron **10.040 posiciones** de **595 buques**, **307 visitas a fondeo**
-  (`270` en Pacífico, `37` en Atlántico) y **2 tránsitos completos** (`18 h 48 min` y `10 h 08 min` en
-  sentido sur) frente a `~520` esperados (`~35/día` de media ACP). Solo `86` posiciones (`0,9 %`)
-  cayeron en las entradas y `26` en Culebra / Miraflores, confirmando que la cobertura terrestre
-  gratuita de AISStream dentro del Canal es parcial mientras `3.875` posiciones paradas quedan fuera de
-  los polígonos iniciales de fondeo. Los umbrales siguen calibrados sobre trayectorias sintéticas
-  sobre OSM, mientras `ADR-0019` y `scripts/ais_coverage.py` (`#165`, `#169`) amplían las horas de
-  escucha y miden la recepción Tipo 27 / caja ampliada.
-- **Prueba de carga WebSocket `/ws/live` ([docs/LOAD_TEST.md](docs/LOAD_TEST.md))**: con **500 clientes
-  WebSocket simultáneos** frente a FastAPI + Redis + TimescaleDB (Apple M5 10 núcleos, simulador a
-  `--speed 60`), conectaron **500/500** y recibieron el snapshot inicial con **0 fallos** (`9 ms` p50 /
-  `11 ms` p95 / `37 ms` máx.), `17.466` mensajes entregados (cadencia p50 de `2,00 s`), **7,8 % media /
-  10,9 % pico** de CPU en la API, **153 MB** de memoria máxima y sin degradación en ingesta
-  (`10,63 filas/s` sin carga frente a `9,52 filas/s` con 500 clientes).
+Esa diferencia mide la cobertura de AISStream en Panamá, no la precisión del detector, y el estudio
+concluye que los datos no permiten calibrar los umbrales. La lógica de tránsitos y fondeo se
+verifica con el simulador y con trayectorias sintéticas. Por eso el mapa en vivo enseña pocos buques
+y las estadísticas, que solo cuentan tránsitos completados, quedan casi vacías.
 
-## Cómo se construyó
+Una prueba de carga del WebSocket con 500 clientes simultáneos ([docs/LOAD_TEST.md](docs/LOAD_TEST.md))
+los conectó a todos sin fallos y con una latencia mediana del snapshot de 9 ms (percentil 95: 11 ms).
+La ingesta siguió funcionando bajo carga: 9,5 filas/s frente a una referencia de 10,6.
 
-Construido estrictamente fase por fase (`un issue = una rama = un PR`) con decisiones de arquitectura
-documentadas en ADRs:
+## Ejecución
 
-- **Hoja de ruta e hitos**: [docs/ROADMAP.md](docs/ROADMAP.md) (Fases `0`–`7` y criterios de aceptación)
-- **Decisiones técnicas clave (`docs/adr/`)**: worker AIS separado + Redis pub/sub (`ADR-0004`),
-  hipertablas TimescaleDB + PostGIS (`ADR-0005`), renderizado WebGL GeoJSON (`ADR-0006`), Argon2id +
-  PyJWT (`ADR-0003`), demo estática en GitHub Pages (`ADR-0011`), analítica SQL en TimescaleDB
-  (`ADR-0013`), copias cifradas con GPG (`ADR-0015`), capa satelital Esri World Imagery (`ADR-0018`), y
-  recolector continuo encadenado junto al worker `launchd` en macOS dentro del límite de 2 sockets
-  (`ADR-0012`, `ADR-0019`). Índice completo:
-  [0001](docs/adr/0001-stack-tecnico.md)–[0020](docs/adr/0020-capturas-con-datos-reales.md).
-- **Línea base de seguridad**: [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) y [SECURITY.md](SECURITY.md)
-- **Historial en GitHub**: [Issues](https://github.com/zSamir015/panama-canal-tracker/issues) ·
-  [PRs fusionados](https://github.com/zSamir015/panama-canal-tracker/pulls?q=is%3Apr+is%3Amerged) ·
-  [Releases (`v0.1.0`–`v0.6.0`)](https://github.com/zSamir015/panama-canal-tracker/releases) ·
-  [CHANGELOG.md](CHANGELOG.md)
-
-## Inicio rápido
-
-Toda la pila (PostgreSQL, Redis, migraciones, API, worker AIS y simulador de 18 buques a velocidad
-`2×`) corre en contenedores sin API key:
+La pila completa (PostgreSQL, Redis, migraciones, API, worker y un simulador con 18 buques) corre en
+contenedores sin ninguna clave externa:
 
 ```bash
-cp .env.example .env            # contraseñas aleatorias y JWT_SECRET_KEY; nunca commitear .env
+cp .env.example .env            # rellenar contraseñas aleatorias y JWT_SECRET_KEY; nunca subir .env
 AISSTREAM_URL=ws://simulator:8765 AISSTREAM_API_KEY=simulator \
   docker compose -f docker-compose.stack.yml --profile simulator up -d --build --wait
-# Documentación de la API: http://localhost:8000/docs (registro, login y GET /api/v1/vessels)
-docker compose -f docker-compose.stack.yml --profile simulator down   # parar (-v borra los datos)
+# Documentación de la API: http://localhost:8000/docs (registrarse, iniciar sesión y GET /api/v1/vessels)
+docker compose -f docker-compose.stack.yml --profile simulator down   # parar; con -v borra los datos
 ```
 
-Con una clave real de AISStream.io, añádela en `AISSTREAM_API_KEY` dentro de `.env` y omite las
-variables y el perfil `--profile simulator`. Para desarrollo local con `--reload`, consulta
-[AGENTS.md](AGENTS.md#10-comandos-útiles).
+Con una clave real de AISStream, define `AISSTREAM_API_KEY` en `.env` y omite las variables y el
+perfil del simulador. Para desarrollar en el equipo, las copias de seguridad, el worker de macOS y la
+carga de datos recolectados, ver [docs/OPERATIONS.md](docs/OPERATIONS.md).
 
 ## Documentación
 
+[docs/README.md](docs/README.md) es el índice. Los documentos principales:
+
 | Documento | Contenido |
 |---|---|
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Componentes, flujo de datos y modelo de datos |
-| [docs/ROADMAP.md](docs/ROADMAP.md) | Fases y criterios de aceptación |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Componentes, flujo de datos, modelo de datos y lógica de dominio |
 | [docs/API_DESIGN.md](docs/API_DESIGN.md) | Contrato REST y WebSocket |
-| [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md) | Fuente AIS, límites y zonas geográficas |
-| [docs/LOAD_TEST.md](docs/LOAD_TEST.md) | Prueba de carga WebSocket (500 clientes) |
-| [docs/VALIDATION.md](docs/VALIDATION.md) | Estudio de 14,9 días de cobertura AIS real |
-| [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Revisión de seguridad y requisitos previos a producción |
-| [docs/AIS_COLLECTOR.md](docs/AIS_COLLECTOR.md) | Flujo continuo del recolector AIS en GitHub Actions |
-| [docs/LOCAL_WORKER_MAC.md](docs/LOCAL_WORKER_MAC.md) | Worker estable en macOS con `launchd` y `caffeinate` |
-| [docs/adr/](docs/adr/) | Architecture Decision Records ([0001](docs/adr/0001-stack-tecnico.md)–[0020](docs/adr/0020-capturas-con-datos-reales.md)) |
-| [AGENTS.md](AGENTS.md) | Convenciones de ingeniería y seguridad |
-| [SECURITY.md](SECURITY.md) | Cómo reportar una vulnerabilidad |
+| [docs/OPERATIONS.md](docs/OPERATIONS.md) | Cómo ejecutar, comprobar y mantener el sistema |
+| [docs/VALIDATION.md](docs/VALIDATION.md) | Estudio con AIS real: qué se puede y qué no se puede concluir |
+| [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Revisión de seguridad final y lo que exigiría un despliegue |
+| [docs/adr/](docs/adr/README.md) | Decisiones de arquitectura ([0001](docs/adr/0001-stack-tecnico.md) a [0020](docs/adr/0020-capturas-con-datos-reales.md)) |
+| [AGENTS.md](AGENTS.md) | Convenciones de código, pruebas, seguridad y flujo de trabajo |
+
+Este README existe en inglés y en español; el resto de la documentación está en español.
+
+## Proceso de desarrollo
+
+Cada cambio es un issue, una rama y un pull request, con las decisiones de arquitectura registradas
+como ADR y una entrada del changelog por versión. Historial: [issues](https://github.com/zSamir015/panama-canal-tracker/issues),
+[pull requests fusionados](https://github.com/zSamir015/panama-canal-tracker/pulls?q=is%3Apr+is%3Amerged),
+[releases](https://github.com/zSamir015/panama-canal-tracker/releases) y el
+[changelog](CHANGELOG.md).
+
+## Seguridad
+
+Para informar de una vulnerabilidad, ver [SECURITY.md](SECURITY.md); la revisión está en
+[docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md).
 
 ## Licencia
 
-Todos los derechos reservados. El código es público para que se pueda ver y evaluar; usarlo, copiarlo o modificarlo requiere permiso por escrito. Ver [LICENSE](LICENSE).
+Todos los derechos reservados. El código es público para poder leerlo y evaluarlo; usarlo,
+copiarlo o modificarlo requiere permiso por escrito. Ver [LICENSE](LICENSE).

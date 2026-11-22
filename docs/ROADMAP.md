@@ -179,7 +179,19 @@ objetivo sin degradar la ingesta.
 
 ---
 
-## Backlog (fuera de alcance hasta v1.0)
+## Estado final
+
+Las Fases 0 a 7 están cerradas y `v1.0.0` está publicada (2026-11-20). El proyecto se considera
+terminado: no hay tareas abiertas. Lo que se añadió después del release (selector de estela,
+pestaña Historial, importador de datos recolectados, copia nocturna en macOS, capturas con datos
+reales) no abre fases nuevas y consta en `CHANGELOG.md`.
+
+Cómo se ejecuta y se mantiene: [`docs/OPERATIONS.md`](OPERATIONS.md). Qué falta para un despliegue
+público: [`docs/SECURITY_REVIEW.md`](SECURITY_REVIEW.md) y ADR-0017.
+
+---
+
+## Backlog (fuera de alcance)
 - Exportación CSV/GeoJSON de tránsitos
 - Alertas (webhook o email) cuando un buque entra al Canal
 - Inferencia de esclusas usadas (Panamax vs. Neopanamax)

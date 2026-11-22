@@ -1,7 +1,7 @@
 # ADR-0005: TimescaleDB para la serie temporal de posiciones
 
 - **Fecha**: 2026-10-15
-- **Estado**: Aceptada (validar en Fase 3 con volumen real)
+- **Estado**: Aceptada. En uso con datos reales desde el 2026-11-07 (hypertable, compresión y agregados continuos)
 
 ## Contexto
 `positions` es una serie temporal de alto volumen de escritura (cientos de mensajes por minuto,
