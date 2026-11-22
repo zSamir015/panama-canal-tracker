@@ -6,6 +6,12 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- `scripts/import_collected.py` (issue #187): importa a la base local los ficheros del recolector
+  de GitHub (buques con datos estáticos, posiciones y los tránsitos y visitas a fondeo ya cerrados,
+  recalculados con los detectores del worker). Ensayo por defecto, `--apply` para escribir;
+  idempotente y sin tocar lo abierto ni lo que se solape con filas existentes. Probado contra
+  PostgreSQL real, incluido que no cierra el tránsito abierto de un buque. Ver
+  `docs/AIS_COLLECTOR.md`.
 - Copia nocturna de la base en la Mac (issue #182): LaunchAgent `com.panama-canal-tracker.backup`
   (`scripts/macos/install_launchd_backup.sh`) que a las 03:00 ejecuta `scripts/macos/run_db_backup.sh`.
   La contraseña de cifrado se lee del Keychain, las copias van a `~/Backups/panama-canal-tracker`

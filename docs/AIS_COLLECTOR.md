@@ -90,6 +90,30 @@ desde esa entrada (la regla del detector es "aparece en una entrada"), que queda
 hasta que el timeout lo aborta. Con cobertura parcial esto produce tránsitos falsos de corta
 vida; medirlos es parte de la validación de la 5.7.
 
+## Importar a la base local
+
+`scripts/import_collected.py` carga esos ficheros en la base que lee la app (la de `.env`), para
+tener el histórico recolectado en local junto a lo que guarda el worker:
+
+```bash
+python scripts/import_collected.py            # ensayo: cuenta lo que haría y no escribe nada
+python scripts/import_collected.py --apply    # escribe (haz antes una copia: docs/BACKUP.md)
+```
+
+- **Buques y posiciones**: un buque por MMSI (con tipo, eslora y manga si el recolector los vio) y
+  todas las posiciones válidas. Las que ya estaban (misma hora y MMSI) se omiten: repetir el
+  comando no duplica nada.
+- **Tránsitos y visitas a fondeo**: se recalculan con los mismos detectores y el mismo timeout que
+  el worker (`TRANSIT_SIGNAL_TIMEOUT_MINUTES`) y solo se guardan los ya **cerrados**. Lo que siga
+  abierto al terminar los datos, y cualquier fila que se solape en el tiempo con una ya guardada
+  del mismo buque, no se toca: así no se pisa el estado del worker.
+- **Qué se ve en la app**: el mapa en vivo solo enseña buques con una posición de los últimos 30
+  minutos (`LIVE_WINDOW`), así que no cambia. Las estadísticas solo cuentan tránsitos
+  *completados*, y con el timeout de 30 min la validación (`docs/VALIDATION.md`) da 0: tampoco se
+  llenan. Lo importado sirve para `GET /transits`, el historial y las estelas de un buque
+  (`/vessels/{mmsi}/history`, hasta 7 días) y las consultas directas a la base.
+- Los datos del recolector no traen nombres de buque.
+
 ## Límites
 
 - Entre el fin de una ventana encadenada y el arranque de la siguiente suele haber apenas 1–2 minutos
