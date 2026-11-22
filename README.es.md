@@ -56,6 +56,15 @@ adaptativa según el zoom.
 
 *Estas capturas usan buques simulados con nombres y posiciones ficticios, nunca datos AIS reales ni cuentas personales.*
 
+### Con datos AIS reales
+
+| Historial, últimas 48 horas | Ruta de 7 días de un carguero |
+| :---: | :---: |
+| ![Pestaña Historial con buques reales vistos en las últimas 48 horas; las embarcaciones personales están enmascaradas](docs/media/real-ais-history-48h.png) | ![Ruta real de 7 días de un carguero llegando al fondeadero del Pacífico del Canal](docs/media/real-ais-route-7d.png) |
+| *117 buques reales en 48 horas. Los veleros, embarcaciones de recreo y pesqueros se enmascaran porque su nombre y MMSI pueden identificar a una persona* | *Un carguero que llega al fondeadero del Pacífico desde el sureste. Solo se enseña la ruta de buques comerciales* |
+
+*Datos reales de [AISStream.io](https://aisstream.io), recogidos entre el 2026-11-07 y el 2026-11-22 por el worker local y el recolector de GitHub. La cobertura terrestre es parcial, así que el resultado es escaso por naturaleza. Son imágenes estáticas: la aplicación no expone datos a visitantes anónimos ([ADR-0008](docs/adr/0008-demo-con-login.md), [ADR-0020](docs/adr/0020-capturas-con-datos-reales.md)).*
+
 ---
 
 ## Qué hace
@@ -154,7 +163,7 @@ documentadas en ADRs:
   (`ADR-0013`), copias cifradas con GPG (`ADR-0015`), capa satelital Esri World Imagery (`ADR-0018`), y
   recolector continuo encadenado junto al worker `launchd` en macOS dentro del límite de 2 sockets
   (`ADR-0012`, `ADR-0019`). Índice completo:
-  [0001](docs/adr/0001-stack-tecnico.md)–[0019](docs/adr/0019-recolector-continuo-y-worker-a-la-vez.md).
+  [0001](docs/adr/0001-stack-tecnico.md)–[0020](docs/adr/0020-capturas-con-datos-reales.md).
 - **Línea base de seguridad**: [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) y [SECURITY.md](SECURITY.md)
 - **Historial en GitHub**: [Issues](https://github.com/zSamir015/panama-canal-tracker/issues) ·
   [PRs fusionados](https://github.com/zSamir015/panama-canal-tracker/pulls?q=is%3Apr+is%3Amerged) ·
@@ -191,7 +200,7 @@ variables y el perfil `--profile simulator`. Para desarrollo local con `--reload
 | [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Revisión de seguridad y requisitos previos a producción |
 | [docs/AIS_COLLECTOR.md](docs/AIS_COLLECTOR.md) | Flujo continuo del recolector AIS en GitHub Actions |
 | [docs/LOCAL_WORKER_MAC.md](docs/LOCAL_WORKER_MAC.md) | Worker estable en macOS con `launchd` y `caffeinate` |
-| [docs/adr/](docs/adr/) | Architecture Decision Records ([0001](docs/adr/0001-stack-tecnico.md)–[0019](docs/adr/0019-recolector-continuo-y-worker-a-la-vez.md)) |
+| [docs/adr/](docs/adr/) | Architecture Decision Records ([0001](docs/adr/0001-stack-tecnico.md)–[0020](docs/adr/0020-capturas-con-datos-reales.md)) |
 | [AGENTS.md](AGENTS.md) | Convenciones de ingeniería y seguridad |
 | [SECURITY.md](SECURITY.md) | Cómo reportar una vulnerabilidad |
 

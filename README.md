@@ -55,6 +55,15 @@ naval hulls pair with compact anchorage beacons and zoom-scaled sizing.
 
 *These screenshots use simulated vessels with fictitious names and positions, never real AIS data or personal accounts.*
 
+### With Real AIS Data
+
+| History, last 48 hours | 7-day route of a cargo ship |
+| :---: | :---: |
+| ![History tab with real vessels seen in the last 48 hours; personal vessels are masked](docs/media/real-ais-history-48h.png) | ![Real 7-day route of a cargo ship arriving at the Pacific anchorage of the Canal](docs/media/real-ais-route-7d.png) |
+| *117 real vessels in 48 hours. Sailing, pleasure and fishing vessels are masked because their name and MMSI can identify a person* | *A cargo ship approaching the Pacific anchorage from the south-east. Only commercial vessels are shown with a route* |
+
+*Real data from [AISStream.io](https://aisstream.io), collected between 2026-11-07 and 2026-11-22 by the local worker and the GitHub collector. Terrestrial coverage is partial, so the picture is sparse by design. These are static images: the application does not expose data to anonymous visitors ([ADR-0008](docs/adr/0008-demo-con-login.md), [ADR-0020](docs/adr/0020-capturas-con-datos-reales.md)).*
+
 ---
 
 ## What It Does
@@ -150,7 +159,7 @@ Built strictly phase-by-phase (`un issue = una rama = un PR`) with architecture 
   PyJWT (`ADR-0003`), static GitHub Pages demo (`ADR-0011`), SQL/TimescaleDB stats (`ADR-0013`),
   GPG encrypted DB backups (`ADR-0015`), Esri World Imagery (`ADR-0018`), and continuous collector
   chaining with macOS `launchd` worker within the 2-socket limit (`ADR-0012`, `ADR-0019`). Full index:
-  [0001](docs/adr/0001-stack-tecnico.md)–[0019](docs/adr/0019-recolector-continuo-y-worker-a-la-vez.md).
+  [0001](docs/adr/0001-stack-tecnico.md)–[0020](docs/adr/0020-capturas-con-datos-reales.md).
 - **Security Baseline**: [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) & [SECURITY.md](SECURITY.md)
 - **GitHub History**: [Issues](https://github.com/zSamir015/panama-canal-tracker/issues) ·
   [Merged PRs](https://github.com/zSamir015/panama-canal-tracker/pulls?q=is%3Apr+is%3Amerged) ·
@@ -186,7 +195,7 @@ and profile. For local host development (`--reload`), see [AGENTS.md](AGENTS.md#
 | [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Security checklist & production hardening baseline |
 | [docs/AIS_COLLECTOR.md](docs/AIS_COLLECTOR.md) | Continuous GitHub Actions AIS collector workflow |
 | [docs/LOCAL_WORKER_MAC.md](docs/LOCAL_WORKER_MAC.md) | Stable macOS local worker setup (`launchd` + `caffeinate`) |
-| [docs/adr/](docs/adr/) | Architecture Decision Records ([0001](docs/adr/0001-stack-tecnico.md)–[0019](docs/adr/0019-recolector-continuo-y-worker-a-la-vez.md)) |
+| [docs/adr/](docs/adr/) | Architecture Decision Records ([0001](docs/adr/0001-stack-tecnico.md)–[0020](docs/adr/0020-capturas-con-datos-reales.md)) |
 | [AGENTS.md](AGENTS.md) | Engineering and security conventions for this repository |
 | [SECURITY.md](SECURITY.md) | How to report a vulnerability |
 

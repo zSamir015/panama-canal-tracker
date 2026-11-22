@@ -6,6 +6,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- Capturas con datos reales de AISStream (`docs/media/real-ais-history-48h.png` y
+  `real-ais-route-7d.png`) en `README.md` y `README.es.md`, y ADR-0020 con el alcance de
+  publicarlas: imágenes estáticas, embarcaciones personales enmascaradas y ruta solo de buques
+  comerciales (issue #195).
 - Capturas nuevas en `docs/media/` (`ui-desktop-history.png`, `ui-desktop-trail-7d.png`,
   `ui-mobile-history.png`), hechas con buques simulados de nombres ficticios, y sección «Vessel
   History & Routes» en `README.md` y `README.es.md` (issue #193).
