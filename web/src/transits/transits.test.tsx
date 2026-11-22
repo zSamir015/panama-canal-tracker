@@ -185,6 +185,38 @@ describe('TransitsPanel', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
   });
 
+  it('marca el sentido con un icono SVG decorativo: flecha abajo al sur, arriba al norte', async () => {
+    stubTransits(() =>
+      Response.json({
+        items: [
+          item,
+          {
+            ...item,
+            id: 'b',
+            mmsi: 636000002,
+            vessel_name: 'ATLANTIC DAWN',
+            direction: 'northbound',
+          },
+        ],
+        total: 2,
+      }),
+    );
+    const { container } = renderWithQuery(
+      <TransitsPanel token="abc" selectedMmsi={null} onSelect={vi.fn()} />,
+    );
+    await screen.findByText('PACIFIC STAR');
+
+    const south = container.querySelector('.transits-panel__dir-badge--south');
+    const north = container.querySelector('.transits-panel__dir-badge--north');
+    expect(south).toHaveAttribute('aria-hidden', 'true');
+    expect(south?.querySelector('svg')).not.toBeNull();
+    expect(north?.querySelector('svg')).not.toBeNull();
+    expect(south?.querySelector('path')?.getAttribute('d')).not.toBe(
+      north?.querySelector('path')?.getAttribute('d'),
+    );
+    expect(south?.textContent).toBe('');
+  });
+
   it('mientras carga muestra un esqueleto', () => {
     vi.stubGlobal(
       'fetch',
