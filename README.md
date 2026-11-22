@@ -42,6 +42,19 @@ naval hulls pair with compact anchorage beacons and zoom-scaled sizing.
 | ![Statistics view with period KPI delta cards, honest AIS coverage note, and daily transit chart](docs/media/ui-desktop-stats-kpis.png) | ![Mobile responsive dark layout with expanded draggable bottom sheet](docs/media/ui-mobile-sheet.png) |
 | *Period KPI strip with prior-window deltas, honest terrestrial AIS coverage disclosure, and filterable daily bars* | *`100dvh` iOS Safari layout fix, compact 2-row header, and pointer-draggable mobile sheet* |
 
+### Vessel History & Routes
+
+| Vessel History (`?view=history`) | Route Window (30 min → 7 days) |
+| :---: | :---: |
+| ![History tab listing the vessels seen in the last 48 hours with category, MMSI, and time since last signal](docs/media/ui-desktop-history.png) | ![Dark map showing the 7-day route of a selected vessel across the Canal, with the trail window selector on its card](docs/media/ui-desktop-trail-7d.png) |
+| *Vessels with at least one position in the last 24 h, 48 h, 7 or 30 days, newest first, with a `name`/`MMSI`/`IMO` filter; click one to open it on the map* | *Trail window selector on the vessel card (`30 min`, `6 h`, `24 h`, `48 h`, `7 days`); the line only joins positions that were actually received and breaks at long signal gaps* |
+
+| Mobile History (`390×844`) | How it works |
+| :---: | :--- |
+| ![Mobile vessel history with period buttons, filter, and rows](docs/media/ui-mobile-history.png) | - `GET /api/v1/vessels?seen_since=` lists the vessels; `GET /api/v1/vessels/{mmsi}/history?from=` draws the route.<br>- The route window goes up to 7 days (API limit) and shows a notice if the API truncated it to its 2,000 most recent points.<br>- The Historial tab does not appear in the static demo (it needs the API). |
+
+*These screenshots use simulated vessels with fictitious names and positions, never real AIS data or personal accounts.*
+
 ---
 
 ## What It Does
@@ -55,6 +68,8 @@ naval hulls pair with compact anchorage beacons and zoom-scaled sizing.
 - 🔍 **Detects** complete transits (Atlantic ↔ Pacific) with direction, estimated progress bar,
   elapsed duration, and historic medians
 - ⏱️ **Measures** anchorage wait times before canal entry across Atlantic and Pacific zones
+- 🕘 **Replays history**: a *Historial* tab lists the vessels seen in the last 24 h, 48 h, 7 or 30 days,
+  and each vessel card draws its route over a selectable `30 min` to `7 days` window
 - 📊 **Exposes** REST analytics and live WebSocket telemetry backed by TimescaleDB + PostGIS
 - ♿ **Engineered UX & A11y**: WAI-ARIA `tablist`/`tab` arrow navigation, automatic panel focus
   transfer/restoration, `/` & `⌘K` vessel search, URL deep-linking, password visibility toggle,

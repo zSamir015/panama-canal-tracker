@@ -43,6 +43,19 @@ adaptativa según el zoom.
 | ![Vista de estadísticas con KPIs superiores, comparativa frente al periodo anterior y aviso de cobertura AIS](docs/media/ui-desktop-stats-kpis.png) | ![Vista móvil responsiva oscura con hoja inferior expandida y arrastrable](docs/media/ui-mobile-sheet.png) |
 | *Tarjetas KPI con variación vs periodo anterior, aviso honesto de cobertura AIS parcial y barras apiladas por sentido* | *Corrección `100dvh` para iOS Safari, cabecera compacta y hoja inferior táctil arrastrable (`useSheetDrag`)* |
 
+### Historial de buques y rutas
+
+| Historial de buques (`?view=history`) | Ventana de la ruta (30 min → 7 días) |
+| :---: | :---: |
+| ![Pestaña Historial con los buques vistos en las últimas 48 horas, su tipo, MMSI y cuánto hace de su última señal](docs/media/ui-desktop-history.png) | ![Mapa oscuro con la ruta de 7 días de un buque seleccionado cruzando el Canal y el selector de ventana en su ficha](docs/media/ui-desktop-trail-7d.png) |
+| *Buques con alguna posición en las últimas 24 h, 48 h, 7 o 30 días, el más reciente primero, con filtro por nombre, MMSI o IMO; al pulsar uno se abre en el mapa* | *Selector de ventana en la ficha del buque (`30 min`, `6 h`, `24 h`, `48 h`, `7 días`); la línea solo une posiciones realmente recibidas y se corta en los huecos largos de señal* |
+
+| Historial en móvil (`390×844`) | Cómo funciona |
+| :---: | :--- |
+| ![Historial de buques en móvil con botones de periodo, filtro y filas](docs/media/ui-mobile-history.png) | - `GET /api/v1/vessels?seen_since=` lista los buques; `GET /api/v1/vessels/{mmsi}/history?from=` dibuja la ruta.<br>- La ventana llega a 7 días (límite de la API) y avisa si la API la recortó a sus 2.000 puntos más recientes.<br>- La pestaña Historial no aparece en la demo estática (necesita la API). |
+
+*Estas capturas usan buques simulados con nombres y posiciones ficticios, nunca datos AIS reales ni cuentas personales.*
+
 ---
 
 ## Qué hace
@@ -56,6 +69,8 @@ adaptativa según el zoom.
 - 🔍 **Detecta** tránsitos completos (Atlántico ↔ Pacífico) con sentido (`↓`/`↑`), barra de progreso
   estimada, duración y medianas históricas
 - ⏱️ **Mide** esperas en los fondeaderos Atlántico y Pacífico antes de entrar al Canal
+- 🕘 **Reproduce el historial**: una pestaña *Historial* lista los buques vistos en las últimas 24 h,
+  48 h, 7 o 30 días, y la ficha de cada buque dibuja su ruta en una ventana de `30 min` a `7 días`
 - 📊 **Expone** analítica REST y flujo WebSocket en vivo sobre TimescaleDB + PostGIS
 - ♿ **UX y accesibilidad**: pestañas WAI-ARIA (`tablist`/`tab`) con flechas, gestión automática de
   foco en fichas, buscador `/` y `⌘K`, URL compartible, conmutador de contraseña, botones `Reintentar`
