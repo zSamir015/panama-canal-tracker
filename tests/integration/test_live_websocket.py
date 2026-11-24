@@ -131,6 +131,7 @@ def open_ws(url: str, origin: str | None = ORIGIN) -> Any:
 
 
 WAIT_SECONDS = 3.0
+TOKEN_VALID_SECONDS = 5
 
 
 async def receive(ws: ClientConnection) -> dict[str, Any]:
@@ -139,9 +140,9 @@ async def receive(ws: ClientConnection) -> dict[str, Any]:
     return data
 
 
-async def closed_with(ws: ClientConnection) -> int | None:
+async def closed_with(ws: ClientConnection, wait: float = WAIT_SECONDS) -> int | None:
     with pytest.raises(ConnectionClosed) as error:
-        async with asyncio.timeout(WAIT_SECONDS):
+        async with asyncio.timeout(wait):
             while True:
                 await ws.recv()
     return error.value.rcvd.code if error.value.rcvd else None
@@ -265,16 +266,20 @@ async def test_token_of_a_deleted_user_closes_with_4401(
 async def test_the_connection_closes_with_4401_when_the_token_expires(
     url: str, app: FastAPI
 ) -> None:
-    # Un token emitido hace casi 15 minutos: vale para entrar y caduca un segundo después.
+    # Un token que vale para entrar y caduca unos segundos después. El margen es holgado a
+    # propósito: con un solo segundo, un runner lento de CI tardaba más en conectar y suscribirse
+    # que el token en caducar, y el test fallaba antes de llegar al cierre.
     settings = app.state.settings
     user = await make_user(app)
-    issued = datetime.now(UTC) - timedelta(minutes=settings.access_token_expire_minutes, seconds=-1)
+    issued = datetime.now(UTC) - timedelta(
+        minutes=settings.access_token_expire_minutes, seconds=-TOKEN_VALID_SECONDS
+    )
     access, _ = create_access_token(user.id, settings, now=issued)
 
     async with await authenticated(url, access) as ws:
         await ws.send(json.dumps({"type": "subscribe", "bbox": CANAL}))
         assert (await receive(ws))["type"] == "snapshot"  # dentro: el token aún valía
-        assert await closed_with(ws) == 4401
+        assert await closed_with(ws, wait=TOKEN_VALID_SECONDS + WAIT_SECONDS) == 4401
 
 
 # --- Snapshot y tiempo real -----------------------------------------------------------------
