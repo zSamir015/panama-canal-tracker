@@ -114,10 +114,13 @@ el contenedor `db` esté en marcha y, si no lo está, falla sin hacer nada.
 - **Probado solo contra el contenedor de desarrollo** y bases temporales, con datos sintéticos.
   No se ha restaurado nunca una copia de una base de producción (no existe) ni con volumen real.
   Con datos reales conviene medir cuánto tarda la copia y la restauración.
-- **Copias fuera de la máquina: sin hacer** (ADR-0017). En la Mac la copia nocturna está
-  programada, pero cae en el mismo disco que la base: no protege de perder el equipo. Copia
-  `~/Backups/panama-canal-tracker` a otro disco o a la nube de vez en cuando. La retención está
-  probada contra el contenedor de desarrollo.
+- **Copias fuera de la máquina: solo en la Mac** (ADR-0017). Tras cada copia, el wrapper sube
+  `canal-*.dump.gpg*` con `rclone copy` al remote `gdrive` (carpeta `panama-canal-tracker-backups`,
+  alcance `drive.file`: `rclone` solo ve lo que crea). Se configura una vez con
+  `rclone config create gdrive drive scope=drive.file`. `copy` no borra en la nube: la retención de
+  14 días solo vale en local. El `client_id` compartido de `rclone` se retira durante 2026: hay que
+  crear uno propio. Sin `rclone` o sin el remote, el wrapper avisa y sigue. La subida se ha
+  probado a mano y con `rclone check`, no desde launchd a las 03:00.
 - El volcado de `pg_dump` avisa de claves foráneas circulares en el catálogo de TimescaleDB; la
   restauración funciona (está en la prueba) porque se hace con el superusuario y con las funciones
   `pre_restore` y `post_restore`.
