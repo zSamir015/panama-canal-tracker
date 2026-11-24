@@ -83,6 +83,18 @@ Real data from [AISStream.io](https://aisstream.io), collected between 2026-11-0
 by the local worker and the GitHub collector. Coverage is partial, so the picture is sparse. These
 are static images ([ADR-0020](docs/adr/0020-capturas-con-datos-reales.md)).
 
+### Real-time clip
+
+[![Live map with real AIS data: Pacific anchorage, then the card of a cargo ship](docs/media/real-ais-live-map-poster.png)](docs/media/real-ais-live-map.mp4)
+
+A 47-second recording of the app running on live AISStream data on 2026-11-24 (click the image to
+play it): the map with the Pacific anchorage, the switch between the standard and satellite base
+maps, and the card of a cargo ship at anchor with its trail window (30 min, 6 h, 24 h). Coverage
+is partial, so no vessel is crossing the Canal in this clip. Hover tooltips and the vessel list are
+hidden because they include sailing, pleasure and fishing vessels; only a commercial vessel is
+opened. It is a fixed recording, not a live feed
+([ADR-0020](docs/adr/0020-capturas-con-datos-reales.md)).
+
 ## Features
 
 - Ingestion of Class A and Class B AIS messages from AISStream, written in batches every 0.5 s and
