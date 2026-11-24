@@ -85,6 +85,18 @@ Datos reales de [AISStream.io](https://aisstream.io), recogidos entre el 2026-11
 por el worker local y el recolector de GitHub. La cobertura es parcial, así que el resultado es
 escaso. Son imágenes estáticas ([ADR-0020](docs/adr/0020-capturas-con-datos-reales.md)).
 
+### Clip en tiempo real
+
+[![Mapa en vivo con datos AIS reales: fondeadero del Pacífico y ficha de un carguero](docs/media/real-ais-live-map-poster.png)](docs/media/real-ais-live-map.mp4)
+
+Grabación de 47 segundos de la aplicación con datos de AISStream en vivo el 2026-11-24 (pulsa la
+imagen para verla): el mapa con el fondeadero del Pacífico, el cambio entre mapa estándar y
+satélite, y la ficha de un carguero fondeado con la ventana de la estela (30 min, 6 h, 24 h). La
+cobertura es parcial, así que en este clip no hay ningún buque cruzando el Canal. Los tooltips del
+mapa y la lista de buques están ocultos porque incluyen veleros, embarcaciones de recreo y
+pesqueros; solo se abre un buque comercial. Es una grabación fija, no una emisión en vivo
+([ADR-0020](docs/adr/0020-capturas-con-datos-reales.md)).
+
 ## Funcionalidades
 
 - Ingesta de mensajes AIS de Clase A y Clase B desde AISStream, escritos por lotes cada 0,5 s y

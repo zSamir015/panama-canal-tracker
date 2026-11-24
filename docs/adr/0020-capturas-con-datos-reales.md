@@ -21,8 +21,10 @@ permite seguirla.
 ## Decisión
 El README puede incluir **capturas estáticas** con datos reales, con estas condiciones:
 
-1. Son imágenes fijas de un momento concreto. No hay flujo, ni modo anónimo, ni enlace a datos en
-   vivo: lo decidido en el ADR-0008 no cambia.
+1. Son imágenes fijas de un momento concreto o grabaciones cortas, ya terminadas, de la interfaz
+   (un clip de un minuto como mucho). No hay flujo, ni modo anónimo, ni enlace a datos en vivo: lo
+   decidido en el ADR-0008 no cambia. Un clip es una captura que dura unos segundos, no un acceso
+   a los datos.
 2. Se enmascara el nombre y el MMSI de las embarcaciones clasificadas como recreo, pesca u otro tipo
    no comercial. Los buques de carga, tanqueros y de pasajeros se enseñan tal como los emite AIS.
 3. Una ruta solo se publica de un buque comercial. Nunca la de un velero o una embarcación personal.
@@ -46,6 +48,9 @@ gratuita.
 ## Consecuencias
 - Las capturas reales son `docs/media/real-ais-*.png`. Son la lista de ficheros a retirar si hiciera
   falta.
+- Los clips con datos reales son `docs/media/real-ais-*.mp4`, y se retiran igual que las imágenes.
+  Se graban sin la lista de buques y sin los tooltips del mapa, y solo se abre la ficha de un buque
+  comercial.
 - El enmascarado se hace al capturar, sobre la interfaz, y queda dicho en el pie de cada imagen.
 - Los datos de la base local siguen sin publicarse: ni los ficheros del recolector ni las copias de
   seguridad salen de la máquina.
