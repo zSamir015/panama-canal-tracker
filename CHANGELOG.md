@@ -5,6 +5,10 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 
 ## [Unreleased]
 
+### Added
+- `scripts/macos/record_events.sh`: graba la pantalla cuando el worker registra un tránsito o una
+  espera en fondeo, documentado en `docs/OPERATIONS.md` (sección "Videos de eventos").
+
 ## [1.1.0] - 2026-11-22
 
 Mantenimiento y mejoras posteriores a `v1.0.0`: pestaña **Historial** (`24 h`, `48 h`, `7` y
