@@ -6,6 +6,8 @@ Versionado: `v0.<fase>.0` al cerrar cada fase; `v1.0.0` al cerrar la Fase 7.
 ## [Unreleased]
 
 ### Added
+- README (EN y ES): time-lapse de 20 minutos a ×20 y clip de un tránsito que empieza
+  (`docs/media/real-ais-timelapse.mp4`, `real-ais-transit-start.mp4`), ambos con datos AIS reales.
 - README (EN y ES): clip de 47 segundos con datos AIS reales (`docs/media/real-ais-live-map.mp4`).
   El ADR-0020 admite ahora grabaciones cortas además de imágenes fijas, con el mismo enmascarado.
 - `scripts/macos/record_events.sh`: graba la pantalla cuando el worker registra un tránsito o una
