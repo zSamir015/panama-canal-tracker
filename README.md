@@ -83,7 +83,7 @@ Real data from [AISStream.io](https://aisstream.io), collected between 2026-11-0
 by the local worker and the GitHub collector. Coverage is partial, so the picture is sparse. These
 are static images ([ADR-0020](docs/adr/0020-capturas-con-datos-reales.md)).
 
-### Real-time clip
+### Real-time clips
 
 [![Live map with real AIS data: Pacific anchorage, then the card of a cargo ship](docs/media/real-ais-live-map-poster.png)](docs/media/real-ais-live-map.mp4)
 
@@ -94,6 +94,15 @@ is partial, so no vessel is crossing the Canal in this clip. Hover tooltips and 
 hidden because they include sailing, pleasure and fishing vessels; only a commercial vessel is
 opened. It is a fixed recording, not a live feed
 ([ADR-0020](docs/adr/0020-capturas-con-datos-reales.md)).
+
+| Time-lapse, 20 minutes at ×20 | A transit starting |
+| :---: | :---: |
+| [![Time-lapse of the live map: vessels reported over 20 minutes](docs/media/real-ais-timelapse-poster.png)](docs/media/real-ais-timelapse.mp4) | [![Card of a cargo ship that has just started a transit, Atlantic to Pacific](docs/media/real-ais-transit-start-poster.png)](docs/media/real-ais-transit-start.mp4) |
+| 20 minutes of the live map sped up 20 times (2026-11-24). The vessels seen go from 16 to 46 as AIS messages arrive. Each vessel reports a position every few minutes, so in real time none is seen moving. | A cargo ship (IMO 9441623) entering the Canal from the Atlantic, with "transit in progress" and the zone entry time. It is still at the entrance and does not advance during the minute recorded. |
+
+Both clips come from the same live data. No vessel completes a crossing in them: of the 37 transits
+recorded so far, all ended as `aborted` because the free AIS coverage does not follow vessels along
+the whole route.
 
 ## Features
 

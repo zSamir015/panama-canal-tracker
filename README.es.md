@@ -85,7 +85,7 @@ Datos reales de [AISStream.io](https://aisstream.io), recogidos entre el 2026-11
 por el worker local y el recolector de GitHub. La cobertura es parcial, así que el resultado es
 escaso. Son imágenes estáticas ([ADR-0020](docs/adr/0020-capturas-con-datos-reales.md)).
 
-### Clip en tiempo real
+### Clips en tiempo real
 
 [![Mapa en vivo con datos AIS reales: fondeadero del Pacífico y ficha de un carguero](docs/media/real-ais-live-map-poster.png)](docs/media/real-ais-live-map.mp4)
 
@@ -96,6 +96,15 @@ cobertura es parcial, así que en este clip no hay ningún buque cruzando el Can
 mapa y la lista de buques están ocultos porque incluyen veleros, embarcaciones de recreo y
 pesqueros; solo se abre un buque comercial. Es una grabación fija, no una emisión en vivo
 ([ADR-0020](docs/adr/0020-capturas-con-datos-reales.md)).
+
+| Time-lapse, 20 minutos a ×20 | Un tránsito que empieza |
+| :---: | :---: |
+| [![Time-lapse del mapa en vivo: buques reportados durante 20 minutos](docs/media/real-ais-timelapse-poster.png)](docs/media/real-ais-timelapse.mp4) | [![Ficha de un carguero que acaba de empezar un tránsito, de Atlántico a Pacífico](docs/media/real-ais-transit-start-poster.png)](docs/media/real-ais-transit-start.mp4) |
+| 20 minutos del mapa en vivo acelerados 20 veces (2026-11-24). Los buques vistos pasan de 16 a 46 según llegan mensajes AIS. Cada buque reporta una posición cada pocos minutos, así que en tiempo real no se ve moverse a ninguno. | Un carguero (IMO 9441623) que entra al Canal desde el Atlántico, con «tránsito en curso» y la hora de entrada a la zona. Sigue en la entrada y no avanza durante el minuto grabado. |
+
+Los dos clips salen de los mismos datos en vivo. En ninguno un buque completa el cruce: de los 37
+tránsitos registrados hasta ahora, todos terminaron como `aborted`, porque la cobertura gratuita de
+AIS no sigue a los buques por todo el recorrido.
 
 ## Funcionalidades
 
