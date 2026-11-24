@@ -181,8 +181,9 @@ objetivo sin degradar la ingesta.
 
 ## Estado final
 
-Las Fases 0 a 7 están cerradas y `v1.0.0` está publicada (2026-11-20). El proyecto se considera
-terminado: no hay tareas abiertas. Lo que se añadió después del release (selector de estela,
+Las Fases 0 a 7 están cerradas y `v1.0.0` está publicada (2026-11-20), seguida de `v1.1.0`
+(2026-11-22). El proyecto se considera terminado: no hay tareas abiertas. Lo que se añadió después
+del primer release (selector de estela,
 pestaña Historial, importador de datos recolectados, copia nocturna en macOS, capturas con datos
 reales) no abre fases nuevas y consta en `CHANGELOG.md`.
 
