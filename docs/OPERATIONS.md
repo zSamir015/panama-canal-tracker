@@ -59,6 +59,30 @@ AISStream permite como máximo dos conexiones por clave. El worker local usa una
 `AIS_CANAL_BOUND_ENABLED=false`) y el recolector de GitHub otra; no se debe arrancar un segundo
 worker ni `scripts/ais_coverage.py` mientras los dos estén activos (ADR-0009, ADR-0019).
 
+## Videos de eventos (macOS)
+
+`scripts/macos/record_events.sh` vigila el log del worker y graba la pantalla durante 90 segundos
+(o los que se pasen como argumento) cuando registra un `transit_event` o un `anchorage_event`.
+Abre la interfaz en `http://localhost:5173`, así que la API y el frontend deben estar en marcha con
+el stack real, no con la demo.
+
+```bash
+./scripts/macos/record_events.sh        # 90 s por evento
+caffeinate -dimsu -w $$ &               # opcional: evita la suspensión mientras graba
+```
+
+- Los videos se guardan en `~/Movies/panama-canal-tracker/` como `transito-` o `fondeo-` seguido de
+  la fecha, el tipo de evento y el MMSI. Se conservan los últimos 40 y el registro queda en
+  `recorder.log`.
+- Los tránsitos completos son raros (2 en 14,9 días en la validación); las esperas en fondeo son más
+  frecuentes.
+- `screencapture` graba toda la pantalla y necesita el permiso de grabación de pantalla del
+  terminal. Un video puede mostrar el nombre y el MMSI de embarcaciones de recreo o pesca y
+  cualquier cosa abierta en el escritorio: revisarlo y enmascararlo según el ADR-0020 antes de
+  publicarlo.
+- Se puede cambiar la ruta del log, la carpeta de salida y la URL con `PCT_WORKER_LOG`,
+  `PCT_VIDEO_DIR` y `PCT_APP_URL`.
+
 ## Copias de seguridad
 
 Una copia lógica cifrada cada noche a las 03:00, con retención de 14 días:
