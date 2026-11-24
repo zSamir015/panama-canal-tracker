@@ -52,3 +52,6 @@ backups/
 # Instrucciones y notas personales (privadas)
 CLAUDE.local.md
 *Aprendizaje*.md
+
+# uv lock file: dependencies are pinned in requirements*.lock
+uv.lock
