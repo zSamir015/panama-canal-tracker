@@ -104,6 +104,25 @@ Both clips come from the same live data. No vessel completes a crossing in them:
 recorded so far, all ended as `aborted` because the free AIS coverage does not follow vessels along
 the whole route.
 
+### Feature clips
+
+Short recordings of the same interface on live AISStream data (2026-11-24); click an image to play
+it. Each one is under a minute, has no sound and was recorded with the masking of
+[ADR-0020](docs/adr/0020-capturas-con-datos-reales.md) active: the name and MMSI of sailing,
+pleasure and fishing vessels are blurred, and only commercial vessels are opened or shown with a
+route. Coverage is partial, so the views are sparse.
+
+|  |  |
+| :---: | :---: |
+| [![Card of a tanker with its trail window](docs/media/real-ais-card-and-trail-poster.png)](docs/media/real-ais-card-and-trail.mp4)<br>**Card and trail (48 s)**<br>Speed, heading, status and last signal of a tanker, with the trail window switched between 30 min, 6 h, 24 h and 7 days. Gaps in the route are the gaps in AIS reception. | [![Vessel list with type filters and global search](docs/media/real-ais-filters-and-search-poster.png)](docs/media/real-ais-filters-and-search.mp4)<br>**Filters and search (51 s)**<br>Vessel list filtered by type (cargo only, tankers only; non-commercial vessels are blurred), search by name, MMSI or IMO, the card state kept in the URL, and the light and dark themes. |
+| [![In-transit tab, statistics and vessel history](docs/media/real-ais-transits-and-history-poster.png)](docs/media/real-ais-transits-and-history.mp4)<br>**Transits and history (45 s)**<br>The "in transit" tab, statistics for 7, 30 and 90 days (no completed transits yet with real data) and the history of vessels seen in 24 h, 48 h, 7 or 30 days. | [![Keyboard navigation of the interface](docs/media/real-ais-keyboard-poster.png)](docs/media/real-ais-keyboard.mp4)<br>**Keyboard (33 s)**<br>Arrow keys to switch views with a visible focus, the `/` shortcut to search without the mouse, and focus managed in panels (Escape closes and gives it back). |
+| [![Tour through six commercial vessels](docs/media/real-ais-vessel-tour-poster.png)](docs/media/real-ais-vessel-tour.mp4)<br>**Vessel tour (60 s)**<br>The map flies from one commercial vessel to the next (tankers and cargo ships), opening each card with position, heading, status and trail. | [![Mobile layout](docs/media/real-ais-mobile-poster.png)](docs/media/real-ais-mobile.mp4)<br>**Mobile (45 s)**<br>Full-screen map, satellite view, the "in transit now" bottom sheet, the vessel card as a sheet you drag, statistics and history. |
+
+The statistics view has no completed transits with real data yet, so this clip uses the simulated
+dataset and says so on screen:
+
+[![Statistics and history with example data](docs/media/demo-stats-simulated-poster.png)](docs/media/demo-stats-simulated.mp4)
+
 ## Features
 
 - Ingestion of Class A and Class B AIS messages from AISStream, written in batches every 0.5 s and

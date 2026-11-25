@@ -106,6 +106,25 @@ Los dos clips salen de los mismos datos en vivo. En ninguno un buque completa el
 tránsitos registrados hasta ahora, todos terminaron como `aborted`, porque la cobertura gratuita de
 AIS no sigue a los buques por todo el recorrido.
 
+### Clips de funciones
+
+Grabaciones cortas de la misma interfaz con datos de AISStream en vivo (2026-11-24); pulsa una
+imagen para verla. Cada una dura menos de un minuto, no lleva sonido y se grabó con el enmascarado
+del [ADR-0020](docs/adr/0020-capturas-con-datos-reales.md) activo: el nombre y el MMSI de veleros,
+embarcaciones de recreo y pesqueros salen difuminados, y solo se abren o se dibujan con ruta buques
+comerciales. La cobertura es parcial, así que las vistas son escasas.
+
+|  |  |
+| :---: | :---: |
+| [![Ficha de un petrolero con la ventana de la estela](docs/media/real-ais-card-and-trail-poster.png)](docs/media/real-ais-card-and-trail.mp4)<br>**Ficha y estela (48 s)**<br>Velocidad, rumbo, estado y última señal de un petrolero, con la ventana de la estela cambiando entre 30 min, 6 h, 24 h y 7 días. Los huecos de la ruta son los huecos de recepción AIS. | [![Lista de buques con filtros por tipo y búsqueda global](docs/media/real-ais-filters-and-search-poster.png)](docs/media/real-ais-filters-and-search.mp4)<br>**Filtros y búsqueda (51 s)**<br>Lista de buques filtrada por tipo (solo carga, solo tanqueros; los no comerciales salen difuminados), búsqueda por nombre, MMSI o IMO, el estado de la ficha guardado en la URL y los temas claro y oscuro. |
+| [![Pestaña En tránsito, estadísticas e historial de buques](docs/media/real-ais-transits-and-history-poster.png)](docs/media/real-ais-transits-and-history.mp4)<br>**Tránsitos e historial (45 s)**<br>La pestaña «En tránsito», las estadísticas de 7, 30 y 90 días (aún sin tránsitos completos con datos reales) y el historial de buques vistos en 24 h, 48 h, 7 o 30 días. | [![Navegación por teclado de la interfaz](docs/media/real-ais-keyboard-poster.png)](docs/media/real-ais-keyboard.mp4)<br>**Teclado (33 s)**<br>Flechas para cambiar de vista con el foco visible, el atajo `/` para buscar sin ratón y foco gestionado en los paneles (Escape cierra y lo devuelve). |
+| [![Recorrido por seis buques comerciales](docs/media/real-ais-vessel-tour-poster.png)](docs/media/real-ais-vessel-tour.mp4)<br>**Recorrido por buques (60 s)**<br>El mapa vuela de un buque comercial al siguiente (tanqueros y cargueros) y abre cada ficha con posición, rumbo, estado y estela. | [![Diseño móvil](docs/media/real-ais-mobile-poster.png)](docs/media/real-ais-mobile.mp4)<br>**Móvil (45 s)**<br>Mapa a pantalla completa, vista satélite, la hoja inferior «En tránsito ahora», la ficha del buque como hoja que se arrastra, estadísticas e historial. |
+
+La vista de estadísticas aún no tiene tránsitos completos con datos reales, así que este clip usa
+el conjunto simulado y lo indica en pantalla:
+
+[![Estadísticas e historial con datos de ejemplo](docs/media/demo-stats-simulated-poster.png)](docs/media/demo-stats-simulated.mp4)
+
 ## Funcionalidades
 
 - Ingesta de mensajes AIS de Clase A y Clase B desde AISStream, escritos por lotes cada 0,5 s y
